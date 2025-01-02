@@ -1,11 +1,12 @@
 import {
   getImageApi,
+  getPluginsApi,
   getUserApi,
   getUserLibraryApi,
 } from "@jellyfin/sdk/lib/utils/api";
 import { getAuthenticatedJellyfinApi } from "./jellyfin-api";
 import { subYears } from "date-fns";
-import { BaseItemDto, ImageType } from "@jellyfin/sdk/lib/generated-client";
+import { BaseItemDto, ImageType, PluginStatus } from "@jellyfin/sdk/lib/generated-client";
 
 export type SimpleItemDto = {
   id?: string;
@@ -53,6 +54,15 @@ const playbackReportingSqlRequest = async (
   );
   return res.data;
 };
+
+export const checkIfPlaybackReportingInstalled = async (): Promise<boolean> => {
+  const authenticatedApi = await getAuthenticatedJellyfinApi();
+  const pluginsApi = getPluginsApi(authenticatedApi);
+  const pluginsResponse = await pluginsApi.getPlugins()
+  const plugins = pluginsResponse.data;
+  const playbackReportingPlugin = plugins.find(plugin => plugin.Name === 'Playback Reporting');
+  return playbackReportingPlugin?.Status === PluginStatus.Active;
+}
 
 export const getImageUrlById = async (id: string) => {
   const cacheKey = `imageUrlCache_${id}`;

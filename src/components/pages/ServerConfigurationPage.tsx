@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Textarea } from "../ui/textarea";
 import { authenticate } from "@/lib/jellyfin-api";
 import { useNavigate } from "react-router-dom";
+import { checkIfPlaybackReportingInstalled } from "@/lib/playback-reporting-queries";
 
 const ServerConfigurationPage = () => {
   const navigate = useNavigate();
@@ -42,6 +43,14 @@ const ServerConfigurationPage = () => {
     e.preventDefault();
     setIsLoading(true);
     await authenticate(serverUrl, username, password);
+    const playbackReportingPluginInstalled = await checkIfPlaybackReportingInstalled();
+    if (!playbackReportingPluginInstalled) {
+      alert(
+        "Playback Reporting Plugin is not installed. Please install it to enable playback reporting.",
+      );
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(false);
     navigate("/movies");
   };
