@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import { ImageType } from "@jellyfin/sdk/lib/generated-client";
-import { getAuthenticatedJellyfinApi } from "@/lib/jellyfin-api";
-import { getImageApi } from "@jellyfin/sdk/lib/utils/api";
 import { Avatar } from "@radix-ui/themes";
 import { formatDuration } from "@/lib/utils";
-import { SimpleItemDto } from "@/lib/playback-reporting-queries";
+import { getImageUrlById, SimpleItemDto } from "@/lib/playback-reporting-queries";
 
 interface MovieCardProps {
   item: SimpleItemDto;
@@ -21,9 +18,7 @@ export function MovieCard({
   useEffect(() => {
     const fetchImageUrl = async () => {
       try {
-        const api = getImageApi(await getAuthenticatedJellyfinApi());
-        // @ts-expect-error ImageType.Poster not behaving right
-        const url = await api.getItemImageUrlById(item.id, ImageType.Poster);
+        const url = await getImageUrlById(item.id!);
         setImageUrl(url!);
       } catch (error) {
         console.error("Failed to fetch image URL:", error);
