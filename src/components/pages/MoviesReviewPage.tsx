@@ -7,18 +7,21 @@ import { itemVariants, Title } from "../ui/styled";
 import { useNavigate } from "react-router-dom";
 import { generateGuid } from "@/lib/utils";
 import { useErrorBoundary } from "react-error-boundary";
+import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
 
 export default function MoviesReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [movies, setMovies] = useState<SimpleItemDto[]>([]);
+  const [hiddenIds, setHiddenIds] = useState<string[]>(getCachedHiddenIds());
 
   useEffect(() => {
     const setup = async () => {
       setIsLoading(true);
       try {
-        setMovies(await listMovies());
+        const movies = await listMovies();
+        setMovies(movies.filter((movie) => !hiddenIds.includes(movie.id!)));
       } catch (error) {
         showBoundary(error);
       } finally {
@@ -26,7 +29,7 @@ export default function MoviesReviewPage() {
       }
     };
     setup();
-  }, []);
+  }, [hiddenIds]);
 
   if (isLoading) {
     return (
@@ -58,7 +61,14 @@ export default function MoviesReviewPage() {
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
             {movies.map((movie) => (
-              <MovieCard key={generateGuid()} item={movie} />
+              <MovieCard
+                key={generateGuid()}
+                item={movie}
+                onHide={() => {
+                  setCachedHiddenId(movie.id!);
+                  setHiddenIds([...hiddenIds, movie.id!]);
+                }}
+              />
             ))}
           </Grid>
         </Grid>

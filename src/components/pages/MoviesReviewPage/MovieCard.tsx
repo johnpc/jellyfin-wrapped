@@ -5,17 +5,20 @@ import {
   getImageUrlById,
   SimpleItemDto,
 } from "@/lib/playback-reporting-queries";
+import { Trash2 } from "lucide-react";
 
 interface MovieCardProps {
   item: SimpleItemDto;
   playbackTime?: number;
   episodeCount?: number;
+  onHide?: () => void;
 }
 
 export function MovieCard({
   item,
   playbackTime,
   episodeCount,
+  onHide,
 }: MovieCardProps) {
   const [imageUrl, setImageUrl] = useState<string>();
   useEffect(() => {
@@ -48,7 +51,19 @@ export function MovieCard({
         />
       </div>
       <div className="p-4">
-        <h3 className="font-semibold text-lg">{item.name}</h3>
+        <h3 className="font-semibold text-lg">
+          {item.name}{" "}
+          {onHide && (
+            <Trash2
+              size={16}
+              onClick={(e) => {
+                e.stopPropagation();
+                onHide();
+              }}
+              className="w-5 h-5 text-white"
+            />
+          )}
+        </h3>
         <p className="text-sm text-muted-foreground">
           {item.productionYear && `Released: ${item.productionYear}`}
         </p>
