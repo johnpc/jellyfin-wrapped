@@ -64,6 +64,30 @@ npm run build
 npm run preview
 ```
 
+## Building with Docker
+
+To build with docker, run the following commands
+
+```bash
+docker build -t jellyfin-wrapped .
+docker run -p 80:80 jellyfin-wrapped
+```
+
+Or, via docker compose:
+
+```bash
+# Start the service
+docker compose up -d
+
+# Stop the service
+docker compose down
+
+# Pull latest version
+docker compose pull
+```
+
+Now the Jellyfin Wrapped ui is available at `http://localhost` on port 80.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -71,3 +95,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Privacy
 
 This application connects directly to your Jellyfin server and does not store any credentials or personal data on external servers. All data is processed locally in your browser.
+

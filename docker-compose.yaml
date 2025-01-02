@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  web:
+    image: mrorbitman/jellyfin-wrapped:latest
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    container_name: jellyfin-wrapped
