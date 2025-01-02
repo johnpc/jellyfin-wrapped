@@ -8,7 +8,6 @@ import {
   authenticateByAuthToken,
 } from "@/lib/jellyfin-api";
 import { useNavigate } from "react-router-dom";
-import { checkIfPlaybackReportingInstalled } from "@/lib/playback-reporting-queries";
 import {
   getCacheValue,
   JELLYFIN_AUTH_TOKEN_CACHE_KEY,
@@ -80,15 +79,6 @@ const ServerConfigurationPage = () => {
         await authenticateByUserName(serverUrl, username, password);
       }
 
-      const playbackReportingPluginInstalled =
-        await checkIfPlaybackReportingInstalled();
-      if (!playbackReportingPluginInstalled) {
-        alert(
-          "Playback Reporting Plugin is not installed. Please install it to enable playback reporting.",
-        );
-        setIsLoading(false);
-        return;
-      }
       navigate("/movies");
     } catch (e) {
       showBoundary(e);
