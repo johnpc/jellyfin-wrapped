@@ -18,24 +18,33 @@ import {
   setCacheValue,
 } from "@/lib/cache";
 import { useErrorBoundary } from "react-error-boundary";
-
+type WindowOverride = typeof Window & {
+  ENV:
+    | {
+        FORCE_JELLYFIN_SERVER_URL: string;
+      }
+    | undefined;
+};
 const ServerConfigurationPage = () => {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
+  const serverUrlOverride = (window as unknown as WindowOverride).ENV
+    ?.FORCE_JELLYFIN_SERVER_URL;
 
-  const [serverUrl, setServerUrl] = useState(
-    () => getCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY) || "",
+  const [serverUrl, setServerUrl] = useState<string>(
+    () =>
+      serverUrlOverride || getCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY) || "",
   );
-  const [authToken, setAuthToken] = useState(
+  const [authToken, setAuthToken] = useState<string>(
     () => getCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY) || "",
   );
-  const [username, setUsername] = useState(
+  const [username, setUsername] = useState<string>(
     () => getCacheValue(JELLYFIN_USERNAME_CACHE_KEY) || "",
   );
-  const [password, setPassword] = useState(
+  const [password, setPassword] = useState<string>(
     () => getCacheValue(JELLYFIN_PASSWORD_CACHE_KEY) || "",
   );
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleServerUrlChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -124,29 +133,31 @@ const ServerConfigurationPage = () => {
               </Box>
 
               <Flex direction="column" gap="4">
-                <Textarea
-                  placeholder="Server URL (e.g., http://localhost:8096)"
-                  value={serverUrl}
-                  onChange={handleServerUrlChange}
-                  required
-                />
+                {serverUrlOverride ? null : (
+                  <Textarea
+                    placeholder="Server URL (e.g., http://localhost:8096)"
+                    value={serverUrl}
+                    onChange={handleServerUrlChange}
+                    required
+                  />
+                )}
 
-                <Textarea
+                {serverUrlOverride ? null : <Textarea
                   placeholder="Auth Token - Optional. If supplied, username/password fields are ignored"
                   value={authToken}
                   onChange={handleAuthTokenChange}
                   required={!username && !password}
-                />
+                />}
 
                 <Textarea
-                  placeholder="Username - not required if Auth Token is specified"
+                  placeholder={`Username${serverUrlOverride ? '' : ' - not required if Auth Token is specified'}`}
                   value={username}
                   onChange={handleUsernameChange}
                   required={!authToken}
                 />
 
                 <Textarea
-                  placeholder="Password - not required if Auth Token is specified"
+                  placeholder={`Password${serverUrlOverride ? '' : ' - not required if Auth Token is specified'}`}
                   value={password}
                   onChange={handlePasswordChange}
                   required={!authToken}

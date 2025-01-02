@@ -14,3 +14,5 @@ services:
       - "80:80"
     restart: unless-stopped
     container_name: jellyfin-wrapped
+    environment:
+      - FORCE_JELLYFIN_SERVER_URL=http://<your_jellyfin_server>:8096
