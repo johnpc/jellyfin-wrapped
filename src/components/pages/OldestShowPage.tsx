@@ -25,12 +25,11 @@ export default function OldestShowPage() {
       try {
         const shows = await listShows();
         shows.sort((a, b) => {
-          const aDate = new Date(a.item.date!);
-          const bDate = new Date(b.item.date!);
+          const aDate = new Date(a.item.date ?? new Date());
+          const bDate = new Date(b.item.date ?? new Date());
           return aDate.getTime() - bDate.getTime();
         });
-        const s = shows.find((s) => s)!;
-        console.log({ s });
+        const s = shows.find((s) => s);
         setShow(s);
       } catch (e) {
         showBoundary(e);
@@ -38,7 +37,7 @@ export default function OldestShowPage() {
         setIsLoading(false);
       }
     };
-    setup();
+    void setup();
   }, []);
 
   if (isLoading) {
@@ -83,7 +82,7 @@ export default function OldestShowPage() {
           size={"4"}
           style={{ width: "100%" }}
           onClick={() => {
-            navigate("/actors");
+            void navigate("/actors");
           }}
         >
           Review Favorite Actors
@@ -108,17 +107,20 @@ export default function OldestShowPage() {
               as={motion.p}
               variants={itemVariants}
             >
-              {show!.showName} came out on{" "}
-              {new Date(show!.item.date!).toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              {show.showName} came out on{" "}
+              {new Date(show.item.date ?? new Date()).toLocaleDateString(
+                undefined,
+                {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                },
+              )}
             </Subtitle>
           </div>
           <MovieCard
             key={show?.item.id}
-            item={show!.item}
+            item={show.item}
             episodeCount={show?.episodeCount}
             playbackTime={show?.playbackTime}
           />
@@ -128,7 +130,7 @@ export default function OldestShowPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/actors");
+          void navigate("/actors");
         }}
       >
         Review Favorite Actors

@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 function BlinkingStars() {
   return (
     <AnimatePresence>
-      {[...Array(20)].map((_, i) => (
+      {[...Array<number>(20)].map((_, i) => (
         <motion.div
           key={i}
           initial={{ opacity: 0, scale: 0 }}

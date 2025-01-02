@@ -5,7 +5,7 @@ import {
   getUserLibraryApi,
 } from "@jellyfin/sdk/lib/utils/api";
 import { getAuthenticatedJellyfinApi } from "./jellyfin-api";
-import { subYears } from "date-fns";
+import { addDays, startOfDay, subYears } from "date-fns";
 import {
   BaseItemPerson,
   ImageType,
@@ -42,8 +42,9 @@ const getCurrentUserId = async (): Promise<string> => {
   const authenticatedApi = await getAuthenticatedJellyfinApi();
   const userApi = getUserApi(authenticatedApi);
   const user = await userApi.getCurrentUser();
-  setCacheValue(JELLYFIN_CURRENT_USER_CACHE_KEY, user.data.Id!);
-  return user.data.Id!;
+  const userId = user.data.Id ?? "";
+  setCacheValue(JELLYFIN_CURRENT_USER_CACHE_KEY, userId);
+  return userId;
 };
 
 const playbackReportingSqlRequest = async (
@@ -66,7 +67,10 @@ const playbackReportingSqlRequest = async (
       },
     },
   );
-  return res.data;
+  return res.data as {
+    colums: string[];
+    results: string[][];
+  };
 };
 
 export const checkIfPlaybackReportingInstalled = async (): Promise<boolean> => {
@@ -87,8 +91,9 @@ export const getImageUrlById = async (id: string) => {
     return cachedUrl;
   }
   const api = getImageApi(await getAuthenticatedJellyfinApi());
+  /* eslint-disable @typescript-eslint/no-unsafe-argument */
   // @ts-expect-error ImageType.Poster not behaving right
-  const url = await api.getItemImageUrlById(id, ImageType.Poster);
+  const url = api.getItemImageUrlById(id, ImageType.Poster);
   setCacheValue(cacheKey, url);
   return url;
 };
@@ -107,7 +112,7 @@ const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
 
         if (cachedItem) {
           // If item exists in cache, parse and use it
-          return JSON.parse(cachedItem);
+          return JSON.parse(cachedItem) as SimpleItemDto;
         } else {
           // If not in cache, fetch from API
           const item = await itemsApi.getItem({
@@ -136,7 +141,7 @@ const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
       }
     });
   const movieItems = await Promise.all(itemPromises);
-  return movieItems.filter((item) => item !== null) as SimpleItemDto[];
+  return movieItems.filter((item) => item !== null);
 };
 
 export const listFavoriteActors = async (): Promise<
@@ -158,7 +163,7 @@ export const listFavoriteActors = async (): Promise<
   const counts = people.reduce((acc, person) => {
     if (!person?.Name) return acc;
 
-    const name = person.Name;
+    const name: string = person.Name;
     acc.set(name, (acc.get(name) || 0) + 1);
     return acc;
   }, new Map());
@@ -180,9 +185,9 @@ export const listFavoriteActors = async (): Promise<
     );
 
     return {
-      name,
+      name: name as string,
       count: movieCount + showCount,
-      details: people.find((p) => p?.Name === name)!,
+      details: people.find((p) => p?.Name === name),
       seenInMovies: movies.filter((movie) =>
         movie.people?.some((person) => person?.Name === name),
       ),
@@ -201,7 +206,15 @@ export const listFavoriteActors = async (): Promise<
     return a.name.localeCompare(b.name);
   });
 
-  return peopleWithCounts.filter((p) => p.count > 1);
+  return peopleWithCounts
+    .filter((p) => p.details)
+    .filter((p) => p.count > 1) as {
+    name: string;
+    count: number;
+    details: BaseItemPerson;
+    seenInMovies: SimpleItemDto[];
+    seenInShows: SimpleItemDto[];
+  }[];
 };
 
 export const listMovies = async (): Promise<SimpleItemDto[]> => {
@@ -225,6 +238,72 @@ ORDER BY rowid DESC
         self.indexOf(value) === index,
     );
   return getItemDtosByIds(movieItemIds);
+};
+
+export const listWatchedOnDate = async (
+  date: Date,
+): Promise<SimpleItemDto[]> => {
+  const startOfDate = startOfDay(date);
+  const endOfDate = addDays(startOfDate, 1);
+
+  const userId = await getCurrentUserId();
+
+  const queryString = `
+SELECT ROWID, *
+FROM PlaybackActivity
+WHERE UserId = "${userId}"
+AND ItemType = "Movie"
+AND DateCreated > '${startOfDate.getFullYear()}-${startOfDate.getMonth() + 1}-${startOfDate.getDate()}'
+AND DateCreated < '${endOfDate.getFullYear()}-${endOfDate.getMonth() + 1}-${endOfDate.getDate()}'
+ORDER BY rowid DESC
+`;
+  const data = await playbackReportingSqlRequest(queryString);
+  console.log({ queryString });
+
+  const queryString2 = `
+  SELECT ROWID, *
+  FROM PlaybackActivity
+  WHERE UserId = "${userId}"
+  AND ItemType = "Episode"
+  AND DateCreated > '${startOfDate.getFullYear()}-${startOfDate.getMonth()}-${startOfDate.getDate()}'
+  AND DateCreated < '${endOfDate.getFullYear()}-${endOfDate.getMonth()}-${endOfDate.getDate()}'
+  ORDER BY rowid DESC
+  `;
+  const data2 = await playbackReportingSqlRequest(queryString2);
+  const itemIdIndex2 = data2.colums.findIndex((i: string) => i == "ItemId");
+  const showItemIds = data2.results
+    .map((result: string[]) => result[itemIdIndex2])
+    .filter(
+      (value: string, index: number, self: string[]) =>
+        self.indexOf(value) === index,
+    );
+  const episodes = await getItemDtosByIds(showItemIds);
+  const seasonIds: string[] = episodes
+    .map((episode) => episode.parentId ?? "")
+    .filter((v) => v)
+    .filter(
+      (value: string, index: number, self: string[]) =>
+        self.indexOf(value) === index,
+    );
+  const seasons = await getItemDtosByIds(seasonIds);
+
+  const showIds: string[] = seasons
+    .map((season) => season.parentId ?? "")
+    .filter(
+      (value: string, index: number, self: string[]) =>
+        self.indexOf(value) === index,
+    );
+  const shows = await getItemDtosByIds(showIds);
+  const itemIdIndex = data.colums.findIndex((i: string) => i == "ItemId");
+  const movieItemIds = data.results
+    .map((result: string[]) => result[itemIdIndex])
+    .filter(
+      (value: string, index: number, self: string[]) =>
+        self.indexOf(value) === index,
+    );
+  const movies = await getItemDtosByIds(movieItemIds);
+
+  return [...movies, ...shows];
 };
 
 export const listMusicVideos = async (): Promise<SimpleItemDto[]> => {
@@ -360,16 +439,16 @@ export const listShows = async (): Promise<
         self.indexOf(value) === index,
     );
   const episodes = await getItemDtosByIds(showItemIds);
-  const seasonIds = episodes
-    .map((episode) => episode.parentId!)
+  const seasonIds: string[] = episodes
+    .map((episode) => episode.parentId ?? "")
     .filter(
       (value: string, index: number, self: string[]) =>
         self.indexOf(value) === index,
     );
   const seasons = await getItemDtosByIds(seasonIds);
 
-  const showIds = seasons
-    .map((season) => season.parentId!)
+  const showIds: string[] = seasons
+    .map((season) => season.parentId ?? "")
     .filter(
       (value: string, index: number, self: string[]) =>
         self.indexOf(value) === index,
@@ -387,13 +466,13 @@ export const listShows = async (): Promise<
     });
     const showPlaybackDuration = data.results
       .filter((result: string[]) => {
-        const showEpisodeIds = showEpisodes.map((episode) => episode.id!);
+        const showEpisodeIds = showEpisodes.map((episode) => episode.id);
         return showEpisodeIds.includes(result[itemIdIndex]);
       })
       .map((result: string[]) => parseInt(result[playDurationIndex]))
       .reduce((acc, curr) => acc + curr, 0);
     return {
-      showName: show.name!,
+      showName: show.name ?? "",
       episodeCount: showEpisodes.length,
       playbackTime: showPlaybackDuration,
       item: show,

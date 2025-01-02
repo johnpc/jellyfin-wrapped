@@ -24,14 +24,14 @@ export function MovieCard({
   useEffect(() => {
     const fetchImageUrl = async () => {
       try {
-        const url = await getImageUrlById(item.id!);
-        setImageUrl(url!);
+        const url = await getImageUrlById(item.id);
+        setImageUrl(url);
       } catch (error) {
         console.error("Failed to fetch image URL:", error);
       }
     };
 
-    fetchImageUrl();
+    void fetchImageUrl();
   }, [item]);
 
   return (

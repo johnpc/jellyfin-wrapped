@@ -28,7 +28,7 @@ export default function MusicVideoPage() {
         setIsLoading(false);
       }
     };
-    setup();
+    void setup();
   }, []);
 
   if (isLoading) {
@@ -88,7 +88,7 @@ export default function MusicVideoPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/");
+          void navigate("/");
         }}
       >
         Home

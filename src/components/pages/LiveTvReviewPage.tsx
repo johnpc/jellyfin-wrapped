@@ -55,7 +55,7 @@ export default function LiveTvReviewPage() {
         setIsLoading(false);
       }
     };
-    setup();
+    void setup();
   }, []);
 
   if (isLoading) {
@@ -108,7 +108,7 @@ export default function LiveTvReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/audio");
+          void navigate("/audio");
         }}
       >
         Review Audio

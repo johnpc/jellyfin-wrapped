@@ -21,11 +21,11 @@ export default function OldestMoviePage() {
       try {
         const movies = await listMovies();
         movies.sort((a, b) => {
-          const aDate = new Date(a.date!);
-          const bDate = new Date(b.date!);
+          const aDate = new Date(a.date);
+          const bDate = new Date(b.date);
           return aDate.getTime() - bDate.getTime();
         });
-        const m = movies.find((s) => s)!;
+        const m = movies.find((s) => s);
         setMovie(m);
       } catch (e) {
         showBoundary(e);
@@ -33,7 +33,7 @@ export default function OldestMoviePage() {
         setIsLoading(false);
       }
     };
-    setup();
+    void setup();
   }, []);
 
   if (isLoading) {
@@ -79,7 +79,7 @@ export default function OldestMoviePage() {
           size={"4"}
           style={{ width: "100%" }}
           onClick={() => {
-            navigate("/shows");
+            void navigate("/shows");
           }}
         >
           Review Shows
@@ -114,14 +114,14 @@ export default function OldestMoviePage() {
               })}
             </Subtitle>
           </div>
-          <MovieCard key={movie!.id} item={movie!} />
+          <MovieCard key={movie.id} item={movie} />
         </Grid>
       </Container>
       <Button
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/shows");
+          void navigate("/shows");
         }}
       >
         Review Shows

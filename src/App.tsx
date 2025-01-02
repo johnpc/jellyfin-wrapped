@@ -13,6 +13,7 @@ import OldestShowPage from "./components/pages/OldestShowPage";
 import OldestMoviePage from "./components/pages/OldestMoviePage";
 import MusicVideoPage from "./components/pages/MusicVideoPage";
 import GenreReviewPage from "./components/pages/GenreReviewPage";
+import HolidayReviewPage from "./components/pages/HolidayReviewPage";
 
 // Layout component that wraps all routes
 function RootLayout() {
@@ -72,6 +73,10 @@ const router = createBrowserRouter([
       {
         path: "/genres",
         element: <GenreReviewPage />,
+      },
+      {
+        path: "/holidays",
+        element: <HolidayReviewPage />,
       },
     ],
   },
