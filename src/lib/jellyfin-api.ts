@@ -1,5 +1,5 @@
 import { Api, Jellyfin } from "@jellyfin/sdk";
-import { generateFingerprint } from "./utils";
+import { generateGuid } from "./utils";
 import {
   getCacheValue,
   JELLYFIN_AUTH_TOKEN_CACHE_KEY,
@@ -46,7 +46,7 @@ export const authenticateByAuthToken = async (
     },
     deviceInfo: {
       name: "Jellyfin-Wrapped",
-      id: await generateFingerprint(),
+      id: await generateGuid(),
     },
   });
   api = jellyfin.createApi(serverUrl, jellyfinApiKey);
@@ -69,7 +69,7 @@ export const authenticateByUserName = async (
       },
       deviceInfo: {
         name: "Jellyfin-Wrapped",
-        id: await generateFingerprint(),
+        id: await generateGuid(),
       },
     });
     console.log("Connecting to server...", { serverUrl, username });
