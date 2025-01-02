@@ -5,3 +5,4 @@
 .husky/
 Dockerfile
 *.conf
+LICENSE
