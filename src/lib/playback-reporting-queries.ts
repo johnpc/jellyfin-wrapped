@@ -125,16 +125,21 @@ const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
   return movieItems.filter((item) => item !== null) as SimpleItemDto[];
 };
 
-export const listFavoriteActors = async (): Promise<{
-  name: string,
-  count: number,
-  details: BaseItemPerson,
-  seenInMovies: SimpleItemDto[],
-  seenInShows: SimpleItemDto[],
-}[]> => {
-  const movies = await listMovies()
+export const listFavoriteActors = async (): Promise<
+  {
+    name: string;
+    count: number;
+    details: BaseItemPerson;
+    seenInMovies: SimpleItemDto[];
+    seenInShows: SimpleItemDto[];
+  }[]
+> => {
+  const movies = await listMovies();
   const shows = await listShows();
-  const people = [...shows.flatMap(show => show.item.people), movies.flatMap(movie => movie.people)].flat()
+  const people = [
+    ...shows.flatMap((show) => show.item.people),
+    movies.flatMap((movie) => movie.people),
+  ].flat();
 
   const counts = people.reduce((acc, person) => {
     if (!person?.Name) return acc;
@@ -144,26 +149,36 @@ export const listFavoriteActors = async (): Promise<{
     return acc;
   }, new Map());
 
-  const peopleWithCounts = Array.from(counts.entries()).map(
-    ([name]) => {
-      // Count appearances in movies
-      const movieCount = movies.reduce((acc, movie) =>
-        acc + (movie.people?.some(person => person?.Name === name) ? 1 : 0), 0);
+  const peopleWithCounts = Array.from(counts.entries()).map(([name]) => {
+    // Count appearances in movies
+    const movieCount = movies.reduce(
+      (acc, movie) =>
+        acc + (movie.people?.some((person) => person?.Name === name) ? 1 : 0),
+      0,
+    );
 
-      // Count appearances in shows
-      const showCount = shows.reduce((acc, show) =>
-        acc + (show.item.people?.some(person => person?.Name === name) ? 1 : 0), 0);
+    // Count appearances in shows
+    const showCount = shows.reduce(
+      (acc, show) =>
+        acc +
+        (show.item.people?.some((person) => person?.Name === name) ? 1 : 0),
+      0,
+    );
 
-      return {
-        name,
-        count: movieCount + showCount,
-        details: people.find((p) => p?.Name === name)!,
-        seenInMovies: movies.filter(movie => movie.people?.some(person => person?.Name === name)),
-        seenInShows: shows.filter(show => show.item.people?.some(person => person?.Name === name))
-          .map(s => s.item),
-      };
-    }
-  );
+    return {
+      name,
+      count: movieCount + showCount,
+      details: people.find((p) => p?.Name === name)!,
+      seenInMovies: movies.filter((movie) =>
+        movie.people?.some((person) => person?.Name === name),
+      ),
+      seenInShows: shows
+        .filter((show) =>
+          show.item.people?.some((person) => person?.Name === name),
+        )
+        .map((s) => s.item),
+    };
+  });
 
   peopleWithCounts.sort((a, b) => {
     if (b.count !== a.count) {
@@ -172,7 +187,7 @@ export const listFavoriteActors = async (): Promise<{
     return a.name.localeCompare(b.name);
   });
 
-  return peopleWithCounts.filter(p => p.count > 1)
+  return peopleWithCounts.filter((p) => p.count > 1);
 };
 
 export const listMovies = async (): Promise<SimpleItemDto[]> => {

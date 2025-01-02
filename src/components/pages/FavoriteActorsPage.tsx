@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import { listFavoriteActors, SimpleItemDto } from "@/lib/playback-reporting-queries";
+import {
+  listFavoriteActors,
+  SimpleItemDto,
+} from "@/lib/playback-reporting-queries";
 import { Container, Grid, Box, Spinner, Button } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { itemVariants, Title } from "../ui/styled";
@@ -11,13 +14,15 @@ import { ActorCard } from "./MoviesReviewPage/ActorCard";
 export default function FavoriteActorsPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [favoriteActors, setFavoriteActors] = useState<{
-    name: string,
-    count: number,
-    details: BaseItemPerson,
-    seenInMovies: SimpleItemDto[],
-    seenInShows: SimpleItemDto[],
-  }[]>([]);
+  const [favoriteActors, setFavoriteActors] = useState<
+    {
+      name: string;
+      count: number;
+      details: BaseItemPerson;
+      seenInMovies: SimpleItemDto[];
+      seenInShows: SimpleItemDto[];
+    }[]
+  >([]);
 
   useEffect(() => {
     const setup = async () => {
@@ -52,13 +57,21 @@ export default function FavoriteActorsPage() {
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
-              You Watched {favoriteActors.length} Actors That Appeared In Multiple Productions
+              You Watched {favoriteActors.length} Actors That Appeared In
+              Multiple Productions
             </Title>
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
             {favoriteActors.map((actor) => (
-              <ActorCard key={generateGuid()} name={actor.name} count={actor.count} details={actor.details} seenInMovies={actor.seenInMovies} seenInShows={actor.seenInShows} />
+              <ActorCard
+                key={generateGuid()}
+                name={actor.name}
+                count={actor.count}
+                details={actor.details}
+                seenInMovies={actor.seenInMovies}
+                seenInShows={actor.seenInShows}
+              />
             ))}
           </Grid>
         </Grid>

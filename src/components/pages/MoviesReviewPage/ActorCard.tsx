@@ -7,11 +7,11 @@ import {
 import { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client";
 
 interface ActorCardProps {
-    name: string,
-    count: number,
-    details: BaseItemPerson,
-    seenInMovies: SimpleItemDto[],
-    seenInShows: SimpleItemDto[],
+  name: string;
+  count: number;
+  details: BaseItemPerson;
+  seenInMovies: SimpleItemDto[];
+  seenInShows: SimpleItemDto[];
 }
 
 export function ActorCard({
@@ -59,7 +59,9 @@ export function ActorCard({
               You watched {name} {count} times
             </p>
             <ul>
-              {[...seenInMovies, ...seenInShows].map(itemDto => <li>{itemDto.name}</li>)}
+              {[...seenInMovies, ...seenInShows].map((itemDto) => (
+                <li>{itemDto.name}</li>
+              ))}
             </ul>
           </>
         )}

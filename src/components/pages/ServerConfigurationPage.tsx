@@ -3,7 +3,10 @@ import { Button, Card, Heading, Text, Flex, Box } from "@radix-ui/themes";
 import { styled } from "@stitches/react";
 import { motion } from "framer-motion";
 import { Textarea } from "../ui/textarea";
-import { authenticate } from "@/lib/jellyfin-api";
+import {
+  authenticateByUserName,
+  authenticateByAuthToken,
+} from "@/lib/jellyfin-api";
 import { useNavigate } from "react-router-dom";
 import { checkIfPlaybackReportingInstalled } from "@/lib/playback-reporting-queries";
 
@@ -12,6 +15,9 @@ const ServerConfigurationPage = () => {
 
   const [serverUrl, setServerUrl] = useState(
     () => localStorage.getItem("jellyfinServerUrl") || "",
+  );
+  const [authToken, setAuthToken] = useState(
+    () => localStorage.getItem("jellyfinAuthToken") || "",
   );
   const [username, setUsername] = useState(
     () => localStorage.getItem("jellyfinUsername") || "",
@@ -33,6 +39,12 @@ const ServerConfigurationPage = () => {
     localStorage.setItem("jellyfinUsername", value);
   };
 
+  const handleAuthTokenChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setAuthToken(value);
+    localStorage.setItem("jellyfinAuthToken", value);
+  };
+
   const handlePasswordChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setPassword(value);
@@ -42,7 +54,12 @@ const ServerConfigurationPage = () => {
   const handleConnect = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await authenticate(serverUrl, username, password);
+    if (authToken) {
+      await authenticateByAuthToken(serverUrl, authToken);
+    } else {
+      await authenticateByUserName(serverUrl, username, password);
+    }
+
     const playbackReportingPluginInstalled =
       await checkIfPlaybackReportingInstalled();
     if (!playbackReportingPluginInstalled) {
@@ -100,17 +117,24 @@ const ServerConfigurationPage = () => {
                 />
 
                 <Textarea
-                  placeholder="Username"
-                  value={username}
-                  onChange={handleUsernameChange}
-                  required
+                  placeholder="Auth Token - Optional. If supplied, username/password fields are ignored"
+                  value={authToken}
+                  onChange={handleAuthTokenChange}
+                  required={!username && !password}
                 />
 
                 <Textarea
-                  placeholder="Password"
+                  placeholder="Username - not required if Auth Token is specified"
+                  value={username}
+                  onChange={handleUsernameChange}
+                  required={!authToken}
+                />
+
+                <Textarea
+                  placeholder="Password - not required if Auth Token is specified"
                   value={password}
                   onChange={handlePasswordChange}
-                  required
+                  required={!authToken}
                 />
               </Flex>
 
@@ -119,6 +143,24 @@ const ServerConfigurationPage = () => {
               </StyledButton>
             </Flex>
           </form>
+
+          <Disclaimer as={motion.div} variants={itemVariants}>
+            Auth token can be found by following these steps:
+            <ol>
+              <li>Log into your Jellyfin web interface</li>
+              <li>
+                Open your browser's Developer Tools (usually F12 or right-click
+                then Inspect)
+              </li>
+              <li>Go to the "Network" tab in Developer Tools</li>
+              <li>Look for requests to your Jellyfin server</li>
+              <li>
+                In the request headers, find "X-MediaBrowser-Token" or
+                "Authorization"
+              </li>
+            </ol>
+          </Disclaimer>
+
           <Disclaimer as={motion.div} variants={itemVariants}>
             Jellyfin Wrapped is an entirely client-side application. Your data
             stays private and is never sent to any external service.
