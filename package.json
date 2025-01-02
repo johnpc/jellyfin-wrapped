@@ -1,5 +1,6 @@
 {
   "name": "jellyfin-wrapped",
+  "license": "MIT",
   "private": true,
   "version": "0.0.0",
   "type": "module",
