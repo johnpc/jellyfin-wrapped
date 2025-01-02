@@ -25,4 +25,3 @@ export const generateGuid = () => {
     return v.toString(16);
   });
 };
-

@@ -113,6 +113,11 @@ const ServerConfigurationPage = () => {
       },
     },
   };
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  const port = window.location.port;
+  const currentUrl = `${protocol}//${hostname}${port ? ":" + port : ""}`;
+
   return (
     <Container>
       <StyledCard asChild>
@@ -134,30 +139,51 @@ const ServerConfigurationPage = () => {
 
               <Flex direction="column" gap="4">
                 {serverUrlOverride ? null : (
+                  <>
+                    <Textarea
+                      placeholder="Server URL (e.g., http://localhost:8096)"
+                      value={serverUrl}
+                      onChange={handleServerUrlChange}
+                      required
+                    />
+                    {protocol !== "https" ? null : (
+                      <Disclaimer as={motion.div} variants={itemVariants}>
+                        You are accessing Jellyfin Wrapped via https. You must
+                        either use an https server url or follow these steps:
+                        <ol>
+                          <li>
+                            Click the lock icon next to the URL in the address
+                            bar
+                          </li>
+                          <li>Click "Site Settings"</li>
+                          <li>
+                            Find "Insecure content" and change it to "Allow" for{" "}
+                            {currentUrl}
+                          </li>
+                        </ol>
+                      </Disclaimer>
+                    )}
+                  </>
+                )}
+
+                {serverUrlOverride ? null : (
                   <Textarea
-                    placeholder="Server URL (e.g., http://localhost:8096)"
-                    value={serverUrl}
-                    onChange={handleServerUrlChange}
-                    required
+                    placeholder="Auth Token - Optional. If supplied, username/password fields are ignored"
+                    value={authToken}
+                    onChange={handleAuthTokenChange}
+                    required={!username && !password}
                   />
                 )}
 
-                {serverUrlOverride ? null : <Textarea
-                  placeholder="Auth Token - Optional. If supplied, username/password fields are ignored"
-                  value={authToken}
-                  onChange={handleAuthTokenChange}
-                  required={!username && !password}
-                />}
-
                 <Textarea
-                  placeholder={`Username${serverUrlOverride ? '' : ' - not required if Auth Token is specified'}`}
+                  placeholder={`Username${serverUrlOverride ? "" : " - not required if Auth Token is specified"}`}
                   value={username}
                   onChange={handleUsernameChange}
                   required={!authToken}
                 />
 
                 <Textarea
-                  placeholder={`Password${serverUrlOverride ? '' : ' - not required if Auth Token is specified'}`}
+                  placeholder={`Password${serverUrlOverride ? "" : " - not required if Auth Token is specified"}`}
                   value={password}
                   onChange={handlePasswordChange}
                   required={!authToken}
