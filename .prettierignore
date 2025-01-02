@@ -1,0 +1,5 @@
+.prettierignore
+.gitignore
+*.svg
+*.png
+.husky/
