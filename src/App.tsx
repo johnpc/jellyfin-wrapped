@@ -7,6 +7,7 @@ import MoviesReviewPage from "./components/pages/MoviesReviewPage";
 import ShowReviewPage from "./components/pages/ShowReviewPage";
 import LiveTvReviewPage from "./components/pages/LiveTvReviewPage";
 import AudioReviewPage from "./components/pages/AudioReviewPage";
+import FavoriteActorsPage from "./components/pages/FavoriteActorsPage";
 
 // Layout component that wraps all routes
 function RootLayout() {
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
       {
         path: "/audio",
         element: <AudioReviewPage />,
+      },
+      {
+        path: "/actors",
+        element: <FavoriteActorsPage />,
       },
     ],
   },

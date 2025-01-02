@@ -43,7 +43,8 @@ const ServerConfigurationPage = () => {
     e.preventDefault();
     setIsLoading(true);
     await authenticate(serverUrl, username, password);
-    const playbackReportingPluginInstalled = await checkIfPlaybackReportingInstalled();
+    const playbackReportingPluginInstalled =
+      await checkIfPlaybackReportingInstalled();
     if (!playbackReportingPluginInstalled) {
       alert(
         "Playback Reporting Plugin is not installed. Please install it to enable playback reporting.",

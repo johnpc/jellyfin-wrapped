@@ -1,27 +1,31 @@
 import { useEffect, useState } from "react";
 import { Avatar } from "@radix-ui/themes";
-import { formatDuration } from "@/lib/utils";
 import {
   getImageUrlById,
   SimpleItemDto,
 } from "@/lib/playback-reporting-queries";
+import { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client";
 
-interface MovieCardProps {
-  item: SimpleItemDto;
-  playbackTime?: number;
-  episodeCount?: number;
+interface ActorCardProps {
+    name: string,
+    count: number,
+    details: BaseItemPerson,
+    seenInMovies: SimpleItemDto[],
+    seenInShows: SimpleItemDto[],
 }
 
-export function MovieCard({
-  item,
-  playbackTime,
-  episodeCount,
-}: MovieCardProps) {
+export function ActorCard({
+  name,
+  count,
+  details,
+  seenInMovies,
+  seenInShows,
+}: ActorCardProps) {
   const [imageUrl, setImageUrl] = useState<string>();
   useEffect(() => {
     const fetchImageUrl = async () => {
       try {
-        const url = await getImageUrlById(item.id!);
+        const url = await getImageUrlById(details.Id!);
         setImageUrl(url!);
       } catch (error) {
         console.error("Failed to fetch image URL:", error);
@@ -29,7 +33,7 @@ export function MovieCard({
     };
 
     fetchImageUrl();
-  }, [item]);
+  }, [details]);
 
   return (
     <div className="bg-card rounded-lg shadow-lg overflow-hidden">
@@ -37,7 +41,7 @@ export function MovieCard({
         <Avatar
           size="8"
           src={imageUrl}
-          fallback={item.name?.[0] || "?"}
+          fallback={details.Name?.[0] || "?"}
           className="w-full h-full"
           style={{
             borderRadius: 0,
@@ -48,23 +52,15 @@ export function MovieCard({
         />
       </div>
       <div className="p-4">
-        <h3 className="font-semibold text-lg">{item.name}</h3>
-        <p className="text-sm text-muted-foreground">
-          {item.productionYear && `Released: ${item.productionYear}`}
-        </p>
-        {item.communityRating && (
-          <p className="text-sm text-muted-foreground">
-            Rating: ⭐ {item.communityRating.toFixed(1)}
-          </p>
-        )}
-        {playbackTime && episodeCount && episodeCount > 1 && (
+        <h3 className="font-semibold text-lg">{name}</h3>
+        {count > 0 && (
           <>
             <p className="text-sm text-muted-foreground">
-              You watched {episodeCount} episodes
+              You watched {name} {count} times
             </p>
-            <p className="text-sm text-muted-foreground">
-              Watch time: {formatDuration(playbackTime)}
-            </p>
+            <ul>
+              {[...seenInMovies, ...seenInShows].map(itemDto => <li>{itemDto.name}</li>)}
+            </ul>
           </>
         )}
       </div>

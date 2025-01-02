@@ -6,7 +6,11 @@ import {
 } from "@jellyfin/sdk/lib/utils/api";
 import { getAuthenticatedJellyfinApi } from "./jellyfin-api";
 import { subYears } from "date-fns";
-import { BaseItemDto, ImageType, PluginStatus } from "@jellyfin/sdk/lib/generated-client";
+import {
+  BaseItemPerson,
+  ImageType,
+  PluginStatus,
+} from "@jellyfin/sdk/lib/generated-client";
 
 export type SimpleItemDto = {
   id?: string;
@@ -14,7 +18,8 @@ export type SimpleItemDto = {
   name?: string | null;
   communityRating?: number | null;
   productionYear?: number | null;
-} & BaseItemDto;
+  people?: BaseItemPerson[] | null;
+};
 
 const oneYearAgo = subYears(new Date(), 1);
 
@@ -58,11 +63,13 @@ const playbackReportingSqlRequest = async (
 export const checkIfPlaybackReportingInstalled = async (): Promise<boolean> => {
   const authenticatedApi = await getAuthenticatedJellyfinApi();
   const pluginsApi = getPluginsApi(authenticatedApi);
-  const pluginsResponse = await pluginsApi.getPlugins()
+  const pluginsResponse = await pluginsApi.getPlugins();
   const plugins = pluginsResponse.data;
-  const playbackReportingPlugin = plugins.find(plugin => plugin.Name === 'Playback Reporting');
+  const playbackReportingPlugin = plugins.find(
+    (plugin) => plugin.Name === "Playback Reporting",
+  );
   return playbackReportingPlugin?.Status === PluginStatus.Active;
-}
+};
 
 export const getImageUrlById = async (id: string) => {
   const cacheKey = `imageUrlCache_${id}`;
@@ -95,12 +102,14 @@ const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
           itemId,
           userId,
         });
+
         const simpleItem: SimpleItemDto = {
           id: item.data.Id,
           parentId: item.data.ParentId,
           name: item.data.Name,
           productionYear: item.data.ProductionYear,
           communityRating: item.data.CommunityRating,
+          people: item.data.People,
           // ...item.data,
         };
         localStorage.setItem(`item_${itemId}`, JSON.stringify(simpleItem));
@@ -114,6 +123,56 @@ const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
   });
   const movieItems = await Promise.all(itemPromises);
   return movieItems.filter((item) => item !== null) as SimpleItemDto[];
+};
+
+export const listFavoriteActors = async (): Promise<{
+  name: string,
+  count: number,
+  details: BaseItemPerson,
+  seenInMovies: SimpleItemDto[],
+  seenInShows: SimpleItemDto[],
+}[]> => {
+  const movies = await listMovies()
+  const shows = await listShows();
+  const people = [...shows.flatMap(show => show.item.people), movies.flatMap(movie => movie.people)].flat()
+
+  const counts = people.reduce((acc, person) => {
+    if (!person?.Name) return acc;
+
+    const name = person.Name;
+    acc.set(name, (acc.get(name) || 0) + 1);
+    return acc;
+  }, new Map());
+
+  const peopleWithCounts = Array.from(counts.entries()).map(
+    ([name]) => {
+      // Count appearances in movies
+      const movieCount = movies.reduce((acc, movie) =>
+        acc + (movie.people?.some(person => person?.Name === name) ? 1 : 0), 0);
+
+      // Count appearances in shows
+      const showCount = shows.reduce((acc, show) =>
+        acc + (show.item.people?.some(person => person?.Name === name) ? 1 : 0), 0);
+
+      return {
+        name,
+        count: movieCount + showCount,
+        details: people.find((p) => p?.Name === name)!,
+        seenInMovies: movies.filter(movie => movie.people?.some(person => person?.Name === name)),
+        seenInShows: shows.filter(show => show.item.people?.some(person => person?.Name === name))
+          .map(s => s.item),
+      };
+    }
+  );
+
+  peopleWithCounts.sort((a, b) => {
+    if (b.count !== a.count) {
+      return b.count - a.count;
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  return peopleWithCounts.filter(p => p.count > 1)
 };
 
 export const listMovies = async (): Promise<SimpleItemDto[]> => {
@@ -130,9 +189,6 @@ ORDER BY rowid DESC
   const data = await playbackReportingSqlRequest(queryString);
 
   const itemIdIndex = data.colums.findIndex((i: string) => i == "ItemId");
-  data.results.map((result: string[]) => {
-    return result[itemIdIndex];
-  });
   const movieItemIds = data.results
     .map((result: string[]) => result[itemIdIndex])
     .filter(

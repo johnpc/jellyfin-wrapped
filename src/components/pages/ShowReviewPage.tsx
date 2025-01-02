@@ -93,10 +93,10 @@ export default function ShowReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/tv");
+          navigate("/actors");
         }}
       >
-        Review Live TV
+        Review Favorite Actors
       </Button>
     </Box>
   );

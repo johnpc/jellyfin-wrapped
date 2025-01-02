@@ -96,4 +96,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Privacy
 
 This application connects directly to your Jellyfin server and does not store any credentials or personal data on external servers. All data is processed locally in your browser.
-
