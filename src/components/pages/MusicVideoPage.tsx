@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
-import { listMusicVideos, SimpleItemDto } from "@/lib/playback-reporting-queries";
+import {
+  listMusicVideos,
+  SimpleItemDto,
+} from "@/lib/playback-reporting-queries";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { Container, Grid, Box, Spinner, Button } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
+import { useErrorBoundary } from "react-error-boundary";
 
 export default function MusicVideoPage() {
+  const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -15,8 +20,13 @@ export default function MusicVideoPage() {
   useEffect(() => {
     const setup = async () => {
       setIsLoading(true);
-      setMusicVideos(await listMusicVideos());
-      setIsLoading(false);
+      try {
+        setMusicVideos(await listMusicVideos());
+      } catch (error) {
+        showBoundary(error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     setup();
   }, []);

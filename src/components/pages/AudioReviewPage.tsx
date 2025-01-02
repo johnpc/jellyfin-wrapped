@@ -5,8 +5,10 @@ import { Container, Grid, Box, Spinner, Button } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
+import { useErrorBoundary } from "react-error-boundary";
 
 export default function AudioReviewPage() {
+  const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -15,8 +17,13 @@ export default function AudioReviewPage() {
   useEffect(() => {
     const setup = async () => {
       setIsLoading(true);
-      setAudios(await listAudio());
-      setIsLoading(false);
+      try {
+        setAudios(await listAudio());
+      } catch (e) {
+        showBoundary(e);
+      } finally {
+        setIsLoading(false);
+      }
     };
     setup();
   }, []);

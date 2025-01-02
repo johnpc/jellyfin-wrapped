@@ -6,6 +6,7 @@ import { styled } from "@stitches/react";
 import { Card, Text, Flex } from "@radix-ui/themes";
 import { formatDuration } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { useErrorBoundary } from "react-error-boundary";
 
 interface ChannelCardProps {
   channelName: string;
@@ -34,6 +35,8 @@ export function ChannelCard({ channelName, duration }: ChannelCardProps) {
 }
 
 export default function LiveTvReviewPage() {
+  const { showBoundary } = useErrorBoundary();
+
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [channels, setChannels] = useState<ChannelCardProps[]>([]);
@@ -41,11 +44,16 @@ export default function LiveTvReviewPage() {
   useEffect(() => {
     const setup = async () => {
       setIsLoading(true);
-      const channelData = await listLiveTvChannels();
-      // Sort channels by duration in descending order
-      channelData.sort((a, b) => b.duration - a.duration);
-      setChannels(channelData);
-      setIsLoading(false);
+      try {
+        const channelData = await listLiveTvChannels();
+        // Sort channels by duration in descending order
+        channelData.sort((a, b) => b.duration - a.duration);
+        setChannels(channelData);
+      } catch (e) {
+        showBoundary(e);
+      } finally {
+        setIsLoading(false);
+      }
     };
     setup();
   }, []);

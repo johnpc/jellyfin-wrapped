@@ -11,6 +11,11 @@ import {
   ImageType,
   PluginStatus,
 } from "@jellyfin/sdk/lib/generated-client";
+import {
+  getCacheValue,
+  JELLYFIN_CURRENT_USER_CACHE_KEY,
+  setCacheValue,
+} from "./cache";
 
 export type SimpleItemDto = {
   id?: string;
@@ -25,8 +30,7 @@ export type SimpleItemDto = {
 const oneYearAgo = subYears(new Date(), 1);
 
 const getCurrentUserId = async (): Promise<string> => {
-  const cacheKey = "jellyfinwrapped_current_user";
-  const cachedUserId = localStorage.getItem(cacheKey);
+  const cachedUserId = getCacheValue(JELLYFIN_CURRENT_USER_CACHE_KEY);
   if (cachedUserId) {
     return cachedUserId;
   }
@@ -34,7 +38,7 @@ const getCurrentUserId = async (): Promise<string> => {
   const authenticatedApi = await getAuthenticatedJellyfinApi();
   const userApi = getUserApi(authenticatedApi);
   const user = await userApi.getCurrentUser();
-  localStorage.setItem(cacheKey, user.data.Id!);
+  setCacheValue(JELLYFIN_CURRENT_USER_CACHE_KEY, user.data.Id!);
   return user.data.Id!;
 };
 
@@ -74,14 +78,14 @@ export const checkIfPlaybackReportingInstalled = async (): Promise<boolean> => {
 
 export const getImageUrlById = async (id: string) => {
   const cacheKey = `imageUrlCache_${id}`;
-  const cachedUrl = localStorage.getItem(cacheKey);
+  const cachedUrl = getCacheValue(cacheKey);
   if (cachedUrl) {
     return cachedUrl;
   }
   const api = getImageApi(await getAuthenticatedJellyfinApi());
   // @ts-expect-error ImageType.Poster not behaving right
   const url = await api.getItemImageUrlById(id, ImageType.Poster);
-  localStorage.setItem(cacheKey, url);
+  setCacheValue(cacheKey, url);
   return url;
 };
 
@@ -92,7 +96,7 @@ const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
 
   const itemPromises = ids.map(async (itemId: string) => {
     try {
-      const cachedItem = localStorage.getItem(`item_${itemId}`);
+      const cachedItem = getCacheValue(`item_${itemId}`);
 
       if (cachedItem) {
         // If item exists in cache, parse and use it
@@ -112,9 +116,8 @@ const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
           communityRating: item.data.CommunityRating,
           people: item.data.People,
           date: item.data.PremiereDate,
-          // ...item.data,
         };
-        localStorage.setItem(`item_${itemId}`, JSON.stringify(simpleItem));
+        setCacheValue(`item_${itemId}`, JSON.stringify(simpleItem));
 
         return simpleItem;
       }

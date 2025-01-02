@@ -6,8 +6,10 @@ import { motion } from "framer-motion";
 import { itemVariants, Title } from "../ui/styled";
 import { useNavigate } from "react-router-dom";
 import { generateGuid } from "@/lib/utils";
+import { useErrorBoundary } from "react-error-boundary";
 
 export default function MoviesReviewPage() {
+  const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [movies, setMovies] = useState<SimpleItemDto[]>([]);
@@ -15,8 +17,13 @@ export default function MoviesReviewPage() {
   useEffect(() => {
     const setup = async () => {
       setIsLoading(true);
-      setMovies(await listMovies());
-      setIsLoading(false);
+      try {
+        setMovies(await listMovies());
+      } catch (error) {
+        showBoundary(error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     setup();
   }, []);

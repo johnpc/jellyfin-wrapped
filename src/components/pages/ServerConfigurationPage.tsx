@@ -9,68 +9,83 @@ import {
 } from "@/lib/jellyfin-api";
 import { useNavigate } from "react-router-dom";
 import { checkIfPlaybackReportingInstalled } from "@/lib/playback-reporting-queries";
+import {
+  getCacheValue,
+  JELLYFIN_AUTH_TOKEN_CACHE_KEY,
+  JELLYFIN_PASSWORD_CACHE_KEY,
+  JELLYFIN_SERVER_URL_CACHE_KEY,
+  JELLYFIN_USERNAME_CACHE_KEY,
+  setCacheValue,
+} from "@/lib/cache";
+import { useErrorBoundary } from "react-error-boundary";
 
 const ServerConfigurationPage = () => {
+  const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
 
   const [serverUrl, setServerUrl] = useState(
-    () => localStorage.getItem("jellyfinServerUrl") || "",
+    () => getCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY) || "",
   );
   const [authToken, setAuthToken] = useState(
-    () => localStorage.getItem("jellyfinAuthToken") || "",
+    () => getCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY) || "",
   );
   const [username, setUsername] = useState(
-    () => localStorage.getItem("jellyfinUsername") || "",
+    () => getCacheValue(JELLYFIN_USERNAME_CACHE_KEY) || "",
   );
   const [password, setPassword] = useState(
-    () => localStorage.getItem("jellyfinPassword") || "",
+    () => getCacheValue(JELLYFIN_PASSWORD_CACHE_KEY) || "",
   );
   const [isLoading, setIsLoading] = useState(false);
 
   const handleServerUrlChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setServerUrl(value);
-    localStorage.setItem("jellyfinServerUrl", value);
+    setCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY, value);
   };
 
   const handleUsernameChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setUsername(value);
-    localStorage.setItem("jellyfinUsername", value);
+    setCacheValue(JELLYFIN_USERNAME_CACHE_KEY, value);
   };
 
   const handleAuthTokenChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setAuthToken(value);
-    localStorage.setItem("jellyfinAuthToken", value);
+    setCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY, value);
   };
 
   const handlePasswordChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setPassword(value);
-    localStorage.setItem("jellyfinPassword", value);
+    setCacheValue(JELLYFIN_PASSWORD_CACHE_KEY, value);
   };
 
   const handleConnect = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    if (authToken) {
-      await authenticateByAuthToken(serverUrl, authToken);
-    } else {
-      await authenticateByUserName(serverUrl, username, password);
-    }
+    try {
+      if (authToken) {
+        await authenticateByAuthToken(serverUrl, authToken);
+      } else {
+        await authenticateByUserName(serverUrl, username, password);
+      }
 
-    const playbackReportingPluginInstalled =
-      await checkIfPlaybackReportingInstalled();
-    if (!playbackReportingPluginInstalled) {
-      alert(
-        "Playback Reporting Plugin is not installed. Please install it to enable playback reporting.",
-      );
+      const playbackReportingPluginInstalled =
+        await checkIfPlaybackReportingInstalled();
+      if (!playbackReportingPluginInstalled) {
+        alert(
+          "Playback Reporting Plugin is not installed. Please install it to enable playback reporting.",
+        );
+        setIsLoading(false);
+        return;
+      }
+      navigate("/movies");
+    } catch (e) {
+      showBoundary(e);
+    } finally {
       setIsLoading(false);
-      return;
     }
-    setIsLoading(false);
-    navigate("/movies");
   };
   const Disclaimer = styled("p", {
     fontSize: "0.875rem",

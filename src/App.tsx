@@ -1,4 +1,5 @@
 import "@radix-ui/themes/styles.css";
+import { ErrorBoundary } from "react-error-boundary";
 import { Theme } from "@radix-ui/themes";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import SplashPage from "./components/pages/SplashPage";
@@ -15,9 +16,11 @@ import MusicVideoPage from "./components/pages/MusicVideoPage";
 // Layout component that wraps all routes
 function RootLayout() {
   return (
-    <Theme>
-      <Outlet />
-    </Theme>
+    <ErrorBoundary fallback={<div>Something went wrong</div>}>
+      <Theme>
+        <Outlet />
+      </Theme>
+    </ErrorBoundary>
   );
 }
 

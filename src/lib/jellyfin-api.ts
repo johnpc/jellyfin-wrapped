@@ -1,5 +1,12 @@
 import { Api, Jellyfin } from "@jellyfin/sdk";
 import { generateFingerprint } from "./utils";
+import {
+  getCacheValue,
+  JELLYFIN_AUTH_TOKEN_CACHE_KEY,
+  JELLYFIN_PASSWORD_CACHE_KEY,
+  JELLYFIN_SERVER_URL_CACHE_KEY,
+  JELLYFIN_USERNAME_CACHE_KEY,
+} from "./cache";
 
 let api: Api | null = null;
 
@@ -8,10 +15,10 @@ export const getAuthenticatedJellyfinApi = async (): Promise<Api> => {
     return api;
   }
 
-  const serverUrl = localStorage.getItem("jellyfinServerUrl");
-  const username = localStorage.getItem("jellyfinUsername");
-  const password = localStorage.getItem("jellyfinPassword");
-  const jellyfinAuthToken = localStorage.getItem("jellyfinAuthToken");
+  const serverUrl = getCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY);
+  const username = getCacheValue(JELLYFIN_USERNAME_CACHE_KEY);
+  const password = getCacheValue(JELLYFIN_PASSWORD_CACHE_KEY);
+  const jellyfinAuthToken = getCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY);
 
   if (!serverUrl || (!(username && password) && !jellyfinAuthToken)) {
     throw new Error(

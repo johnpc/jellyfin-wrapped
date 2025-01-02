@@ -10,8 +10,10 @@ import { useNavigate } from "react-router-dom";
 import { generateGuid } from "@/lib/utils";
 import { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client";
 import { ActorCard } from "./MoviesReviewPage/ActorCard";
+import { useErrorBoundary } from "react-error-boundary";
 
 export default function FavoriteActorsPage() {
+  const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [favoriteActors, setFavoriteActors] = useState<
@@ -27,8 +29,13 @@ export default function FavoriteActorsPage() {
   useEffect(() => {
     const setup = async () => {
       setIsLoading(true);
-      setFavoriteActors(await listFavoriteActors());
-      setIsLoading(false);
+      try {
+        setFavoriteActors(await listFavoriteActors());
+      } catch (e) {
+        showBoundary(e);
+      } finally {
+        setIsLoading(false);
+      }
     };
     setup();
   }, []);

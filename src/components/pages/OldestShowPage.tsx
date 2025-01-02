@@ -6,8 +6,10 @@ import { motion } from "framer-motion";
 import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
 import { Subtitle } from "../ui/styled";
+import { useErrorBoundary } from "react-error-boundary";
 
 export default function OldestShowPage() {
+  const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [show, setShow] = useState<{
@@ -20,16 +22,21 @@ export default function OldestShowPage() {
   useEffect(() => {
     const setup = async () => {
       setIsLoading(true);
-      const shows = await listShows();
-      shows.sort((a, b) => {
-        const aDate = new Date(a.item.date!);
-        const bDate = new Date(b.item.date!);
-        return aDate.getTime() - bDate.getTime();
-      });
-      const s = shows.find((s) => s)!;
-      console.log({ s });
-      setShow(s);
-      setIsLoading(false);
+      try {
+        const shows = await listShows();
+        shows.sort((a, b) => {
+          const aDate = new Date(a.item.date!);
+          const bDate = new Date(b.item.date!);
+          return aDate.getTime() - bDate.getTime();
+        });
+        const s = shows.find((s) => s)!;
+        console.log({ s });
+        setShow(s);
+      } catch (e) {
+        showBoundary(e);
+      } finally {
+        setIsLoading(false);
+      }
     };
     setup();
   }, []);

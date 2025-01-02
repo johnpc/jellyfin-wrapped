@@ -6,8 +6,11 @@ import { motion } from "framer-motion";
 import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
 import { Subtitle } from "../ui/styled";
+import { useErrorBoundary } from "react-error-boundary";
 
 export default function OldestMoviePage() {
+  const { showBoundary } = useErrorBoundary();
+
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [movie, setMovie] = useState<SimpleItemDto>();
@@ -15,15 +18,20 @@ export default function OldestMoviePage() {
   useEffect(() => {
     const setup = async () => {
       setIsLoading(true);
-      const movies = await listMovies();
-      movies.sort((a, b) => {
-        const aDate = new Date(a.date!);
-        const bDate = new Date(b.date!);
-        return aDate.getTime() - bDate.getTime();
-      });
-      const m = movies.find((s) => s)!;
-      setMovie(m);
-      setIsLoading(false);
+      try {
+        const movies = await listMovies();
+        movies.sort((a, b) => {
+          const aDate = new Date(a.date!);
+          const bDate = new Date(b.date!);
+          return aDate.getTime() - bDate.getTime();
+        });
+        const m = movies.find((s) => s)!;
+        setMovie(m);
+      } catch (e) {
+        showBoundary(e);
+      } finally {
+        setIsLoading(false);
+      }
     };
     setup();
   }, []);
@@ -72,7 +80,8 @@ export default function OldestMoviePage() {
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
-              It's {new Date().getFullYear()}, but you've time traveled back to {movie?.productionYear}
+              It's {new Date().getFullYear()}, but you've time traveled back to{" "}
+              {movie?.productionYear}
             </Title>
 
             <Subtitle
@@ -81,17 +90,14 @@ export default function OldestMoviePage() {
               variants={itemVariants}
             >
               {movie?.name} came out on{" "}
-              {new Date(movie?.date ?? '').toLocaleDateString(undefined, {
+              {new Date(movie?.date ?? "").toLocaleDateString(undefined, {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
               })}
             </Subtitle>
           </div>
-          <MovieCard
-            key={movie!.id}
-            item={movie!}
-          />
+          <MovieCard key={movie!.id} item={movie!} />
         </Grid>
       </Container>
       <Button

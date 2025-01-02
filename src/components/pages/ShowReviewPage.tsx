@@ -5,8 +5,10 @@ import { Container, Grid, Box, Button, Spinner } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
+import { useErrorBoundary } from "react-error-boundary";
 
 export default function ShowReviewPage() {
+  const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [shows, setShows] = useState<
@@ -21,8 +23,13 @@ export default function ShowReviewPage() {
   useEffect(() => {
     const setup = async () => {
       setIsLoading(true);
-      setShows(await listShows());
-      setIsLoading(false);
+      try {
+        setShows(await listShows());
+      } catch (e) {
+        showBoundary(e);
+      } finally {
+        setIsLoading(false);
+      }
     };
     setup();
   }, []);
