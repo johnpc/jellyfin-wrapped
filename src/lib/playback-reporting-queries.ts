@@ -12,6 +12,7 @@ import {
   PluginStatus,
 } from "@jellyfin/sdk/lib/generated-client";
 import {
+  getCachedHiddenIds,
   getCacheValue,
   JELLYFIN_CURRENT_USER_CACHE_KEY,
   setCacheValue,
@@ -90,42 +91,45 @@ export const getImageUrlById = async (id: string) => {
 };
 
 const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
+  const hiddenIds = getCachedHiddenIds();
   const authenticatedApi = await getAuthenticatedJellyfinApi();
   const userId = await getCurrentUserId();
   const itemsApi = getUserLibraryApi(authenticatedApi);
 
-  const itemPromises = ids.map(async (itemId: string) => {
-    try {
-      const cachedItem = getCacheValue(`item_${itemId}`);
+  const itemPromises = ids
+    .filter((id) => !hiddenIds.includes(id))
+    .map(async (itemId: string) => {
+      try {
+        const cachedItem = getCacheValue(`item_${itemId}`);
 
-      if (cachedItem) {
-        // If item exists in cache, parse and use it
-        return JSON.parse(cachedItem);
-      } else {
-        // If not in cache, fetch from API
-        const item = await itemsApi.getItem({
-          itemId,
-          userId,
-        });
+        if (cachedItem) {
+          // If item exists in cache, parse and use it
+          return JSON.parse(cachedItem);
+        } else {
+          // If not in cache, fetch from API
+          const item = await itemsApi.getItem({
+            itemId,
+            userId,
+          });
 
-        const simpleItem: SimpleItemDto = {
-          id: item.data.Id,
-          parentId: item.data.ParentId,
-          name: item.data.Name,
-          productionYear: item.data.ProductionYear,
-          communityRating: item.data.CommunityRating,
-          people: item.data.People,
-          date: item.data.PremiereDate,
-        };
-        setCacheValue(`item_${itemId}`, JSON.stringify(simpleItem));
+          const simpleItem: SimpleItemDto = {
+            id: item.data.Id,
+            parentId: item.data.ParentId,
+            name: item.data.Name,
+            productionYear: item.data.ProductionYear,
+            communityRating: item.data.CommunityRating,
+            people: item.data.People,
+            date: item.data.PremiereDate,
+          };
+          setCacheValue(`item_${itemId}`, JSON.stringify(simpleItem));
 
-        return simpleItem;
+          return simpleItem;
+        }
+      } catch (e) {
+        console.error(e);
+        return null;
       }
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
-  });
+    });
   const movieItems = await Promise.all(itemPromises);
   return movieItems.filter((item) => item !== null) as SimpleItemDto[];
 };

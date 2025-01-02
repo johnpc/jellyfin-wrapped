@@ -6,11 +6,13 @@ import { motion } from "framer-motion";
 import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
+import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
 
 export default function ShowReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [hiddenIds, setHiddenIds] = useState<string[]>(getCachedHiddenIds());
   const [shows, setShows] = useState<
     {
       showName: string;
@@ -24,7 +26,11 @@ export default function ShowReviewPage() {
     const setup = async () => {
       setIsLoading(true);
       try {
-        setShows(await listShows());
+        const shows = await listShows();
+        const filteredShows = shows.filter(
+          (show) => !hiddenIds.includes(show.item.id!),
+        );
+        setShows(filteredShows);
       } catch (e) {
         showBoundary(e);
       } finally {
@@ -32,7 +38,7 @@ export default function ShowReviewPage() {
       }
     };
     setup();
-  }, []);
+  }, [hiddenIds]);
 
   if (isLoading) {
     return (
@@ -90,6 +96,10 @@ export default function ShowReviewPage() {
                   item={show.item}
                   episodeCount={show.episodeCount}
                   playbackTime={show.playbackTime}
+                  onHide={() => {
+                    setCachedHiddenId(show.item.id!);
+                    setHiddenIds([...hiddenIds, show.item.id!]);
+                  }}
                 />
               </>
             ))}

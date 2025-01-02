@@ -3,6 +3,7 @@ export const JELLYFIN_AUTH_TOKEN_CACHE_KEY = "jellyfinAuthToken";
 export const JELLYFIN_USERNAME_CACHE_KEY = "jellyfinUsername";
 export const JELLYFIN_PASSWORD_CACHE_KEY = "jellyfinPassword";
 export const JELLYFIN_CURRENT_USER_CACHE_KEY = "jellyfinwrapped_current_user";
+export const JELLYFIN_HIDDEN_ITEMS = "jellyfinwrapped_hidden_items";
 const localCache: Record<string, string> = {};
 export const setCacheValue = (key: string, value: string) => {
   try {
@@ -38,4 +39,14 @@ export const getCacheValue = (key: string): string | null => {
 
   // If the value is not in localStorage, return null
   return null;
+};
+
+export const getCachedHiddenIds = (): string[] => {
+  return getCacheValue(JELLYFIN_HIDDEN_ITEMS)?.split(",") ?? [];
+};
+
+export const setCachedHiddenId = (id: string) => {
+  const hiddenIds = getCachedHiddenIds();
+  hiddenIds.push(id);
+  setCacheValue(JELLYFIN_HIDDEN_ITEMS, hiddenIds.join(","));
 };
