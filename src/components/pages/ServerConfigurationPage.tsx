@@ -178,7 +178,6 @@ const ServerConfigurationPage = () => {
                   placeholder={`Password${serverUrlOverride ? "" : " - not required if Auth Token is specified"}`}
                   value={password}
                   onChange={handlePasswordChange}
-                  required={!authToken}
                 />
               </Flex>
 

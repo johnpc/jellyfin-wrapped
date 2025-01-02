@@ -21,7 +21,7 @@ export const getAuthenticatedJellyfinApi = async (): Promise<Api> => {
   const password = getCacheValue(JELLYFIN_PASSWORD_CACHE_KEY) ?? "";
   const jellyfinAuthToken = getCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY);
 
-  if (!serverUrl || (!(username && password) && !jellyfinAuthToken)) {
+  if (!serverUrl || (!username && !jellyfinAuthToken)) {
     throw new Error(
       "Missing credentials in localStorage. Please configure your Jellyfin connection.",
     );
