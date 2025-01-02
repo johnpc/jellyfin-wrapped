@@ -21,8 +21,8 @@ export default function OldestMoviePage() {
       try {
         const movies = await listMovies();
         movies.sort((a, b) => {
-          const aDate = new Date(a.date);
-          const bDate = new Date(b.date);
+          const aDate = new Date(a.date ?? new Date());
+          const bDate = new Date(b.date ?? new Date());
           return aDate.getTime() - bDate.getTime();
         });
         const m = movies.find((s) => s);

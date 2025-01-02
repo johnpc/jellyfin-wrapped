@@ -28,7 +28,7 @@ export default function ShowReviewPage() {
       try {
         const shows = await listShows();
         const filteredShows = shows.filter(
-          (show) => !hiddenIds.includes(show.item.id),
+          (show) => !hiddenIds.includes(show.item.id ?? ""),
         );
         setShows(filteredShows);
       } catch (e) {
@@ -97,8 +97,8 @@ export default function ShowReviewPage() {
                   episodeCount={show.episodeCount}
                   playbackTime={show.playbackTime}
                   onHide={() => {
-                    setCachedHiddenId(show.item.id);
-                    setHiddenIds([...hiddenIds, show.item.id]);
+                    setCachedHiddenId(show.item.id ?? "");
+                    setHiddenIds([...hiddenIds, show.item.id ?? ""]);
                   }}
                 />
               </>

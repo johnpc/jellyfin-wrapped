@@ -81,7 +81,7 @@ export const authenticateByUserName = async (
 
   try {
     // Authentication state is persisted on the api object
-    const authenticated = await api.authenticateUserByName(username, password);
+    await api.authenticateUserByName(username, password);
   } catch (error) {
     console.error("Connection failed:", error);
     alert(error);

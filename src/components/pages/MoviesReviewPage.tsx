@@ -21,7 +21,9 @@ export default function MoviesReviewPage() {
       setIsLoading(true);
       try {
         const movies = await listMovies();
-        setMovies(movies.filter((movie) => !hiddenIds.includes(movie.id)));
+        setMovies(
+          movies.filter((movie) => !hiddenIds.includes(movie.id ?? "")),
+        );
       } catch (error) {
         showBoundary(error);
       } finally {
@@ -65,8 +67,8 @@ export default function MoviesReviewPage() {
                 key={generateGuid()}
                 item={movie}
                 onHide={() => {
-                  setCachedHiddenId(movie.id);
-                  setHiddenIds([...hiddenIds, movie.id]);
+                  setCachedHiddenId(movie.id ?? "");
+                  setHiddenIds([...hiddenIds, movie.id ?? ""]);
                 }}
               />
             ))}
