@@ -1,27 +1,28 @@
 import { useState, useEffect } from "react";
-import { listShows, SimpleItemDto } from "@/lib/playback-reporting-queries";
+import { listMovies, SimpleItemDto } from "@/lib/playback-reporting-queries";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { Container, Grid, Box, Button, Spinner } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
+import { Subtitle } from "../ui/styled";
 
-export default function ShowReviewPage() {
+export default function OldestMoviePage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [shows, setShows] = useState<
-    {
-      showName: string;
-      episodeCount: number;
-      playbackTime: number;
-      item: SimpleItemDto;
-    }[]
-  >([]);
+  const [movie, setMovie] = useState<SimpleItemDto>();
 
   useEffect(() => {
     const setup = async () => {
       setIsLoading(true);
-      setShows(await listShows());
+      const movies = await listMovies();
+      movies.sort((a, b) => {
+        const aDate = new Date(a.date!);
+        const bDate = new Date(b.date!);
+        return aDate.getTime() - bDate.getTime();
+      });
+      const m = movies.find((s) => s)!;
+      setMovie(m);
       setIsLoading(false);
     };
     setup();
@@ -71,32 +72,36 @@ export default function ShowReviewPage() {
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
-              You Watched {shows.length} Shows This Year
+              It's {new Date().getFullYear()}, but you've time traveled back to {movie?.productionYear}
             </Title>
-          </div>
 
-          <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
-            {shows.map((show) => (
-              <>
-                <MovieCard
-                  key={show.item.id}
-                  item={show.item}
-                  episodeCount={show.episodeCount}
-                  playbackTime={show.playbackTime}
-                />
-              </>
-            ))}
-          </Grid>
+            <Subtitle
+              style={{ backgroundColor: "palevioletred", borderRadius: "10px" }}
+              as={motion.p}
+              variants={itemVariants}
+            >
+              {movie?.name} came out on{" "}
+              {new Date(movie?.date ?? '').toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </Subtitle>
+          </div>
+          <MovieCard
+            key={movie!.id}
+            item={movie!}
+          />
         </Grid>
       </Container>
       <Button
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/oldest-show");
+          navigate("/shows");
         }}
       >
-        Review Oldest Show
+        Review Shows
       </Button>
     </Box>
   );

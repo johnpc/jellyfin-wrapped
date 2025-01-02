@@ -16,6 +16,7 @@ export type SimpleItemDto = {
   id?: string;
   parentId?: string | null;
   name?: string | null;
+  date?: string | null;
   communityRating?: number | null;
   productionYear?: number | null;
   people?: BaseItemPerson[] | null;
@@ -110,6 +111,7 @@ const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
           productionYear: item.data.ProductionYear,
           communityRating: item.data.CommunityRating,
           people: item.data.People,
+          date: item.data.PremiereDate,
           // ...item.data,
         };
         localStorage.setItem(`item_${itemId}`, JSON.stringify(simpleItem));

@@ -60,10 +60,10 @@ export default function MoviesReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/shows");
+          navigate("/oldest-movie");
         }}
       >
-        Review Shows
+        Review Oldest Movie
       </Button>
     </Box>
   );

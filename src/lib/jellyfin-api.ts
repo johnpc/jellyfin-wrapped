@@ -21,7 +21,6 @@ export const getAuthenticatedJellyfinApi = async (): Promise<Api> => {
 
   // Attempt to authenticate with stored credentials
   if (jellyfinAuthToken) {
-    console.log("hello?");
     await authenticateByAuthToken(serverUrl, jellyfinAuthToken);
   } else {
     await authenticateByUserName(serverUrl, username!, password!);
