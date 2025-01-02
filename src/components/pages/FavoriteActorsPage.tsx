@@ -37,7 +37,7 @@ export default function FavoriteActorsPage() {
         setIsLoading(false);
       }
     };
-    setup();
+    void setup();
   }, []);
 
   if (isLoading) {
@@ -87,7 +87,7 @@ export default function FavoriteActorsPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/genres");
+          void navigate("/genres");
         }}
       >
         Review Top Genres

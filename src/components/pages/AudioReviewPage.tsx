@@ -15,7 +15,7 @@ export default function AudioReviewPage() {
   const [audios, setAudios] = useState<SimpleItemDto[]>([]);
 
   useEffect(() => {
-    const setup = async () => {
+    const setup = async (): Promise<void> => {
       setIsLoading(true);
       try {
         setAudios(await listAudio());
@@ -25,7 +25,7 @@ export default function AudioReviewPage() {
         setIsLoading(false);
       }
     };
-    setup();
+    void setup();
   }, []);
 
   if (isLoading) {
@@ -85,7 +85,7 @@ export default function AudioReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/music-videos");
+          void navigate("/music-videos");
         }}
       >
         Review Music Videos

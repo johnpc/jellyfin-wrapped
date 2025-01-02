@@ -9,15 +9,16 @@ import {
 } from "./cache";
 
 let api: Api | null = null;
-
+const sleep = (durationMs: number) =>
+  new Promise((resolve) => setTimeout(resolve, durationMs));
 export const getAuthenticatedJellyfinApi = async (): Promise<Api> => {
-  if (api) {
+  if (api && api.accessToken) {
     return api;
   }
 
   const serverUrl = getCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY);
-  const username = getCacheValue(JELLYFIN_USERNAME_CACHE_KEY);
-  const password = getCacheValue(JELLYFIN_PASSWORD_CACHE_KEY);
+  const username = getCacheValue(JELLYFIN_USERNAME_CACHE_KEY) ?? "";
+  const password = getCacheValue(JELLYFIN_PASSWORD_CACHE_KEY) ?? "";
   const jellyfinAuthToken = getCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY);
 
   if (!serverUrl || (!(username && password) && !jellyfinAuthToken)) {
@@ -28,17 +29,21 @@ export const getAuthenticatedJellyfinApi = async (): Promise<Api> => {
 
   // Attempt to authenticate with stored credentials
   if (jellyfinAuthToken) {
-    await authenticateByAuthToken(serverUrl, jellyfinAuthToken);
+    api = authenticateByAuthToken(serverUrl, jellyfinAuthToken);
   } else {
-    await authenticateByUserName(serverUrl, username!, password!);
+    api = await authenticateByUserName(serverUrl, username, password);
+    // No, I cannot explain why this needs to happen twice with long delay.
+    // However, if omitted, you cannot refresh the page from a specific route.
+    await sleep(1000);
+    api = await authenticateByUserName(serverUrl, username, password);
   }
-  return api!;
+  return api;
 };
 
-export const authenticateByAuthToken = async (
+export const authenticateByAuthToken = (
   serverUrl: string,
   jellyfinApiKey: string,
-) => {
+): Api => {
   const jellyfin = new Jellyfin({
     clientInfo: {
       name: "Jellyfin-Wrapped",
@@ -46,7 +51,7 @@ export const authenticateByAuthToken = async (
     },
     deviceInfo: {
       name: "Jellyfin-Wrapped",
-      id: await generateGuid(),
+      id: generateGuid(),
     },
   });
   api = jellyfin.createApi(serverUrl, jellyfinApiKey);
@@ -57,28 +62,31 @@ export const authenticateByUserName = async (
   serverUrl: string,
   username: string,
   password: string,
-) => {
-  try {
-    if (api) {
-      return;
-    }
-    const jellyfin = new Jellyfin({
-      clientInfo: {
-        name: "Jellyfin-Wrapped",
-        version: "1.0.0",
-      },
-      deviceInfo: {
-        name: "Jellyfin-Wrapped",
-        id: await generateGuid(),
-      },
-    });
-    console.log("Connecting to server...", { serverUrl, username });
-    api = jellyfin.createApi(serverUrl);
+): Promise<Api> => {
+  if (api) {
+    return api;
+  }
+  const jellyfin = new Jellyfin({
+    clientInfo: {
+      name: "Jellyfin-Wrapped",
+      version: "1.0.0",
+    },
+    deviceInfo: {
+      name: "Jellyfin-Wrapped",
+      id: generateGuid(),
+    },
+  });
+  console.log("Connecting to server...", { serverUrl, username });
+  api = jellyfin.createApi(serverUrl);
 
+  try {
     // Authentication state is persisted on the api object
-    await api.authenticateUserByName(username, password);
+    const authenticated = await api.authenticateUserByName(username, password);
   } catch (error) {
     console.error("Connection failed:", error);
     alert(error);
+    throw error;
   }
+
+  return api;
 };

@@ -101,7 +101,7 @@ const SplashPage = () => {
         >
           <StyledButton
             onClick={() => {
-              navigate("/configure");
+              void navigate("/configure");
             }}
           >
             Connect Your Jellyfin Server

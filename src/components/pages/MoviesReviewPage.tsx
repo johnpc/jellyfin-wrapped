@@ -21,14 +21,14 @@ export default function MoviesReviewPage() {
       setIsLoading(true);
       try {
         const movies = await listMovies();
-        setMovies(movies.filter((movie) => !hiddenIds.includes(movie.id!)));
+        setMovies(movies.filter((movie) => !hiddenIds.includes(movie.id)));
       } catch (error) {
         showBoundary(error);
       } finally {
         setIsLoading(false);
       }
     };
-    setup();
+    void setup();
   }, [hiddenIds]);
 
   if (isLoading) {
@@ -65,8 +65,8 @@ export default function MoviesReviewPage() {
                 key={generateGuid()}
                 item={movie}
                 onHide={() => {
-                  setCachedHiddenId(movie.id!);
-                  setHiddenIds([...hiddenIds, movie.id!]);
+                  setCachedHiddenId(movie.id);
+                  setHiddenIds([...hiddenIds, movie.id]);
                 }}
               />
             ))}
@@ -77,7 +77,7 @@ export default function MoviesReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/oldest-movie");
+          void navigate("/oldest-movie");
         }}
       >
         Review Oldest Movie

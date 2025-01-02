@@ -69,17 +69,19 @@ const ServerConfigurationPage = () => {
     setCacheValue(JELLYFIN_PASSWORD_CACHE_KEY, value);
   };
 
-  const handleConnect = async (e: React.FormEvent) => {
+  const handleConnect = async (e: React.FormEvent<HTMLFormElement>) => {
+    /* eslint-disable @typescript-eslint/no-unsafe-call */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     e.preventDefault();
     setIsLoading(true);
     try {
       if (authToken) {
-        await authenticateByAuthToken(serverUrl, authToken);
+        authenticateByAuthToken(serverUrl, authToken);
       } else {
         await authenticateByUserName(serverUrl, username, password);
       }
 
-      navigate("/movies");
+      void navigate("/movies");
     } catch (e) {
       showBoundary(e);
     } finally {
@@ -116,7 +118,7 @@ const ServerConfigurationPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <form onSubmit={handleConnect}>
+          <form onSubmit={(e) => void handleConnect(e)}>
             <Flex direction="column" gap="6">
               <Box>
                 <Heading size="7" align="center" mb="4">

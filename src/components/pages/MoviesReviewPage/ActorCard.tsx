@@ -25,14 +25,14 @@ export function ActorCard({
   useEffect(() => {
     const fetchImageUrl = async () => {
       try {
-        const url = await getImageUrlById(details.Id!);
-        setImageUrl(url!);
+        const url = await getImageUrlById(details.Id);
+        setImageUrl(url);
       } catch (error) {
         console.error("Failed to fetch image URL:", error);
       }
     };
 
-    fetchImageUrl();
+    void fetchImageUrl();
   }, [details]);
 
   return (

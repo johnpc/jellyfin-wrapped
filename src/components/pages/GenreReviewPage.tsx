@@ -26,12 +26,12 @@ export default function GenreReviewPage() {
       setIsLoading(true);
       try {
         const movies = await listMovies();
-        setMovies(movies.filter((movie) => !hiddenIds.includes(movie.id!)));
+        setMovies(movies.filter((movie) => !hiddenIds.includes(movie.id)));
         const shows = await listShows();
         setShows(
           shows
             .map((show) => show.item)
-            .filter((show) => !hiddenIds.includes(show.id!)),
+            .filter((show) => !hiddenIds.includes(show.id)),
         );
       } catch (error) {
         showBoundary(error);
@@ -39,7 +39,7 @@ export default function GenreReviewPage() {
         setIsLoading(false);
       }
     };
-    setup();
+    void setup();
   }, [hiddenIds]);
 
   if (isLoading) {
@@ -60,7 +60,7 @@ export default function GenreReviewPage() {
   const allGenres = movies.flatMap((movie) => movie.genres).filter((g) => g);
   const genreCounts = allGenres.reduce(
     (counts, genre) => {
-      counts[genre!] = (counts[genre!] || 0) + 1;
+      counts[genre] = (counts[genre] || 0) + 1;
       return counts;
     },
     {} as Record<string, number>,
@@ -104,8 +104,8 @@ export default function GenreReviewPage() {
                     key={generateGuid()}
                     item={movie}
                     onHide={() => {
-                      setCachedHiddenId(movie.id!);
-                      setHiddenIds([...hiddenIds, movie.id!]);
+                      setCachedHiddenId(movie.id);
+                      setHiddenIds([...hiddenIds, movie.id]);
                     }}
                   />
                 ))}
@@ -118,10 +118,10 @@ export default function GenreReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/tv");
+          void navigate("/holidays");
         }}
       >
-        Review Live TV
+        Review Holidays
       </Button>
     </Box>
   );
