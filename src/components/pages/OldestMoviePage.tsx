@@ -71,6 +71,23 @@ export default function OldestMoviePage() {
     textShadow: "0 0 30px rgba(255, 215, 0, 0.3)",
   });
 
+  if (!movie?.id) {
+    return (
+      <>
+        <>No movies watched.</>{" "}
+        <Button
+          size={"4"}
+          style={{ width: "100%" }}
+          onClick={() => {
+            navigate("/shows");
+          }}
+        >
+          Review Shows
+        </Button>
+      </>
+    );
+  }
+
   return (
     <Box
       style={{ backgroundColor: "var(--yellow-8)" }}

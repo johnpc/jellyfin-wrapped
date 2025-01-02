@@ -75,7 +75,22 @@ export default function OldestShowPage() {
     WebkitTextFillColor: "transparent",
     textShadow: "0 0 30px rgba(255, 215, 0, 0.3)",
   });
-
+  if (!show?.item?.id) {
+    return (
+      <>
+        <>No shows watched.</>{" "}
+        <Button
+          size={"4"}
+          style={{ width: "100%" }}
+          onClick={() => {
+            navigate("/actors");
+          }}
+        >
+          Review Favorite Actors
+        </Button>
+      </>
+    );
+  }
   return (
     <Box
       style={{ backgroundColor: "var(--yellow-8)" }}

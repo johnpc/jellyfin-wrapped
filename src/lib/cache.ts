@@ -6,18 +6,21 @@ export const JELLYFIN_CURRENT_USER_CACHE_KEY = "jellyfinwrapped_current_user";
 export const JELLYFIN_HIDDEN_ITEMS = "jellyfinwrapped_hidden_items";
 const localCache: Record<string, string> = {};
 export const setCacheValue = (key: string, value: string) => {
+  const userConfigCacheKeys = [
+    JELLYFIN_SERVER_URL_CACHE_KEY,
+    JELLYFIN_AUTH_TOKEN_CACHE_KEY,
+    JELLYFIN_USERNAME_CACHE_KEY,
+    JELLYFIN_PASSWORD_CACHE_KEY,
+  ];
   try {
     localCache[key] = value;
     localStorage.setItem(key, value);
+    if (userConfigCacheKeys.includes(key)) {
+      localStorage.removeItem(JELLYFIN_CURRENT_USER_CACHE_KEY);
+    }
   } catch (error) {
     console.warn(`Error setting cache value for key ${key}:`, error);
-    const necessaryCacheKeys = [
-      JELLYFIN_SERVER_URL_CACHE_KEY,
-      JELLYFIN_AUTH_TOKEN_CACHE_KEY,
-      JELLYFIN_USERNAME_CACHE_KEY,
-      JELLYFIN_PASSWORD_CACHE_KEY,
-    ];
-    if (necessaryCacheKeys.includes(key)) {
+    if (userConfigCacheKeys.includes(key)) {
       throw new Error(`Error setting cache value for key ${key}: ${error}`);
     }
   }
