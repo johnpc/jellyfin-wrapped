@@ -13,7 +13,7 @@ export const getAuthenticatedJellyfinApi = async (): Promise<Api> => {
   const password = localStorage.getItem("jellyfinPassword");
   const jellyfinAuthToken = localStorage.getItem("jellyfinAuthToken");
 
-  if (!serverUrl || !username || !password || !jellyfinAuthToken) {
+  if (!serverUrl || (!(username && password) && !jellyfinAuthToken)) {
     throw new Error(
       "Missing credentials in localStorage. Please configure your Jellyfin connection.",
     );
@@ -21,9 +21,10 @@ export const getAuthenticatedJellyfinApi = async (): Promise<Api> => {
 
   // Attempt to authenticate with stored credentials
   if (jellyfinAuthToken) {
+    console.log("hello?");
     await authenticateByAuthToken(serverUrl, jellyfinAuthToken);
   } else {
-    await authenticateByUserName(serverUrl, username, password);
+    await authenticateByUserName(serverUrl, username!, password!);
   }
   return api!;
 };
@@ -32,9 +33,6 @@ export const authenticateByAuthToken = async (
   serverUrl: string,
   jellyfinApiKey: string,
 ) => {
-  if (api) {
-    return;
-  }
   const jellyfin = new Jellyfin({
     clientInfo: {
       name: "Jellyfin-Wrapped",
@@ -45,8 +43,7 @@ export const authenticateByAuthToken = async (
       id: await generateFingerprint(),
     },
   });
-  api = jellyfin.createApi(serverUrl);
-  api.accessToken = jellyfinApiKey;
+  api = jellyfin.createApi(serverUrl, jellyfinApiKey);
   return api;
 };
 
