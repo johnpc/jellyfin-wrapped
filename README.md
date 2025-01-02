@@ -89,6 +89,14 @@ docker compose pull
 
 Now the Jellyfin Wrapped ui is available at `http://localhost` on port 80.
 
+### Updating Published Docker Image
+
+```bash
+docker build -t jellyfin-wrapped . --no-cache
+docker tag jellyfin-wrapped:latest mrorbitman/jellyfin-wrapped:latest
+docker push mrorbitman/jellyfin-wrapped:latest
+```
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
