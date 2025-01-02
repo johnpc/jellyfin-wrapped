@@ -15,7 +15,7 @@ A web application that generates personalized year-in-review statistics for your
 
 ### Prerequisites
 
-- A Jellyfin server (version 10.8.0 or higher)
+- A Jellyfin server (version 10.8.0 or higher) with Jellyfin's official [Playback Reporting plugin](https://github.com/jellyfin/jellyfin-plugin-playbackreporting) installed
 - Your Jellyfin server URL
 - A valid Jellyfin username and password
 
@@ -69,6 +69,7 @@ npm run preview
 To build with docker, run the following commands
 
 ```bash
+npm run build
 docker build -t jellyfin-wrapped .
 docker run -p 80:80 jellyfin-wrapped
 ```
