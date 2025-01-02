@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
-import { listAudio, SimpleItemDto } from "@/lib/playback-reporting-queries";
+import { listMusicVideos, SimpleItemDto } from "@/lib/playback-reporting-queries";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { Container, Grid, Box, Spinner, Button } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
 
-export default function AudioReviewPage() {
+export default function MusicVideoPage() {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [audios, setAudios] = useState<SimpleItemDto[]>([]);
+  const [musicVideos, setMusicVideos] = useState<SimpleItemDto[]>([]);
 
   useEffect(() => {
     const setup = async () => {
       setIsLoading(true);
-      setAudios(await listAudio());
+      setMusicVideos(await listMusicVideos());
       setIsLoading(false);
     };
     setup();
@@ -63,13 +63,13 @@ export default function AudioReviewPage() {
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
-              You Listened to {audios.length} Songs This Year
+              You Listened to {musicVideos.length} Music Videos This Year
             </Title>
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
-            {audios.map((audio) => (
-              <MovieCard key={audio.id} item={audio} />
+            {musicVideos.map((musicVideo) => (
+              <MovieCard key={musicVideo.id} item={musicVideo} />
             ))}
           </Grid>
         </Grid>
@@ -78,10 +78,10 @@ export default function AudioReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/music-videos");
+          navigate("/");
         }}
       >
-        Review Music Videos
+        Home
       </Button>
     </Box>
   );

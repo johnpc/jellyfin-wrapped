@@ -215,6 +215,32 @@ ORDER BY rowid DESC
   return getItemDtosByIds(movieItemIds);
 };
 
+export const listMusicVideos = async (): Promise<SimpleItemDto[]> => {
+  const userId = await getCurrentUserId();
+
+  const queryString = `
+  SELECT ROWID, *
+  FROM PlaybackActivity
+  WHERE UserId = "${userId}"
+  AND ItemType = "MusicVideo"
+  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  ORDER BY rowid DESC
+  `;
+  const data = await playbackReportingSqlRequest(queryString);
+
+  const itemIdIndex = data.colums.findIndex((i: string) => i == "ItemId");
+  data.results.map((result: string[]) => {
+    return result[itemIdIndex];
+  });
+  const movieItemIds = data.results
+    .map((result: string[]) => result[itemIdIndex])
+    .filter(
+      (value: string, index: number, self: string[]) =>
+        self.indexOf(value) === index,
+    );
+  return getItemDtosByIds(movieItemIds);
+};
+
 export const listAudio = async (): Promise<SimpleItemDto[]> => {
   const userId = await getCurrentUserId();
 
