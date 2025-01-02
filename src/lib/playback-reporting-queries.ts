@@ -9,6 +9,7 @@ import { subYears } from "date-fns";
 import {
   BaseItemPerson,
   ImageType,
+  NameGuidPair,
   PluginStatus,
 } from "@jellyfin/sdk/lib/generated-client";
 import {
@@ -26,6 +27,8 @@ export type SimpleItemDto = {
   communityRating?: number | null;
   productionYear?: number | null;
   people?: BaseItemPerson[] | null;
+  genres?: string[] | null;
+  genreItems?: NameGuidPair[] | null;
 };
 
 const oneYearAgo = subYears(new Date(), 1);
@@ -120,6 +123,8 @@ const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
             communityRating: item.data.CommunityRating,
             people: item.data.People,
             date: item.data.PremiereDate,
+            genres: item.data.Genres,
+            genreItems: item.data.GenreItems,
           };
           setCacheValue(`item_${itemId}`, JSON.stringify(simpleItem));
 

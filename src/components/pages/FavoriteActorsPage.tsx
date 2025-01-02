@@ -87,10 +87,10 @@ export default function FavoriteActorsPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          navigate("/tv");
+          navigate("/genres");
         }}
       >
-        Review Live TV
+        Review Top Genres
       </Button>
     </Box>
   );
