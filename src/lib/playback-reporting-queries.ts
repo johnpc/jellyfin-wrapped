@@ -29,6 +29,7 @@ export type SimpleItemDto = {
   people?: BaseItemPerson[] | null;
   genres?: string[] | null;
   genreItems?: NameGuidPair[] | null;
+  durationSeconds: number;
 };
 
 const oneYearAgo = subYears(new Date(), 1);
@@ -93,7 +94,11 @@ export const getImageUrlById = async (id: string) => {
   const api = getImageApi(await getAuthenticatedJellyfinApi());
   /* eslint-disable @typescript-eslint/no-unsafe-argument */
   // @ts-expect-error ImageType.Poster not behaving right
-  const url = api.getItemImageUrlById(id, ImageType.Poster);
+  const url = api.getItemImageUrlById(id, ImageType.Poster, {
+    maxWidth: 300,
+    width: 300,
+    quality: 90,
+  });
   setCacheValue(cacheKey, url);
   return url;
 };
@@ -119,6 +124,9 @@ const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
             itemId,
             userId,
           });
+          const ticks = item.data.RunTimeTicks ?? 0
+          // In Jellyfin, runtime ticks are a unit of time measurement used to track media playback duration. One tick represents 10,000,000 (10 million) nanoseconds, which is equivalent to 1/10th of a second.
+          const durationSeconds = Math.floor(ticks / 10000000);
 
           const simpleItem: SimpleItemDto = {
             id: item.data.Id,
@@ -130,6 +138,7 @@ const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
             date: item.data.PremiereDate,
             genres: item.data.Genres,
             genreItems: item.data.GenreItems,
+            durationSeconds,
           };
           setCacheValue(`item_${itemId}`, JSON.stringify(simpleItem));
 
@@ -258,7 +267,6 @@ AND DateCreated < '${endOfDate.getFullYear()}-${endOfDate.getMonth() + 1}-${endO
 ORDER BY rowid DESC
 `;
   const data = await playbackReportingSqlRequest(queryString);
-  console.log({ queryString });
 
   const queryString2 = `
   SELECT ROWID, *
@@ -469,7 +477,15 @@ export const listShows = async (): Promise<
         const showEpisodeIds = showEpisodes.map((episode) => episode.id);
         return showEpisodeIds.includes(result[itemIdIndex]);
       })
-      .map((result: string[]) => parseInt(result[playDurationIndex]))
+      .map((result: string[]) => {
+        const duration = parseInt(result[playDurationIndex])
+        // Prevent negative playback time due to Playback Reporting bug
+        const zeroBoundDuration = Math.max(0, duration);
+        const maxShowRuntime = showEpisodes.find(show => show.id === result[itemIdIndex])?.durationSeconds || zeroBoundDuration;
+        // Prevent excessive playback time due to Playback Reporting bug
+        const playBackBoundDuration = Math.min(zeroBoundDuration, maxShowRuntime);
+        return playBackBoundDuration;
+      })
       .reduce((acc, curr) => acc + curr, 0);
     return {
       showName: show.name ?? "",
