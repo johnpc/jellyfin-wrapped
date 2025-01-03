@@ -138,7 +138,7 @@ const ServerConfigurationPage = () => {
                       onChange={handleServerUrlChange}
                       required
                     />
-                    {protocol !== "https" ? null : (
+                    {!protocol.includes("https") ? null : (
                       <Disclaimer as={motion.div} variants={itemVariants}>
                         You are accessing Jellyfin Wrapped via https. You must
                         either use an https server url or follow these steps:
