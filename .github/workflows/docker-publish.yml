@@ -61,3 +61,23 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ github.ref_name }}
+          body: |
+              ## Docker Images
+
+              Pull the image using:
+              ```bash
+              docker pull mrorbitman/jellyfin-wrapped:${{ github.ref_name }}
+              # or
+              docker pull mrorbitman/jellyfin-wrapped:latest
+              ```
+
+              Docker Hub URL: https://hub.docker.com/r/mrorbitman/jellyfin-wrapped/tags
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
