@@ -13,6 +13,7 @@ interface ChannelCardProps {
   duration: number;
 }
 
+const NEXT_PAGE = '/audio';
 export function ChannelCard({ channelName, duration }: ChannelCardProps) {
   return (
     <motion.div
@@ -48,6 +49,9 @@ export default function LiveTvReviewPage() {
         const channelData = await listLiveTvChannels();
         // Sort channels by duration in descending order
         channelData.sort((a, b) => b.duration - a.duration);
+        if (!channelData.length) {
+          void navigate(NEXT_PAGE);
+        }
         setChannels(channelData);
       } catch (e) {
         showBoundary(e);
@@ -108,7 +112,7 @@ export default function LiveTvReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          void navigate("/audio");
+          void navigate(NEXT_PAGE);
         }}
       >
         Review Audio

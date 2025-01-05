@@ -11,7 +11,7 @@ import { generateGuid } from "@/lib/utils";
 import { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client";
 import { ActorCard } from "./MoviesReviewPage/ActorCard";
 import { useErrorBoundary } from "react-error-boundary";
-
+const NEXT_PAGE = '/genres';
 export default function FavoriteActorsPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -30,7 +30,11 @@ export default function FavoriteActorsPage() {
     const setup = async () => {
       setIsLoading(true);
       try {
-        setFavoriteActors(await listFavoriteActors());
+        const fetched = await listFavoriteActors();
+        if (!fetched.length) {
+          void navigate(NEXT_PAGE);
+        }
+        setFavoriteActors(fetched);
       } catch (e) {
         showBoundary(e);
       } finally {
@@ -87,7 +91,7 @@ export default function FavoriteActorsPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          void navigate("/genres");
+          void navigate(NEXT_PAGE);
         }}
       >
         Review Top Genres

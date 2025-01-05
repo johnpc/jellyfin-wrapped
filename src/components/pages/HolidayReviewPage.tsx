@@ -17,6 +17,8 @@ import {
   getValentinesDay,
 } from "date-fns-holiday-us";
 import { isAfter, isSameDay, subDays } from "date-fns";
+
+const NEXT_PAGE = '/tv';
 export default function HolidayReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -87,6 +89,9 @@ export default function HolidayReviewPage() {
         setValentinesItems(
           valentinesItems.filter((item) => !hiddenIds.includes(item.id ?? "")),
         );
+        if (christmasItems.length === 0 && christmasEveItems.length === 0 && halloweenItems.length === 0 && valentinesItems.length === 0) {
+          void navigate(NEXT_PAGE);
+        }
       } catch (error) {
         showBoundary(error);
       } finally {
@@ -200,7 +205,7 @@ export default function HolidayReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          void navigate("/tv");
+          void navigate(NEXT_PAGE);
         }}
       >
         Review Live TV

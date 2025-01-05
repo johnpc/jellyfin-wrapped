@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
 
+const NEXT_PAGE = "/oldest-show";
 export default function ShowReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -31,6 +32,9 @@ export default function ShowReviewPage() {
           (show) => !hiddenIds.includes(show.item.id ?? ""),
         );
         setShows(filteredShows);
+        if (!filteredShows.length) {
+          void navigate(NEXT_PAGE);
+        }
       } catch (e) {
         showBoundary(e);
       } finally {
@@ -110,7 +114,7 @@ export default function ShowReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          void navigate("/oldest-show");
+          void navigate(NEXT_PAGE);
         }}
       >
         Review Oldest Show

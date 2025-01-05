@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Subtitle } from "../ui/styled";
 import { useErrorBoundary } from "react-error-boundary";
 
+const NEXT_PAGE = "/actors";
 export default function OldestShowPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -30,6 +31,9 @@ export default function OldestShowPage() {
           return aDate.getTime() - bDate.getTime();
         });
         const s = shows.find((s) => s);
+        if (!s) {
+          void navigate(NEXT_PAGE);
+        }
         setShow(s);
       } catch (e) {
         showBoundary(e);
@@ -82,7 +86,7 @@ export default function OldestShowPage() {
           size={"4"}
           style={{ width: "100%" }}
           onClick={() => {
-            void navigate("/actors");
+            void navigate(NEXT_PAGE);
           }}
         >
           Review Favorite Actors
@@ -130,7 +134,7 @@ export default function OldestShowPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          void navigate("/actors");
+          void navigate(NEXT_PAGE);
         }}
       >
         Review Favorite Actors

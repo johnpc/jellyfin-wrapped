@@ -13,6 +13,7 @@ import { generateGuid } from "@/lib/utils";
 import { useErrorBoundary } from "react-error-boundary";
 import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
 
+const NEXT_PAGE = '/holidays';
 export default function GenreReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -35,6 +36,9 @@ export default function GenreReviewPage() {
             .map((show) => show.item)
             .filter((show) => !hiddenIds.includes(show.id ?? "")),
         );
+        if (!movies.length && !shows.length) {
+          void navigate(NEXT_PAGE);
+        }
       } catch (error) {
         showBoundary(error);
       } finally {
@@ -121,7 +125,7 @@ export default function GenreReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          void navigate("/holidays");
+          void navigate(NEXT_PAGE);
         }}
       >
         Review Holidays
