@@ -75,6 +75,20 @@ jobs:
               docker pull mrorbitman/jellyfin-wrapped:latest
               ```
 
+              Example docker-compose.yaml:
+
+              ```
+              version: "3"
+              services:
+                web:
+                  image: mrorbitman/jellyfin-wrapped:${{ github.ref_name }}
+
+                  ports:
+                    - "80:80"
+                  restart: unless-stopped
+                  container_name: jellyfin-wrapped
+              ```
+
               Docker Hub URL: https://hub.docker.com/r/mrorbitman/jellyfin-wrapped/tags
           draft: false
           prerelease: false
