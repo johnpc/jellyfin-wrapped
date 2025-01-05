@@ -31,7 +31,7 @@ export const ContentWrapper = styled("div", {
 });
 
 export const Title = styled("h1", {
-  fontSize: "4rem",
+  fontSize: "2rem",
   fontWeight: "bold",
   marginBottom: "1rem",
   // Updated gradient with yellow to blue
@@ -39,6 +39,9 @@ export const Title = styled("h1", {
   WebkitBackgroundClip: "text",
   WebkitTextFillColor: "transparent",
   textShadow: "0 0 30px rgba(255, 215, 0, 0.3)",
+  "@media (min-width: 768px)": {
+    fontSize: "4rem", // Larger size for tablets and up
+  }
 });
 
 export const Subtitle = styled("p", {

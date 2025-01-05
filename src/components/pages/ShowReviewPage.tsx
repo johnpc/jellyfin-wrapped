@@ -3,10 +3,10 @@ import { listShows, SimpleItemDto } from "@/lib/playback-reporting-queries";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { Container, Grid, Box, Button, Spinner } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
+import { itemVariants, Title } from "../ui/styled";
 
 const NEXT_PAGE = "/oldest-show";
 export default function ShowReviewPage() {
@@ -58,26 +58,6 @@ export default function ShowReviewPage() {
       </div>
     );
   }
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  };
-  const Title = styled("h1", {
-    fontSize: "4rem",
-    fontWeight: "bold",
-    marginBottom: "1rem",
-    background: "linear-gradient(90deg, #FFD700 0%, #00E1FF 100%)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    textShadow: "0 0 30px rgba(255, 215, 0, 0.3)",
-  });
 
   return (
     <Box
@@ -117,7 +97,7 @@ export default function ShowReviewPage() {
           void navigate(NEXT_PAGE);
         }}
       >
-        Review Oldest Show
+        Next
       </Button>
     </Box>
   );

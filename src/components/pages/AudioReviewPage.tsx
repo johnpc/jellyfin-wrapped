@@ -3,9 +3,9 @@ import { listAudio, SimpleItemDto } from "@/lib/playback-reporting-queries";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { Container, Grid, Box, Spinner, Button } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
+import { itemVariants, Title } from "../ui/styled";
 
 const NEXT_PAGE = '/music-videos'
 
@@ -48,27 +48,6 @@ export default function AudioReviewPage() {
       </div>
     );
   }
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  };
-  const Title = styled("h1", {
-    fontSize: "4rem",
-    fontWeight: "bold",
-    marginBottom: "1rem",
-    // Updated gradient with yellow to blue
-    background: "linear-gradient(90deg, #FFD700 0%, #00E1FF 100%)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    textShadow: "0 0 30px rgba(255, 215, 0, 0.3)",
-  });
 
   return (
     <Box style={{ backgroundColor: "var(--red-8)" }} className="min-h-screen">
@@ -94,7 +73,7 @@ export default function AudioReviewPage() {
           void navigate(NEXT_PAGE);
         }}
       >
-        Review Music Videos
+        Next
       </Button>
     </Box>
   );

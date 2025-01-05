@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { listLiveTvChannels } from "@/lib/playback-reporting-queries";
 import { Container, Grid, Box, Spinner, Button } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { styled } from "@stitches/react";
 import { Card, Text, Flex } from "@radix-ui/themes";
 import { formatDuration } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
+import { Title } from "../ui/styled";
 
 interface ChannelCardProps {
   channelName: string;
@@ -77,16 +77,6 @@ export default function LiveTvReviewPage() {
     );
   }
 
-  const Title = styled("h1", {
-    fontSize: "4rem",
-    fontWeight: "bold",
-    marginBottom: "1rem",
-    background: "linear-gradient(90deg, #FFD700 0%, #00E1FF 100%)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    textShadow: "0 0 30px rgba(255, 215, 0, 0.3)",
-  });
-
   return (
     <Box style={{ backgroundColor: "var(--green-8)" }} className="min-h-screen">
       <Container size="4" p="4">
@@ -115,7 +105,7 @@ export default function LiveTvReviewPage() {
           void navigate(NEXT_PAGE);
         }}
       >
-        Review Audio
+        Next
       </Button>
     </Box>
   );

@@ -86,7 +86,7 @@ export default function MoviesReviewPage() {
           void navigate(NEXT_PAGE);
         }}
       >
-        Review Oldest Movie
+        Next
       </Button>
     </Box>
   );

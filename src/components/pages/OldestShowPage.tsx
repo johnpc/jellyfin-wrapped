@@ -3,9 +3,8 @@ import { listShows, SimpleItemDto } from "@/lib/playback-reporting-queries";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { Container, Grid, Box, Button, Spinner } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
-import { Subtitle } from "../ui/styled";
+import { itemVariants, Subtitle, Title } from "../ui/styled";
 import { useErrorBoundary } from "react-error-boundary";
 
 const NEXT_PAGE = "/actors";
@@ -58,26 +57,6 @@ export default function OldestShowPage() {
       </div>
     );
   }
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  };
-  const Title = styled("h1", {
-    fontSize: "4rem",
-    fontWeight: "bold",
-    marginBottom: "1rem",
-    background: "linear-gradient(90deg, #FFD700 0%, #00E1FF 100%)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    textShadow: "0 0 30px rgba(255, 215, 0, 0.3)",
-  });
   if (!show?.item?.id) {
     return (
       <>
@@ -89,7 +68,7 @@ export default function OldestShowPage() {
             void navigate(NEXT_PAGE);
           }}
         >
-          Review Favorite Actors
+          Next
         </Button>
       </>
     );
@@ -137,7 +116,7 @@ export default function OldestShowPage() {
           void navigate(NEXT_PAGE);
         }}
       >
-        Review Favorite Actors
+        Next
       </Button>
     </Box>
   );

@@ -128,7 +128,7 @@ export default function GenreReviewPage() {
           void navigate(NEXT_PAGE);
         }}
       >
-        Review Holidays
+        Next
       </Button>
     </Box>
   );

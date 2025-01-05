@@ -94,7 +94,7 @@ export default function FavoriteActorsPage() {
           void navigate(NEXT_PAGE);
         }}
       >
-        Review Top Genres
+        Next
       </Button>
     </Box>
   );

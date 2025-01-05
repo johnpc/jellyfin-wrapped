@@ -3,9 +3,8 @@ import { listMovies, SimpleItemDto } from "@/lib/playback-reporting-queries";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { Container, Grid, Box, Button, Spinner } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
-import { Subtitle } from "../ui/styled";
+import { itemVariants, Subtitle, Title } from "../ui/styled";
 import { useErrorBoundary } from "react-error-boundary";
 
 const NEXT_PAGE = "/shows";
@@ -54,26 +53,6 @@ export default function OldestMoviePage() {
       </div>
     );
   }
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  };
-  const Title = styled("h1", {
-    fontSize: "4rem",
-    fontWeight: "bold",
-    marginBottom: "1rem",
-    background: "linear-gradient(90deg, #FFD700 0%, #00E1FF 100%)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    textShadow: "0 0 30px rgba(255, 215, 0, 0.3)",
-  });
 
   if (!movie?.id) {
     return (
@@ -86,7 +65,7 @@ export default function OldestMoviePage() {
             void navigate(NEXT_PAGE);
           }}
         >
-          Review Shows
+          Next
         </Button>
       </>
     );
@@ -98,7 +77,7 @@ export default function OldestMoviePage() {
       className="min-h-screen"
     >
       <Container size="4" p="4">
-        <Grid gap="6">
+      <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               It's {new Date().getFullYear()}, but you've time traveled back to{" "}
@@ -118,7 +97,18 @@ export default function OldestMoviePage() {
               })}
             </Subtitle>
           </div>
-          <MovieCard key={movie.id} item={movie} />
+          <div style={{
+    display: "flex",
+    justifyContent: "center",
+    width: "100%"
+  }}>
+    <div style={{
+      maxWidth: "50%",
+      width: "100%"
+    }}>
+      <MovieCard key={movie.id} item={movie} />
+    </div>
+  </div>
         </Grid>
       </Container>
       <Button
@@ -128,7 +118,7 @@ export default function OldestMoviePage() {
           void navigate(NEXT_PAGE);
         }}
       >
-        Review Shows
+        Next
       </Button>
     </Box>
   );

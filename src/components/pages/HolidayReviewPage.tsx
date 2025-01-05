@@ -208,7 +208,7 @@ export default function HolidayReviewPage() {
           void navigate(NEXT_PAGE);
         }}
       >
-        Review Live TV
+        Next
       </Button>
     </Box>
   );
