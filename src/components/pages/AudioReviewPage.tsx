@@ -7,6 +7,8 @@ import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 
+const NEXT_PAGE = '/music-videos'
+
 export default function AudioReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -18,7 +20,11 @@ export default function AudioReviewPage() {
     const setup = async (): Promise<void> => {
       setIsLoading(true);
       try {
-        setAudios(await listAudio());
+        const fetched = await listAudio();
+        if (!fetched.length) {
+          void navigate(NEXT_PAGE);
+        }
+        setAudios(fetched);
       } catch (e) {
         showBoundary(e);
       } finally {
@@ -85,7 +91,7 @@ export default function AudioReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          void navigate("/music-videos");
+          void navigate(NEXT_PAGE);
         }}
       >
         Review Music Videos

@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Subtitle } from "../ui/styled";
 import { useErrorBoundary } from "react-error-boundary";
 
+const NEXT_PAGE = "/shows";
 export default function OldestMoviePage() {
   const { showBoundary } = useErrorBoundary();
 
@@ -26,6 +27,9 @@ export default function OldestMoviePage() {
           return aDate.getTime() - bDate.getTime();
         });
         const m = movies.find((s) => s);
+        if (!m) {
+          void navigate(NEXT_PAGE);
+        }
         setMovie(m);
       } catch (e) {
         showBoundary(e);
@@ -79,7 +83,7 @@ export default function OldestMoviePage() {
           size={"4"}
           style={{ width: "100%" }}
           onClick={() => {
-            void navigate("/shows");
+            void navigate(NEXT_PAGE);
           }}
         >
           Review Shows
@@ -121,7 +125,7 @@ export default function OldestMoviePage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          void navigate("/shows");
+          void navigate(NEXT_PAGE);
         }}
       >
         Review Shows

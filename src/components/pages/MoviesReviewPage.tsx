@@ -9,6 +9,7 @@ import { generateGuid } from "@/lib/utils";
 import { useErrorBoundary } from "react-error-boundary";
 import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
 
+const NEXT_PAGE = '/oldest-movie'
 export default function MoviesReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -24,6 +25,9 @@ export default function MoviesReviewPage() {
         setMovies(
           movies.filter((movie) => !hiddenIds.includes(movie.id ?? "")),
         );
+        if (!movies.length) {
+          void navigate(NEXT_PAGE);
+        }
       } catch (error) {
         showBoundary(error);
       } finally {
@@ -79,7 +83,7 @@ export default function MoviesReviewPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          void navigate("/oldest-movie");
+          void navigate(NEXT_PAGE);
         }}
       >
         Review Oldest Movie

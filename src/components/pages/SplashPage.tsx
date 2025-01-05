@@ -12,6 +12,7 @@ import {
   Title,
 } from "../ui/styled";
 
+const NEXT_PAGE = "/configure";
 const SplashPage = () => {
   const navigate = useNavigate();
 
@@ -101,7 +102,7 @@ const SplashPage = () => {
         >
           <StyledButton
             onClick={() => {
-              void navigate("/configure");
+              void navigate(NEXT_PAGE);
             }}
           >
             Connect Your Jellyfin Server

@@ -10,6 +10,7 @@ import { styled } from "@stitches/react";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 
+const NEXT_PAGE = "/";
 export default function MusicVideoPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -21,7 +22,11 @@ export default function MusicVideoPage() {
     const setup = async () => {
       setIsLoading(true);
       try {
-        setMusicVideos(await listMusicVideos());
+        const fetched = await listMusicVideos();
+        if (!fetched.length) {
+          void navigate(NEXT_PAGE);
+        }
+        setMusicVideos(fetched);
       } catch (error) {
         showBoundary(error);
       } finally {
@@ -88,7 +93,7 @@ export default function MusicVideoPage() {
         size={"4"}
         style={{ width: "100%" }}
         onClick={() => {
-          void navigate("/");
+          void navigate(NEXT_PAGE);
         }}
       >
         Home

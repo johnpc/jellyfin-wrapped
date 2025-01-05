@@ -17,6 +17,9 @@ import {
   setCacheValue,
 } from "@/lib/cache";
 import { useErrorBoundary } from "react-error-boundary";
+import { listAudio, listLiveTvChannels, listMovies, listShows } from "@/lib/playback-reporting-queries";
+
+const NEXT_PAGE = '/movies'
 type WindowOverride = typeof Window & {
   ENV:
     | {
@@ -81,7 +84,13 @@ const ServerConfigurationPage = () => {
         await authenticateByUserName(serverUrl, username, password);
       }
 
-      void navigate("/movies");
+      // Warm caches
+      void listMovies();
+      void listShows();
+      void listAudio();
+      void listLiveTvChannels();
+
+      void navigate(NEXT_PAGE);
     } catch (e) {
       showBoundary(e);
     } finally {
