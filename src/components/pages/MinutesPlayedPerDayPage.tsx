@@ -11,14 +11,16 @@ interface PlaybackData {
   date: string;
   minutes: number;
 }
-
 const NEXT_PAGE = "/";
 export default function MinutesPlayedPerDayPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [playbackData, setPlaybackData] = useState<PlaybackData[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const navigate = useNavigate();
+
+  // Format time display helper
   const formatTimeDisplay = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
@@ -33,13 +35,13 @@ export default function MinutesPlayedPerDayPage() {
 
     return `${hours} ${hours === 1 ? "hour" : "hours"} ${remainingMinutes} ${remainingMinutes === 1 ? "minute" : "minutes"}`;
   };
+
   // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
         const data = await getMinutesPlayedPerDay();
-        // Sort data chronologically for the graph
         setPlaybackData(
           data.sort(
             (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
@@ -55,16 +57,26 @@ export default function MinutesPlayedPerDayPage() {
   }, []);
 
   // Create/Update D3 visualization
-  useEffect(() => {
-    if (!playbackData.length || !svgRef.current) return;
+  const updateChart = () => {
+    if (!playbackData.length || !svgRef.current || !containerRef.current)
+      return;
 
     // Clear any existing SVG content
     d3.select(svgRef.current).selectAll("*").remove();
 
-    // Set up dimensions
-    const margin = { top: 20, right: 30, bottom: 40, left: 60 };
-    const width = 800 - margin.left - margin.right;
-    const height = 400 - margin.top - margin.bottom;
+    // Get container width
+    const containerWidth = containerRef.current.clientWidth;
+
+    // Set responsive dimensions
+    const margin = {
+      top: 20,
+      right: 20,
+      bottom: containerWidth < 600 ? 60 : 40, // More space for labels on mobile
+      left: containerWidth < 600 ? 50 : 60,
+    };
+    const width = containerWidth - margin.left - margin.right;
+    const height =
+      Math.min(400, containerWidth * 0.6) - margin.top - margin.bottom;
 
     // Create SVG
     const svg = d3
@@ -116,13 +128,15 @@ export default function MinutesPlayedPerDayPage() {
       .attr("stroke-width", 2)
       .attr("d", line);
 
-    // Add axes
+    // Configure axes with responsive settings
     const xAxis = d3
       .axisBottom(xScale)
-      .ticks(d3.timeMonth.every(1))
+      .ticks(containerWidth < 600 ? 4 : d3.timeMonth.every(1))
       .tickFormat((d) => {
         if (d instanceof Date) {
-          return d3.timeFormat("%b %Y")(d);
+          return containerWidth < 600
+            ? d3.timeFormat("%b")(d) // Short month name on mobile
+            : d3.timeFormat("%b %Y")(d);
         }
         return "";
       });
@@ -132,6 +146,7 @@ export default function MinutesPlayedPerDayPage() {
       .ticks(5)
       .tickFormat((d: d3.NumberValue) => `${d.valueOf()}m`);
 
+    // Add x-axis
     svg
       .append("g")
       .attr("transform", `translate(0,${height})`)
@@ -140,8 +155,9 @@ export default function MinutesPlayedPerDayPage() {
       .style("text-anchor", "end")
       .attr("dx", "-.8em")
       .attr("dy", ".15em")
-      .attr("transform", "rotate(-45)");
+      .attr("transform", containerWidth < 600 ? "rotate(-45)" : "rotate(-45)");
 
+    // Add y-axis
     svg.append("g").call(yAxis);
 
     // Add hover effects
@@ -154,7 +170,10 @@ export default function MinutesPlayedPerDayPage() {
       .style("padding", "8px")
       .style("border-radius", "4px")
       .style("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
-      .style("display", "none");
+      .style("display", "none")
+      .style("z-index", "1000")
+      .style("pointer-events", "none")
+      .style("font-size", containerWidth < 600 ? "12px" : "14px");
 
     const dots = svg
       .selectAll(".dot")
@@ -164,7 +183,7 @@ export default function MinutesPlayedPerDayPage() {
       .attr("class", "dot")
       .attr("cx", (d) => xScale(new Date(d.date)))
       .attr("cy", (d) => yScale(d.minutes))
-      .attr("r", 4)
+      .attr("r", containerWidth < 600 ? 3 : 4)
       .attr("fill", "var(--yellow-9)")
       .style("opacity", 0);
 
@@ -175,15 +194,12 @@ export default function MinutesPlayedPerDayPage() {
       .style("fill", "none")
       .style("pointer-events", "all")
       .on("mousemove", function (event: PointerEvent) {
-        const [xPos] = d3.pointer(event);
+        const [xPos] = d3.pointer(event, this);
         const xDate = xScale.invert(xPos);
-        const bisectByDate = d3.bisector<PlaybackData, Date>(
+        const bisectLeft = d3.bisector<PlaybackData, Date>(
           (d) => new Date(d.date),
-        );
-        const bisectLeft = (data: PlaybackData[], date: Date) =>
-          bisectByDate.left(data, date);
+        ).left;
         const index = bisectLeft(playbackData, xDate);
-
         const d = playbackData[index];
 
         if (d) {
@@ -194,9 +210,7 @@ export default function MinutesPlayedPerDayPage() {
             .style("display", "block")
             .style("left", `${event.pageX + 10}px`)
             .style("top", `${event.pageY - 10}px`)
-            .html(
-              `Date: ${d.date}<br>Time: ${formatTimeDisplay(d.minutes)}`,
-            );
+            .html(`Date: ${d.date}<br>${formatTimeDisplay(d.minutes)}`);
         }
       })
       .on("mouseout", () => {
@@ -204,9 +218,22 @@ export default function MinutesPlayedPerDayPage() {
         tooltip.style("display", "none");
       });
 
-    // Cleanup function
     return () => {
       tooltip.remove();
+    };
+  };
+
+  // Update chart on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      updateChart();
+    };
+
+    window.addEventListener("resize", handleResize);
+    updateChart();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
     };
   }, [playbackData]);
 
@@ -220,25 +247,7 @@ export default function MinutesPlayedPerDayPage() {
           minHeight: "100vh",
         }}
       >
-        <Box
-          style={{
-            backgroundColor: "var(--green-8)",
-            minHeight: "100vh",
-            minWidth: "100vw",
-          }}
-          className="min-h-screen"
-        >
-          <Box
-            style={{
-              backgroundColor: "var(--green-8)",
-              minHeight: "100vh",
-              minWidth: "100vw",
-            }}
-            className="min-h-screen"
-          >
-            <Spinner size="3" />
-          </Box>
-        </Box>
+        <Spinner size="3" />
       </div>
     );
   }
@@ -247,14 +256,7 @@ export default function MinutesPlayedPerDayPage() {
   const averageMinutes = Math.round(totalMinutes / playbackData.length);
 
   return (
-    <Box
-      style={{
-        backgroundColor: "var(--green-8)",
-        minHeight: "100vh",
-        minWidth: "100vw",
-      }}
-      className="min-h-screen"
-    >
+    <Box className="min-h-screen">
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
@@ -267,11 +269,14 @@ export default function MinutesPlayedPerDayPage() {
           </div>
 
           <div
+            ref={containerRef}
             style={{
               backgroundColor: "white",
               padding: "20px",
               borderRadius: "8px",
               boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+              width: "100%",
+              overflowX: "hidden",
             }}
           >
             <svg ref={svgRef}></svg>
