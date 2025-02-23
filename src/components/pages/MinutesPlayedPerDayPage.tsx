@@ -27,15 +27,15 @@ const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const CHART_COLORS = {
   timeOfDay: {
-    line: "var(--blue-9)",
+    line: "var(--blue-11)",
     area: "var(--blue-5)",
   },
   dayOfWeek: {
-    bar: "var(--green-9)",
+    bar: "var(--purple-11)",
   },
   activity: {
-    line: "var(--yellow-9)",
-    area: "var(--yellow-5)",
+    line: "var(--orange-11)",
+    area: "var(--orange-5)",
   },
 };
 
@@ -494,45 +494,53 @@ export default function MinutesPlayedPerDayPage() {
           </div>
 
           <div ref={containerRef}>
-            <Grid columns={{ initial: "1", sm: "2" }} gap="4">
+            <Grid columns="1" gap="6">
               <Box
                 style={{
-                  backgroundColor: "var(--red-8)",
+                  backgroundColor: "var(--blue-8)",
                   borderRadius: "8px",
-                  padding: "16px 0",
+                  padding: "32px 0",
                   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                   width: "100%",
                   overflowX: "hidden",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
                 <svg ref={timeOfDayRef}></svg>
               </Box>
               <Box
                 style={{
-                  backgroundColor: "var(--red-8)",
+                  backgroundColor: "var(--purple-8)",
                   borderRadius: "8px",
-                  padding: "16px 0",
+                  padding: "32px 0",
                   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                   width: "100%",
                   overflowX: "hidden",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
                 <svg ref={dayOfWeekRef}></svg>
               </Box>
+              <Box
+                style={{
+                  backgroundColor: "var(--orange-8)",
+                  borderRadius: "8px",
+                  padding: "32px 0",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  width: "100%",
+                  overflowX: "hidden",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <svg ref={svgRef}></svg>
+              </Box>
             </Grid>
-            <Box
-              style={{
-                backgroundColor: "var(--red-8)",
-                borderRadius: "8px",
-                padding: "16px 0",
-                marginTop: "16px",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                width: "100%",
-                overflowX: "hidden",
-              }}
-            >
-              <svg ref={svgRef}></svg>
-            </Box>
           </div>
         </Grid>
       </Container>
