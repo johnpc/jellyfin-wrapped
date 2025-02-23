@@ -41,7 +41,7 @@ export const Title = styled("h1", {
   textShadow: "0 0 30px rgba(255, 215, 0, 0.3)",
   "@media (min-width: 768px)": {
     fontSize: "4rem", // Larger size for tablets and up
-  }
+  },
 });
 
 export const Subtitle = styled("p", {

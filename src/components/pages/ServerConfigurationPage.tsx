@@ -17,9 +17,14 @@ import {
   setCacheValue,
 } from "@/lib/cache";
 import { useErrorBoundary } from "react-error-boundary";
-import { listAudio, listLiveTvChannels, listMovies, listShows } from "@/lib/playback-reporting-queries";
+import {
+  listAudio,
+  listLiveTvChannels,
+  listMovies,
+  listShows,
+} from "@/lib/playback-reporting-queries";
 
-const NEXT_PAGE = '/movies'
+const NEXT_PAGE = "/movies";
 type WindowOverride = typeof Window & {
   ENV:
     | {

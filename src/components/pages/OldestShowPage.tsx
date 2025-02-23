@@ -53,7 +53,16 @@ export default function OldestShowPage() {
           minHeight: "100vh",
         }}
       >
-        <Spinner size={"3"} />
+        <Box
+          style={{
+            backgroundColor: "var(--green-8)",
+            minHeight: "100vh",
+            minWidth: "100vw",
+          }}
+          className="min-h-screen"
+        >
+          <Spinner size={"3"} />
+        </Box>
       </div>
     );
   }

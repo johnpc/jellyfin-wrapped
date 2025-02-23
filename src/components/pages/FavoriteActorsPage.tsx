@@ -11,7 +11,7 @@ import { generateGuid } from "@/lib/utils";
 import { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client";
 import { ActorCard } from "./MoviesReviewPage/ActorCard";
 import { useErrorBoundary } from "react-error-boundary";
-const NEXT_PAGE = '/genres';
+const NEXT_PAGE = "/genres";
 export default function FavoriteActorsPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -54,7 +54,16 @@ export default function FavoriteActorsPage() {
           minHeight: "100vh",
         }}
       >
-        <Spinner size={"3"} />
+        <Box
+          style={{
+            backgroundColor: "var(--green-8)",
+            minHeight: "100vh",
+            minWidth: "100vw",
+          }}
+          className="min-h-screen"
+        >
+          <Spinner size={"3"} />
+        </Box>
       </div>
     );
   }

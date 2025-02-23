@@ -14,6 +14,7 @@ import OldestMoviePage from "./components/pages/OldestMoviePage";
 import MusicVideoPage from "./components/pages/MusicVideoPage";
 import GenreReviewPage from "./components/pages/GenreReviewPage";
 import HolidayReviewPage from "./components/pages/HolidayReviewPage";
+import MinutesPlayedPerDayPage from "./components/pages/MinutesPlayedPerDayPage";
 
 // Layout component that wraps all routes
 function RootLayout() {
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
       {
         path: "/holidays",
         element: <HolidayReviewPage />,
+      },
+      {
+        path: "/minutes-per-day",
+        element: <MinutesPlayedPerDayPage />,
       },
     ],
   },

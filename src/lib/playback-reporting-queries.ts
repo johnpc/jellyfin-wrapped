@@ -124,7 +124,7 @@ const getItemDtosByIds = async (ids: string[]): Promise<SimpleItemDto[]> => {
             itemId,
             userId,
           });
-          const ticks = item.data.RunTimeTicks ?? 0
+          const ticks = item.data.RunTimeTicks ?? 0;
           // In Jellyfin, runtime ticks are a unit of time measurement used to track media playback duration. One tick represents 10,000,000 (10 million) nanoseconds, which is equivalent to 1/10th of a second.
           const durationSeconds = Math.floor(ticks / 10000000);
 
@@ -478,12 +478,17 @@ export const listShows = async (): Promise<
         return showEpisodeIds.includes(result[itemIdIndex]);
       })
       .map((result: string[]) => {
-        const duration = parseInt(result[playDurationIndex])
+        const duration = parseInt(result[playDurationIndex]);
         // Prevent negative playback time due to Playback Reporting bug
         const zeroBoundDuration = Math.max(0, duration);
-        const maxShowRuntime = showEpisodes.find(show => show.id === result[itemIdIndex])?.durationSeconds || zeroBoundDuration;
+        const maxShowRuntime =
+          showEpisodes.find((show) => show.id === result[itemIdIndex])
+            ?.durationSeconds || zeroBoundDuration;
         // Prevent excessive playback time due to Playback Reporting bug
-        const playBackBoundDuration = Math.min(zeroBoundDuration, maxShowRuntime);
+        const playBackBoundDuration = Math.min(
+          zeroBoundDuration,
+          maxShowRuntime,
+        );
         return playBackBoundDuration;
       })
       .reduce((acc, curr) => acc + curr, 0);
@@ -498,4 +503,44 @@ export const listShows = async (): Promise<
   showInfo.sort((a, b) => b.episodeCount - a.episodeCount);
 
   return showInfo;
+};
+
+export const getMinutesPlayedPerDay = async (): Promise<
+  {
+    date: string;
+    minutes: number;
+  }[]
+> => {
+  const userId = await getCurrentUserId();
+
+  const queryString = `
+  SELECT
+    date(DateCreated) as PlayDate,
+    SUM(PlayDuration) as TotalPlayDuration
+  FROM PlaybackActivity
+  WHERE UserId = "${userId}"
+  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  GROUP BY date(DateCreated)
+  ORDER BY PlayDate DESC
+  `;
+
+  const data = await playbackReportingSqlRequest(queryString);
+
+  const dateIndex = data.colums.findIndex((i: string) => i === "PlayDate");
+  const durationIndex = data.colums.findIndex(
+    (i: string) => i === "TotalPlayDuration",
+  );
+
+  return data.results.map((result: string[]) => {
+    const duration = parseInt(result[durationIndex]);
+    // Prevent negative playback time due to potential reporting bugs
+    const zeroBoundDuration = Math.max(0, duration);
+    // Convert seconds to minutes, rounding down
+    const minutes = Math.floor(zeroBoundDuration / 60);
+
+    return {
+      date: result[dateIndex],
+      minutes: minutes,
+    };
+  });
 };

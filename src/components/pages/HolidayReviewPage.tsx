@@ -18,7 +18,7 @@ import {
 } from "date-fns-holiday-us";
 import { isAfter, isSameDay, subDays } from "date-fns";
 
-const NEXT_PAGE = '/tv';
+const NEXT_PAGE = "/tv";
 export default function HolidayReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -89,7 +89,12 @@ export default function HolidayReviewPage() {
         setValentinesItems(
           valentinesItems.filter((item) => !hiddenIds.includes(item.id ?? "")),
         );
-        if (christmasItems.length === 0 && christmasEveItems.length === 0 && halloweenItems.length === 0 && valentinesItems.length === 0) {
+        if (
+          christmasItems.length === 0 &&
+          christmasEveItems.length === 0 &&
+          halloweenItems.length === 0 &&
+          valentinesItems.length === 0
+        ) {
           void navigate(NEXT_PAGE);
         }
       } catch (error) {
@@ -111,7 +116,16 @@ export default function HolidayReviewPage() {
           minHeight: "100vh",
         }}
       >
-        <Spinner size={"3"} />
+        <Box
+          style={{
+            backgroundColor: "var(--green-8)",
+            minHeight: "100vh",
+            minWidth: "100vw",
+          }}
+          className="min-h-screen"
+        >
+          <Spinner size={"3"} />
+        </Box>
       </div>
     );
   }

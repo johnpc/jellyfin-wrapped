@@ -18,6 +18,7 @@
     "@radix-ui/themes": "^3.1.6",
     "@stitches/react": "^1.2.8",
     "class-variance-authority": "^0.7.1",
+    "d3": "^7.9.0",
     "date-fns": "^4.1.0",
     "date-fns-holiday-us": "^1.1.0",
     "framer-motion": "^11.15.0",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@types/d3": "^7.4.3",
     "@types/node": "^22.10.3",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",

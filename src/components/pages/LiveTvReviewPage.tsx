@@ -13,7 +13,7 @@ interface ChannelCardProps {
   duration: number;
 }
 
-const NEXT_PAGE = '/audio';
+const NEXT_PAGE = "/audio";
 export function ChannelCard({ channelName, duration }: ChannelCardProps) {
   return (
     <motion.div
@@ -72,7 +72,16 @@ export default function LiveTvReviewPage() {
           minHeight: "100vh",
         }}
       >
-        <Spinner size={"3"} />
+        <Box
+          style={{
+            backgroundColor: "var(--green-8)",
+            minHeight: "100vh",
+            minWidth: "100vw",
+          }}
+          className="min-h-screen"
+        >
+          <Spinner size={"3"} />
+        </Box>
       </div>
     );
   }

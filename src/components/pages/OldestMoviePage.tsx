@@ -49,7 +49,16 @@ export default function OldestMoviePage() {
           minHeight: "100vh",
         }}
       >
-        <Spinner size={"3"} />
+        <Box
+          style={{
+            backgroundColor: "var(--green-8)",
+            minHeight: "100vh",
+            minWidth: "100vw",
+          }}
+          className="min-h-screen"
+        >
+          <Spinner size={"3"} />
+        </Box>
       </div>
     );
   }
@@ -77,7 +86,7 @@ export default function OldestMoviePage() {
       className="min-h-screen"
     >
       <Container size="4" p="4">
-      <Grid gap="6">
+        <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               It's {new Date().getFullYear()}, but you've time traveled back to{" "}
@@ -97,18 +106,22 @@ export default function OldestMoviePage() {
               })}
             </Subtitle>
           </div>
-          <div style={{
-    display: "flex",
-    justifyContent: "center",
-    width: "100%"
-  }}>
-    <div style={{
-      maxWidth: "50%",
-      width: "100%"
-    }}>
-      <MovieCard key={movie.id} item={movie} />
-    </div>
-  </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <div
+              style={{
+                maxWidth: "50%",
+                width: "100%",
+              }}
+            >
+              <MovieCard key={movie.id} item={movie} />
+            </div>
+          </div>
         </Grid>
       </Container>
       <Button

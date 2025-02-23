@@ -13,7 +13,7 @@ import { generateGuid } from "@/lib/utils";
 import { useErrorBoundary } from "react-error-boundary";
 import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
 
-const NEXT_PAGE = '/holidays';
+const NEXT_PAGE = "/holidays";
 export default function GenreReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -58,7 +58,16 @@ export default function GenreReviewPage() {
           minHeight: "100vh",
         }}
       >
-        <Spinner size={"3"} />
+        <Box
+          style={{
+            backgroundColor: "var(--green-8)",
+            minHeight: "100vh",
+            minWidth: "100vw",
+          }}
+          className="min-h-screen"
+        >
+          <Spinner size={"3"} />
+        </Box>
       </div>
     );
   }
