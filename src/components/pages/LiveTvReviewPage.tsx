@@ -87,7 +87,14 @@ export default function LiveTvReviewPage() {
   }
 
   return (
-    <Box style={{ backgroundColor: "var(--green-8)" }} className="min-h-screen">
+    <Box
+      style={{
+        backgroundColor: "var(--green-8)",
+        minWidth: "100vw",
+        minHeight: "100vh",
+      }}
+      className="min-h-screen"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>

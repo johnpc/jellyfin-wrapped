@@ -247,7 +247,16 @@ export default function MinutesPlayedPerDayPage() {
           minHeight: "100vh",
         }}
       >
-        <Spinner size="3" />
+        <Box
+          style={{
+            backgroundColor: "var(--green-8)",
+            minHeight: "100vh",
+            minWidth: "100vw",
+          }}
+          className="min-h-screen"
+        >
+          <Spinner size="3" />
+        </Box>
       </div>
     );
   }
@@ -256,7 +265,14 @@ export default function MinutesPlayedPerDayPage() {
   const averageMinutes = Math.round(totalMinutes / playbackData.length);
 
   return (
-    <Box className="min-h-screen">
+    <Box
+      style={{
+        backgroundColor: "var(--green-8)",
+        minHeight: "100vh",
+        minWidth: "100vw",
+      }}
+      className="min-h-screen"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
@@ -271,8 +287,7 @@ export default function MinutesPlayedPerDayPage() {
           <div
             ref={containerRef}
             style={{
-              backgroundColor: "white",
-              padding: "20px",
+              backgroundColor: "var(--red-8)",
               borderRadius: "8px",
               boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
               width: "100%",

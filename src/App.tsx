@@ -1,7 +1,12 @@
 import "@radix-ui/themes/styles.css";
 import { ErrorBoundary } from "react-error-boundary";
 import { Theme } from "@radix-ui/themes";
-import { createBrowserRouter, RouterProvider, Outlet, useLocation } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
 import SplashPage from "./components/pages/SplashPage";
 import ServerConfigurationPage from "./components/pages/ServerConfigurationPage";
 import MoviesReviewPage from "./components/pages/MoviesReviewPage";
@@ -24,7 +29,7 @@ function ScrollToTop() {
   useEffect(() => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
   }, [pathname]);
 
