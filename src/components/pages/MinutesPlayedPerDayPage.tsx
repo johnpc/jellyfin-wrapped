@@ -21,7 +21,7 @@ interface ViewingPatterns {
   primeTime: { isPrimeTime: boolean; minutes: number }[];
 }
 
-const NEXT_PAGE = "/";
+const NEXT_PAGE = "/device-stats";
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 

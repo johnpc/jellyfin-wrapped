@@ -653,3 +653,104 @@ export const getViewingPatterns = async (): Promise<{
     primeTime,
   };
 };
+
+export const getDeviceStats = async (): Promise<{
+  deviceUsage: { deviceName: string; minutes: number }[];
+  browserUsage: { browserName: string; minutes: number }[];
+  osUsage: { osName: string; minutes: number }[];
+}> => {
+  const userId = await getCurrentUserId();
+
+  // Device query
+  const deviceQuery = `
+  SELECT
+    DeviceName,
+    SUM(PlayDuration) as TotalPlayDuration
+  FROM PlaybackActivity
+  WHERE UserId = "${userId}"
+  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  GROUP BY DeviceName
+  ORDER BY TotalPlayDuration DESC
+  `;
+
+  // Browser query
+  const browserQuery = `
+  SELECT
+    CASE
+      WHEN DeviceName LIKE '%Chrome%' THEN 'Chrome'
+      WHEN DeviceName LIKE '%Firefox%' THEN 'Firefox'
+      WHEN DeviceName LIKE '%Safari%' THEN 'Safari'
+      WHEN DeviceName LIKE '%Edge%' THEN 'Edge'
+      WHEN DeviceName LIKE '%TV%' THEN 'Smart TV'
+      WHEN DeviceName LIKE '%Mobile%' THEN 'Mobile'
+      ELSE 'Other'
+    END as BrowserName,
+    SUM(PlayDuration) as TotalPlayDuration
+  FROM PlaybackActivity
+  WHERE UserId = "${userId}"
+  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  GROUP BY BrowserName
+  ORDER BY TotalPlayDuration DESC
+  `;
+
+  // OS query
+  const osQuery = `
+  SELECT
+    CASE
+      WHEN DeviceName LIKE '%Windows%' THEN 'Windows'
+      WHEN DeviceName LIKE '%Mac%' OR DeviceName LIKE '%iOS%' THEN 'Apple'
+      WHEN DeviceName LIKE '%Android%' THEN 'Android'
+      WHEN DeviceName LIKE '%Linux%' THEN 'Linux'
+      WHEN DeviceName LIKE '%TV%' THEN 'Smart TV'
+      ELSE 'Other'
+    END as OSName,
+    SUM(PlayDuration) as TotalPlayDuration
+  FROM PlaybackActivity
+  WHERE UserId = "${userId}"
+  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  GROUP BY OSName
+  ORDER BY TotalPlayDuration DESC
+  `;
+
+  const [deviceData, browserData, osData] = await Promise.all([
+    playbackReportingSqlRequest(deviceQuery),
+    playbackReportingSqlRequest(browserQuery),
+    playbackReportingSqlRequest(osQuery),
+  ]);
+
+  // Process device data
+  const deviceUsage = deviceData.results.map((result) => {
+    const deviceName = result[deviceData.colums.findIndex((c) => c === "DeviceName")];
+    const duration = parseInt(result[deviceData.colums.findIndex((c) => c === "TotalPlayDuration")]);
+    return {
+      deviceName,
+      minutes: Math.floor(Math.max(0, duration) / 60),
+    };
+  });
+
+  // Process browser data
+  const browserUsage = browserData.results.map((result) => {
+    const browserName = result[browserData.colums.findIndex((c) => c === "BrowserName")];
+    const duration = parseInt(result[browserData.colums.findIndex((c) => c === "TotalPlayDuration")]);
+    return {
+      browserName,
+      minutes: Math.floor(Math.max(0, duration) / 60),
+    };
+  });
+
+  // Process OS data
+  const osUsage = osData.results.map((result) => {
+    const osName = result[osData.colums.findIndex((c) => c === "OSName")];
+    const duration = parseInt(result[osData.colums.findIndex((c) => c === "TotalPlayDuration")]);
+    return {
+      osName,
+      minutes: Math.floor(Math.max(0, duration) / 60),
+    };
+  });
+
+  return {
+    deviceUsage,
+    browserUsage,
+    osUsage,
+  };
+};

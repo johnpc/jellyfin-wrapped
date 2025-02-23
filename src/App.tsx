@@ -20,6 +20,7 @@ import MusicVideoPage from "./components/pages/MusicVideoPage";
 import GenreReviewPage from "./components/pages/GenreReviewPage";
 import HolidayReviewPage from "./components/pages/HolidayReviewPage";
 import MinutesPlayedPerDayPage from "./components/pages/MinutesPlayedPerDayPage";
+import DeviceStatsPage from "./components/pages/DeviceStatsPage";
 import { useEffect } from "react";
 
 // Layout component that wraps all routes
@@ -102,6 +103,10 @@ const router = createBrowserRouter([
       {
         path: "/minutes-per-day",
         element: <MinutesPlayedPerDayPage />,
+      },
+      {
+        path: "/device-stats",
+        element: <DeviceStatsPage />,
       },
     ],
   },
