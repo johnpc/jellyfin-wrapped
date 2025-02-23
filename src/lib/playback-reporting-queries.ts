@@ -544,3 +544,112 @@ export const getMinutesPlayedPerDay = async (): Promise<
     };
   });
 };
+
+export const getViewingPatterns = async (): Promise<{
+  timeOfDay: { hour: number; minutes: number }[];
+  dayOfWeek: { day: number; minutes: number }[];
+  primeTime: { isPrimeTime: boolean; minutes: number }[];
+}> => {
+  const userId = await getCurrentUserId();
+
+  // Time of day query
+  const timeOfDayQuery = `
+  SELECT
+    strftime('%H', DateCreated) as Hour,
+    SUM(PlayDuration) as TotalPlayDuration
+  FROM PlaybackActivity
+  WHERE UserId = "${userId}"
+  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  GROUP BY Hour
+  ORDER BY Hour
+  `;
+
+  // Day of week query (0 = Sunday, 6 = Saturday)
+  const dayOfWeekQuery = `
+  SELECT
+    strftime('%w', DateCreated) as DayOfWeek,
+    SUM(PlayDuration) as TotalPlayDuration
+  FROM PlaybackActivity
+  WHERE UserId = "${userId}"
+  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  GROUP BY DayOfWeek
+  ORDER BY DayOfWeek
+  `;
+
+  // Prime time query (7 PM - 11 PM)
+  const primeTimeQuery = `
+  SELECT
+    CASE
+      WHEN strftime('%H', DateCreated) BETWEEN '19' AND '22' THEN 1
+      ELSE 0
+    END as IsPrimeTime,
+    SUM(PlayDuration) as TotalPlayDuration
+  FROM PlaybackActivity
+  WHERE UserId = "${userId}"
+  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  GROUP BY IsPrimeTime
+  ORDER BY IsPrimeTime
+  `;
+
+  const [timeData, dayData, primeTimeData] = await Promise.all([
+    playbackReportingSqlRequest(timeOfDayQuery),
+    playbackReportingSqlRequest(dayOfWeekQuery),
+    playbackReportingSqlRequest(primeTimeQuery),
+  ]);
+
+  // Process time of day data
+  const timeOfDay = Array.from({ length: 24 }, (_, i) => ({
+    hour: i,
+    minutes: 0,
+  }));
+
+  timeData.results.forEach((result) => {
+    const hour = parseInt(
+      result[timeData.colums.findIndex((c) => c === "Hour")],
+    );
+    const duration = parseInt(
+      result[timeData.colums.findIndex((c) => c === "TotalPlayDuration")],
+    );
+    timeOfDay[hour].minutes = Math.floor(Math.max(0, duration) / 60);
+  });
+
+  // Process day of week data
+  const dayOfWeek = Array.from({ length: 7 }, (_, i) => ({
+    day: i,
+    minutes: 0,
+  }));
+
+  dayData.results.forEach((result) => {
+    const day = parseInt(
+      result[dayData.colums.findIndex((c) => c === "DayOfWeek")],
+    );
+    const duration = parseInt(
+      result[dayData.colums.findIndex((c) => c === "TotalPlayDuration")],
+    );
+    dayOfWeek[day].minutes = Math.floor(Math.max(0, duration) / 60);
+  });
+
+  // Process prime time data
+  const primeTime = Array.from({ length: 2 }, (_, i) => ({
+    isPrimeTime: i === 1,
+    minutes: 0,
+  }));
+
+  primeTimeData.results.forEach((result) => {
+    const isPrimeTime =
+      parseInt(
+        result[primeTimeData.colums.findIndex((c) => c === "IsPrimeTime")],
+      ) === 1;
+    const duration = parseInt(
+      result[primeTimeData.colums.findIndex((c) => c === "TotalPlayDuration")],
+    );
+    const index = isPrimeTime ? 1 : 0;
+    primeTime[index].minutes = Math.floor(Math.max(0, duration) / 60);
+  });
+
+  return {
+    timeOfDay,
+    dayOfWeek,
+    primeTime,
+  };
+};

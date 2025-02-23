@@ -4,19 +4,50 @@ import { motion } from "framer-motion";
 import { useErrorBoundary } from "react-error-boundary";
 import { itemVariants, Title } from "../ui/styled";
 import * as d3 from "d3";
-import { getMinutesPlayedPerDay } from "@/lib/playback-reporting-queries";
+import {
+  getMinutesPlayedPerDay,
+  getViewingPatterns,
+} from "@/lib/playback-reporting-queries";
 import { useNavigate } from "react-router-dom";
 
 interface PlaybackData {
   date: string;
   minutes: number;
 }
+
+interface ViewingPatterns {
+  timeOfDay: { hour: number; minutes: number }[];
+  dayOfWeek: { day: number; minutes: number }[];
+  primeTime: { isPrimeTime: boolean; minutes: number }[];
+}
+
 const NEXT_PAGE = "/";
+
+const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const CHART_COLORS = {
+  timeOfDay: {
+    line: "var(--blue-9)",
+    area: "var(--blue-5)",
+  },
+  dayOfWeek: {
+    bar: "var(--green-9)",
+  },
+  activity: {
+    line: "var(--yellow-9)",
+    area: "var(--yellow-5)",
+  },
+};
+
 export default function MinutesPlayedPerDayPage() {
   const { showBoundary } = useErrorBoundary();
   const [isLoading, setIsLoading] = useState(true);
   const [playbackData, setPlaybackData] = useState<PlaybackData[]>([]);
+  const [viewingPatterns, setViewingPatterns] =
+    useState<ViewingPatterns | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const timeOfDayRef = useRef<SVGSVGElement>(null);
+  const dayOfWeekRef = useRef<SVGSVGElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const navigate = useNavigate();
 
@@ -41,12 +72,16 @@ export default function MinutesPlayedPerDayPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const data = await getMinutesPlayedPerDay();
+        const [data, patterns] = await Promise.all([
+          getMinutesPlayedPerDay(),
+          getViewingPatterns(),
+        ]);
         setPlaybackData(
           data.sort(
             (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
           ),
         );
+        setViewingPatterns(patterns);
       } catch (e) {
         showBoundary(e);
       } finally {
@@ -56,8 +91,158 @@ export default function MinutesPlayedPerDayPage() {
     void fetchData();
   }, []);
 
-  // Create/Update D3 visualization
-  const updateChart = () => {
+  // Create/Update D3 visualizations
+  const updateCharts = () => {
+    if (!playbackData.length || !viewingPatterns || !containerRef.current)
+      return;
+
+    // Get container width
+    const containerWidth = containerRef.current.clientWidth;
+    const smallChart = containerWidth < 600;
+
+    // Common chart dimensions
+    const margin = {
+      top: 40, // Increased top margin for title
+      right: 20,
+      bottom: smallChart ? 60 : 40,
+      left: smallChart ? 50 : 60,
+    };
+
+    // Full width for each chart on mobile
+    const width = smallChart
+      ? containerWidth - margin.left - margin.right
+      : (containerWidth - margin.left - margin.right) / 2;
+    const height =
+      Math.min(300, containerWidth * 0.4) - margin.top - margin.bottom;
+
+    // Update time of day chart
+    if (timeOfDayRef.current) {
+      d3.select(timeOfDayRef.current).selectAll("*").remove();
+      const svg = d3
+        .select(timeOfDayRef.current)
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const xScale = d3.scaleLinear().domain([0, 23]).range([0, width]);
+
+      const yScale = d3
+        .scaleLinear()
+        .domain([0, d3.max(viewingPatterns.timeOfDay, (d) => d.minutes) || 0])
+        .range([height, 0]);
+
+      // Create line
+      const line = d3
+        .line<{ hour: number; minutes: number }>()
+        .x((d) => xScale(d.hour))
+        .y((d) => yScale(d.minutes))
+        .curve(d3.curveBasis);
+
+      // Add the line
+      svg
+        .append("path")
+        .datum(viewingPatterns.timeOfDay)
+        .attr("fill", "none")
+        .attr("stroke", CHART_COLORS.timeOfDay.line)
+        .attr("stroke-width", 2)
+        .attr("d", line);
+
+      // Add axes
+      const xAxis = d3
+        .axisBottom(xScale)
+        .ticks(12)
+        .tickFormat((d) => `${d}:00`);
+
+      const yAxis = d3
+        .axisLeft(yScale)
+        .ticks(5)
+        .tickFormat((d) => `${d}m`);
+
+      svg
+        .append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(xAxis)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-45)");
+
+      svg.append("g").call(yAxis);
+
+      // Add title with more space
+      svg
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", -margin.top / 2)
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
+        .text("Time of Day Viewing Pattern");
+    }
+
+    // Update day of week chart
+    if (dayOfWeekRef.current) {
+      d3.select(dayOfWeekRef.current).selectAll("*").remove();
+      const svg = d3
+        .select(dayOfWeekRef.current)
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const xScale = d3
+        .scaleBand()
+        .domain(dayNames)
+        .range([0, width])
+        .padding(0.1);
+
+      const yScale = d3
+        .scaleLinear()
+        .domain([0, d3.max(viewingPatterns.dayOfWeek, (d) => d.minutes) || 0])
+        .range([height, 0]);
+
+      // Add bars
+      svg
+        .selectAll("rect")
+        .data(viewingPatterns.dayOfWeek)
+        .enter()
+        .append("rect")
+        .attr("x", (d) => xScale(dayNames[d.day]) || 0)
+        .attr("y", (d) => yScale(d.minutes))
+        .attr("width", xScale.bandwidth())
+        .attr("height", (d) => height - yScale(d.minutes))
+        .attr("fill", CHART_COLORS.dayOfWeek.bar);
+
+      // Add axes
+      const xAxis = d3.axisBottom(xScale);
+      const yAxis = d3
+        .axisLeft(yScale)
+        .ticks(5)
+        .tickFormat((d) => `${d}m`);
+
+      svg.append("g").attr("transform", `translate(0,${height})`).call(xAxis);
+
+      svg.append("g").call(yAxis);
+
+      // Add title with more space
+      svg
+        .append("text")
+        .attr("x", width / 2)
+        .attr("y", -margin.top / 2)
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
+        .text("Day of Week Viewing Pattern");
+    }
+
+    // Update original chart
+    updateOriginalChart();
+  };
+
+  // Keep the original chart update logic in a separate function
+  const updateOriginalChart = () => {
     if (!playbackData.length || !svgRef.current || !containerRef.current)
       return;
 
@@ -116,7 +301,7 @@ export default function MinutesPlayedPerDayPage() {
     svg
       .append("path")
       .datum(playbackData)
-      .attr("fill", "var(--yellow-5)")
+      .attr("fill", CHART_COLORS.activity.area)
       .attr("d", area);
 
     // Add the line
@@ -124,7 +309,7 @@ export default function MinutesPlayedPerDayPage() {
       .append("path")
       .datum(playbackData)
       .attr("fill", "none")
-      .attr("stroke", "var(--yellow-9)")
+      .attr("stroke", CHART_COLORS.activity.line)
       .attr("stroke-width", 2)
       .attr("d", line);
 
@@ -218,24 +403,34 @@ export default function MinutesPlayedPerDayPage() {
         tooltip.style("display", "none");
       });
 
+    // Add title
+    svg
+      .append("text")
+      .attr("x", width / 2)
+      .attr("y", -margin.top / 2)
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .style("font-weight", "bold")
+      .text("Daily Viewing Activity");
+
     return () => {
       tooltip.remove();
     };
   };
 
-  // Update chart on window resize
+  // Update charts on window resize
   useEffect(() => {
     const handleResize = () => {
-      updateChart();
+      updateCharts();
     };
 
     window.addEventListener("resize", handleResize);
-    updateChart();
+    updateCharts();
 
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [playbackData]);
+  }, [playbackData, viewingPatterns]);
 
   if (isLoading) {
     return (
@@ -264,6 +459,14 @@ export default function MinutesPlayedPerDayPage() {
   const totalMinutes = playbackData.reduce((sum, day) => sum + day.minutes, 0);
   const averageMinutes = Math.round(totalMinutes / playbackData.length);
 
+  const primeTimePercentage = viewingPatterns
+    ? Math.round(
+        ((viewingPatterns.primeTime.find((p) => p.isPrimeTime)?.minutes || 0) /
+          viewingPatterns.primeTime.reduce((sum, p) => sum + p.minutes, 0)) *
+          100,
+      )
+    : 0;
+
   return (
     <Box
       style={{
@@ -273,7 +476,7 @@ export default function MinutesPlayedPerDayPage() {
       }}
       className="min-h-screen"
     >
-      <Container size="4" p="4">
+      <Container size="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
@@ -282,25 +485,60 @@ export default function MinutesPlayedPerDayPage() {
             <motion.p variants={itemVariants}>
               Average: {formatTimeDisplay(averageMinutes)} per day
             </motion.p>
+            {viewingPatterns && (
+              <motion.p variants={itemVariants}>
+                {primeTimePercentage}% of your viewing happens during prime time
+                (7 PM - 11 PM)
+              </motion.p>
+            )}
           </div>
 
-          <div
-            ref={containerRef}
-            style={{
-              backgroundColor: "var(--red-8)",
-              borderRadius: "8px",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-              width: "100%",
-              overflowX: "hidden",
-            }}
-          >
-            <svg ref={svgRef}></svg>
+          <div ref={containerRef}>
+            <Grid columns={{ initial: "1", sm: "2" }} gap="4">
+              <Box
+                style={{
+                  backgroundColor: "var(--red-8)",
+                  borderRadius: "8px",
+                  padding: "16px 0",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  width: "100%",
+                  overflowX: "hidden",
+                }}
+              >
+                <svg ref={timeOfDayRef}></svg>
+              </Box>
+              <Box
+                style={{
+                  backgroundColor: "var(--red-8)",
+                  borderRadius: "8px",
+                  padding: "16px 0",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  width: "100%",
+                  overflowX: "hidden",
+                }}
+              >
+                <svg ref={dayOfWeekRef}></svg>
+              </Box>
+            </Grid>
+            <Box
+              style={{
+                backgroundColor: "var(--red-8)",
+                borderRadius: "8px",
+                padding: "16px 0",
+                marginTop: "16px",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                width: "100%",
+                overflowX: "hidden",
+              }}
+            >
+              <svg ref={svgRef}></svg>
+            </Box>
           </div>
         </Grid>
       </Container>
       <Button
         size={"4"}
-        style={{ width: "100%" }}
+        style={{ width: "100%", marginTop: "16px" }}
         onClick={() => {
           void navigate(NEXT_PAGE);
         }}
