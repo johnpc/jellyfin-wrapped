@@ -1032,3 +1032,66 @@ export async function getUnfinishedShows(): Promise<UnfinishedShowDto[]> {
     .filter((show): show is UnfinishedShowDto => show !== null)
     .sort((a, b) => b.lastWatchedDate.getTime() - a.lastWatchedDate.getTime());
 }
+
+export interface PunchCardData {
+  dayOfWeek: number; // 0-6 (Sunday-Saturday)
+  hour: number; // 0-23
+  count: number;
+}
+
+export async function getPunchCardData(): Promise<PunchCardData[]> {
+  const userId = await getCurrentUserId();
+
+  const queryString = `
+    SELECT
+      strftime('%w', DateCreated) as day_of_week,
+      strftime('%H', DateCreated) as hour,
+      COUNT(*) as count
+    FROM PlaybackActivity
+    WHERE UserId = "${userId}"
+    GROUP BY day_of_week, hour
+    ORDER BY day_of_week, hour
+  `;
+
+  const data = await playbackReportingSqlRequest(queryString);
+
+  const dayIndex = data.colums.findIndex((i) => i === "day_of_week");
+  const hourIndex = data.colums.findIndex((i) => i === "hour");
+  const countIndex = data.colums.findIndex((i) => i === "count");
+
+  return data.results.map((row) => ({
+    dayOfWeek: parseInt(row[dayIndex]),
+    hour: parseInt(row[hourIndex]),
+    count: parseInt(row[countIndex])
+  }));
+}
+
+export interface CalendarData {
+  value: number;
+  day: string; // Format: YYYY-MM-DD
+}
+
+export async function getCalendarData(): Promise<CalendarData[]> {
+  const userId = await getCurrentUserId();
+
+  const queryString = `
+    SELECT
+      date(DateCreated) as day,
+      COUNT(*) as count
+    FROM PlaybackActivity
+    WHERE UserId = "${userId}"
+    AND DateCreated > date('now', '-1 year')
+    GROUP BY date(DateCreated)
+    ORDER BY day
+  `;
+
+  const data = await playbackReportingSqlRequest(queryString);
+
+  const dayIndex = data.colums.findIndex((i) => i === "day");
+  const countIndex = data.colums.findIndex((i) => i === "count");
+
+  return data.results.map((row) => ({
+    day: row[dayIndex],
+    value: parseInt(row[countIndex])
+  }));
+}

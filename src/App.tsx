@@ -7,6 +7,7 @@ import {
   Outlet,
   useLocation,
 } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import SplashPage from "./components/pages/SplashPage";
 import ServerConfigurationPage from "./components/pages/ServerConfigurationPage";
 import MoviesReviewPage from "./components/pages/MoviesReviewPage";
@@ -24,7 +25,12 @@ import DeviceStatsPage from "./components/pages/DeviceStatsPage";
 import ShowOfTheMonthPage from "./components/pages/ShowOfTheMonthPage";
 import UnfinishedShowsPage from "./components/pages/UnfinishedShowsPage";
 import CriticallyAcclaimedPage from "./components/pages/CriticallyAcclaimedPage";
+import PunchCardPage from "./components/pages/PunchCardPage";
 import { useEffect } from "react";
+import ActivityCalendarPage from "./components/pages/ActivityCalendarPage";
+
+// Create a client
+const queryClient = new QueryClient();
 
 // Layout component that wraps all routes
 function ScrollToTop() {
@@ -44,9 +50,11 @@ function RootLayout() {
   return (
     <ErrorBoundary fallback={<div>Something went wrong</div>}>
       <ScrollToTop />
-      <Theme>
-        <Outlet />
-      </Theme>
+      <QueryClientProvider client={queryClient}>
+        <Theme>
+          <Outlet />
+        </Theme>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }
@@ -122,6 +130,10 @@ const router = createBrowserRouter([
       {
         path: "/device-stats",
         element: <DeviceStatsPage />,
+      },
+      {
+        path: "/punch-card",
+        element: <ActivityCalendarPage />,
       },
     ],
   },

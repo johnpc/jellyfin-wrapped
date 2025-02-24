@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { itemVariants, Subtitle, Title } from "../ui/styled";
 import { useErrorBoundary } from "react-error-boundary";
 
-const NEXT_PAGE = "/";
+const NEXT_PAGE = "/punch-card";
 export default function OldestShowPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
