@@ -1062,7 +1062,7 @@ export async function getPunchCardData(): Promise<PunchCardData[]> {
   return data.results.map((row) => ({
     dayOfWeek: parseInt(row[dayIndex]),
     hour: parseInt(row[hourIndex]),
-    count: parseInt(row[countIndex])
+    count: parseInt(row[countIndex]),
   }));
 }
 
@@ -1092,6 +1092,6 @@ export async function getCalendarData(): Promise<CalendarData[]> {
 
   return data.results.map((row) => ({
     day: row[dayIndex],
-    value: parseInt(row[countIndex])
+    value: parseInt(row[countIndex]),
   }));
 }
