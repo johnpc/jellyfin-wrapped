@@ -76,7 +76,7 @@ export default function AudioReviewPage() {
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
-            {audios.map((audio) => (
+            {audios.slice(0, 20).map((audio) => (
               <MovieCard key={audio.id} item={audio} />
             ))}
           </Grid>

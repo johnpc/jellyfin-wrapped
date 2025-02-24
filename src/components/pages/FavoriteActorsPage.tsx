@@ -83,7 +83,7 @@ export default function FavoriteActorsPage() {
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
-            {favoriteActors.map((actor) => (
+            {favoriteActors.slice(0, 20).map((actor) => (
               <ActorCard
                 key={generateGuid()}
                 name={actor.name}

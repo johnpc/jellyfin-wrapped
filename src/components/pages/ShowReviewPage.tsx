@@ -8,7 +8,7 @@ import { useErrorBoundary } from "react-error-boundary";
 import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
 import { itemVariants, Title } from "../ui/styled";
 
-const NEXT_PAGE = "/oldest-show";
+const NEXT_PAGE = "/critically-acclaimed";
 export default function ShowReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -82,7 +82,7 @@ export default function ShowReviewPage() {
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
-            {shows.map((show) => (
+            {shows.slice(0, 20).map((show) => (
               <>
                 <MovieCard
                   key={show.item.id}

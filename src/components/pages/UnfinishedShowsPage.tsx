@@ -87,7 +87,7 @@ export default function UnfinishedShowsPage() {
           </div>
 
           <Grid columns={{ initial: "1", sm: "2" }} gap="4">
-            {unfinishedShows.map((show) => (
+            {unfinishedShows.slice(0, 20).map((show) => (
               <motion.div
                 key={show.item.id}
                 variants={itemVariants}

@@ -78,7 +78,7 @@ export default function MusicVideoPage() {
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
-            {musicVideos.map((musicVideo) => (
+            {musicVideos.slice(0, 20).map((musicVideo) => (
               <MovieCard key={musicVideo.id} item={musicVideo} />
             ))}
           </Grid>

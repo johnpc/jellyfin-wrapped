@@ -115,7 +115,7 @@ export default function GenreReviewPage() {
                 columns={{ initial: "2", sm: "3", md: "4", lg: "5" }}
                 gap="4"
               >
-                {items.map((movie) => (
+                {items.slice(0, 10).map((movie) => (
                   <MovieCard
                     key={generateGuid()}
                     item={movie}
