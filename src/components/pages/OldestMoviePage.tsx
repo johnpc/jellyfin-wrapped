@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { itemVariants, Subtitle, Title } from "../ui/styled";
 import { useErrorBoundary } from "react-error-boundary";
 
-const NEXT_PAGE = "/shows";
+const NEXT_PAGE = "/oldest-show";
 export default function OldestMoviePage() {
   const { showBoundary } = useErrorBoundary();
 

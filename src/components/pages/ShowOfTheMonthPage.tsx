@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
-import { SimpleItemDto, getMonthlyShowStats, getImageUrlById } from "@/lib/playback-reporting-queries";
+import {
+  SimpleItemDto,
+  getMonthlyShowStats,
+  getImageUrlById,
+} from "@/lib/playback-reporting-queries";
 import { Container, Grid, Box, Button, Spinner } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -28,10 +32,10 @@ const formatWatchTime = (minutes: number): string => {
   }
 
   if (remainingMinutes === 0) {
-    return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+    return `${hours} ${hours === 1 ? "hour" : "hours"}`;
   }
 
-  return `${hours} ${hours === 1 ? 'hour' : 'hours'} ${remainingMinutes} minutes`;
+  return `${hours} ${hours === 1 ? "hour" : "hours"} ${remainingMinutes} minutes`;
 };
 
 export default function ShowOfTheMonthPage() {
@@ -53,7 +57,7 @@ export default function ShowOfTheMonthPage() {
               ? await getImageUrlById(stat.topShow.item.id)
               : undefined;
             return { ...stat, posterUrl };
-          })
+          }),
         );
 
         setMonthlyStats(statsWithPosters);
@@ -130,13 +134,22 @@ export default function ShowOfTheMonthPage() {
                           {monthStat.topShow.item.name}
                         </h3>
                         <p className="text-lg opacity-80 text-center">
-                          You watched <b>{formatWatchTime(monthStat.topShow.watchTimeMinutes)}</b> of {monthStat.topShow.item.name}
+                          You watched{" "}
+                          <b>
+                            {formatWatchTime(
+                              monthStat.topShow.watchTimeMinutes,
+                            )}
+                          </b>{" "}
+                          of {monthStat.topShow.item.name}
                         </p>
                       </div>
                     )}
                     <div className="mt-4 pt-4 border-t border-white/20">
                       <p className="text-sm opacity-80 text-center">
-                        Out of a total watch time this month of <b>{formatWatchTime(monthStat.totalWatchTimeMinutes)}</b>
+                        Out of a total watch time this month of{" "}
+                        <b>
+                          {formatWatchTime(monthStat.totalWatchTimeMinutes)}
+                        </b>
                       </p>
                     </div>
                   </div>

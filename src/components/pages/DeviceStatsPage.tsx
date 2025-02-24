@@ -13,7 +13,7 @@ interface DeviceStats {
   osUsage: { osName: string; minutes: number }[];
 }
 
-const NEXT_PAGE = "/";
+const NEXT_PAGE = "/oldest-movie";
 
 const CHART_COLORS = {
   devices: d3.schemeSet3,
@@ -72,9 +72,7 @@ export default function DeviceStatsPage() {
   ) => {
     const containerWidth = containerRef.current?.clientWidth || 600;
     const smallChart = containerWidth < 600;
-    const width = smallChart
-      ? containerWidth - 40
-      : (containerWidth - 80) / 2;
+    const width = smallChart ? containerWidth - 40 : (containerWidth - 80) / 2;
     const height = Math.min(400, width);
     const radius = Math.min(width, height) / 2;
 
@@ -172,7 +170,13 @@ export default function DeviceStatsPage() {
 
   // Update charts
   useEffect(() => {
-    if (!deviceChartRef.current || !browserChartRef.current || !osChartRef.current || !deviceStats) return;
+    if (
+      !deviceChartRef.current ||
+      !browserChartRef.current ||
+      !osChartRef.current ||
+      !deviceStats
+    )
+      return;
 
     // Clear existing charts
     d3.select(deviceChartRef.current).selectAll("*").remove();

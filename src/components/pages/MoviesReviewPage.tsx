@@ -9,7 +9,7 @@ import { generateGuid } from "@/lib/utils";
 import { useErrorBoundary } from "react-error-boundary";
 import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
 
-const NEXT_PAGE = "/oldest-movie";
+const NEXT_PAGE = "/critically-acclaimed";
 export default function MoviesReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();

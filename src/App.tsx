@@ -23,6 +23,7 @@ import MinutesPlayedPerDayPage from "./components/pages/MinutesPlayedPerDayPage"
 import DeviceStatsPage from "./components/pages/DeviceStatsPage";
 import ShowOfTheMonthPage from "./components/pages/ShowOfTheMonthPage";
 import UnfinishedShowsPage from "./components/pages/UnfinishedShowsPage";
+import CriticallyAcclaimedPage from "./components/pages/CriticallyAcclaimedPage";
 import { useEffect } from "react";
 
 // Layout component that wraps all routes
@@ -85,6 +86,10 @@ const router = createBrowserRouter([
       {
         path: "/audio",
         element: <AudioReviewPage />,
+      },
+      {
+        path: "/critically-acclaimed",
+        element: <CriticallyAcclaimedPage />,
       },
       {
         path: "/actors",

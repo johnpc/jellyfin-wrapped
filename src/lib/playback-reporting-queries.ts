@@ -721,8 +721,11 @@ export const getDeviceStats = async (): Promise<{
 
   // Process device data
   const deviceUsage = deviceData.results.map((result) => {
-    const deviceName = result[deviceData.colums.findIndex((c) => c === "DeviceName")];
-    const duration = parseInt(result[deviceData.colums.findIndex((c) => c === "TotalPlayDuration")]);
+    const deviceName =
+      result[deviceData.colums.findIndex((c) => c === "DeviceName")];
+    const duration = parseInt(
+      result[deviceData.colums.findIndex((c) => c === "TotalPlayDuration")],
+    );
     return {
       deviceName,
       minutes: Math.floor(Math.max(0, duration) / 60),
@@ -731,8 +734,11 @@ export const getDeviceStats = async (): Promise<{
 
   // Process browser data
   const browserUsage = browserData.results.map((result) => {
-    const browserName = result[browserData.colums.findIndex((c) => c === "BrowserName")];
-    const duration = parseInt(result[browserData.colums.findIndex((c) => c === "TotalPlayDuration")]);
+    const browserName =
+      result[browserData.colums.findIndex((c) => c === "BrowserName")];
+    const duration = parseInt(
+      result[browserData.colums.findIndex((c) => c === "TotalPlayDuration")],
+    );
     return {
       browserName,
       minutes: Math.floor(Math.max(0, duration) / 60),
@@ -742,7 +748,9 @@ export const getDeviceStats = async (): Promise<{
   // Process OS data
   const osUsage = osData.results.map((result) => {
     const osName = result[osData.colums.findIndex((c) => c === "OSName")];
-    const duration = parseInt(result[osData.colums.findIndex((c) => c === "TotalPlayDuration")]);
+    const duration = parseInt(
+      result[osData.colums.findIndex((c) => c === "TotalPlayDuration")],
+    );
     return {
       osName,
       minutes: Math.floor(Math.max(0, duration) / 60),
@@ -756,14 +764,16 @@ export const getDeviceStats = async (): Promise<{
   };
 };
 
-export const getMonthlyShowStats = async (): Promise<{
-  month: Date;
-  topShow: {
-    item: SimpleItemDto;
-    watchTimeMinutes: number;
-  };
-  totalWatchTimeMinutes: number;
-}[]> => {
+export const getMonthlyShowStats = async (): Promise<
+  {
+    month: Date;
+    topShow: {
+      item: SimpleItemDto;
+      watchTimeMinutes: number;
+    };
+    totalWatchTimeMinutes: number;
+  }[]
+> => {
   const userId = await getCurrentUserId();
   const oneYearAgo = subYears(new Date(), 1);
 
@@ -788,33 +798,43 @@ export const getMonthlyShowStats = async (): Promise<{
   const durationIndex = data.colums.findIndex((i) => i === "TotalPlayDuration");
 
   // Get all episode IDs
-  const episodeIds = Array.from(new Set(data.results.map(row => row[itemIdIndex])));
+  const episodeIds = Array.from(
+    new Set(data.results.map((row) => row[itemIdIndex])),
+  );
 
   // Get episode details
   const episodes = await getItemDtosByIds(episodeIds);
 
   // Get season IDs from episodes
-  const seasonIds = Array.from(new Set(episodes
-    .map(episode => episode.parentId)
-    .filter((id): id is string => id !== null && id !== undefined)));
+  const seasonIds = Array.from(
+    new Set(
+      episodes
+        .map((episode) => episode.parentId)
+        .filter((id): id is string => id !== null && id !== undefined),
+    ),
+  );
 
   // Get season details
   const seasons = await getItemDtosByIds(seasonIds);
 
   // Get show IDs from seasons
-  const showIds = Array.from(new Set(seasons
-    .map(season => season.parentId)
-    .filter((id): id is string => id !== null && id !== undefined)));
+  const showIds = Array.from(
+    new Set(
+      seasons
+        .map((season) => season.parentId)
+        .filter((id): id is string => id !== null && id !== undefined),
+    ),
+  );
 
   // Get show details
   const shows = await getItemDtosByIds(showIds);
 
   // Create a mapping from episode to show
   const episodeToShow = new Map<string, SimpleItemDto>();
-  episodes.forEach(episode => {
-    const season = seasons.find(s => s.id === episode.parentId);
+  episodes.forEach((episode) => {
+    const season = seasons.find((s) => s.id === episode.parentId);
     if (season) {
-      const show = shows.find(s => s.id === season.parentId);
+      const show = shows.find((s) => s.id === season.parentId);
       if (show) {
         episodeToShow.set(episode.id!, show);
       }
@@ -822,37 +842,43 @@ export const getMonthlyShowStats = async (): Promise<{
   });
 
   // Group by month and show
-  const monthlyShowData = data.results.reduce((acc, row) => {
-    const month = row[monthIndex];
-    const episodeId = row[itemIdIndex];
-    const duration = parseFloat(row[durationIndex]);
-    const show = episodeToShow.get(episodeId);
+  const monthlyShowData = data.results.reduce(
+    (acc, row) => {
+      const month = row[monthIndex];
+      const episodeId = row[itemIdIndex];
+      const duration = parseFloat(row[durationIndex]);
+      const show = episodeToShow.get(episodeId);
 
-    if (!show) return acc;
+      if (!show) return acc;
 
-    if (!acc[month]) {
-      acc[month] = {
-        shows: new Map<string, number>(),
-        totalDuration: 0,
-      };
-    }
+      if (!acc[month]) {
+        acc[month] = {
+          shows: new Map<string, number>(),
+          totalDuration: 0,
+        };
+      }
 
-    const showDuration = acc[month].shows.get(show.id!) || 0;
-    acc[month].shows.set(show.id!, showDuration + duration);
-    acc[month].totalDuration += duration;
+      const showDuration = acc[month].shows.get(show.id!) || 0;
+      acc[month].shows.set(show.id!, showDuration + duration);
+      acc[month].totalDuration += duration;
 
-    return acc;
-  }, {} as Record<string, {
-    shows: Map<string, number>;
-    totalDuration: number;
-  }>);
+      return acc;
+    },
+    {} as Record<
+      string,
+      {
+        shows: Map<string, number>;
+        totalDuration: number;
+      }
+    >,
+  );
 
   // Convert to final format
   const monthlyStats = await Promise.all(
     Object.entries(monthlyShowData).map(async ([month, data]) => {
       // Get show with highest duration
       let maxDuration = 0;
-      let topShowId = '';
+      let topShowId = "";
 
       data.shows.forEach((duration, showId) => {
         if (duration > maxDuration) {
@@ -861,7 +887,7 @@ export const getMonthlyShowStats = async (): Promise<{
         }
       });
 
-      const topShow = shows.find(show => show.id === topShowId);
+      const topShow = shows.find((show) => show.id === topShowId);
 
       if (!topShow) {
         throw new Error(`Could not find show with ID ${topShowId}`);
@@ -875,7 +901,7 @@ export const getMonthlyShowStats = async (): Promise<{
         },
         totalWatchTimeMinutes: data.totalDuration / 60, // Convert to minutes
       };
-    })
+    }),
   );
 
   return monthlyStats.sort((a, b) => b.month.getTime() - a.month.getTime());
@@ -908,34 +934,40 @@ export async function getUnfinishedShows(): Promise<UnfinishedShowDto[]> {
 
   const data = await playbackReportingSqlRequest(queryString);
 
-  const itemIdIndex = data.colums.findIndex(i => i === "ItemId");
-  const lastWatchedIndex = data.colums.findIndex(i => i === "LastWatched");
+  const itemIdIndex = data.colums.findIndex((i) => i === "ItemId");
+  const lastWatchedIndex = data.colums.findIndex((i) => i === "LastWatched");
 
   // Get all watched episodes
   const watchedEpisodes = await getItemDtosByIds(
-    data.results.map(row => row[itemIdIndex])
+    data.results.map((row) => row[itemIdIndex]),
   );
 
   // Get parent info from the episode items themselves
-  const parentIds = Array.from(new Set(
-    watchedEpisodes
-      .map(episode => episode.parentId)
-      .filter((id): id is string => id !== null && id !== undefined)
-  ));
+  const parentIds = Array.from(
+    new Set(
+      watchedEpisodes
+        .map((episode) => episode.parentId)
+        .filter((id): id is string => id !== null && id !== undefined),
+    ),
+  );
 
   const parents = await getItemDtosByIds(parentIds);
 
   // Get show IDs - either directly from episodes or via seasons
-  const showIds = Array.from(new Set(
-    parents.map(parent => {
-      // If parent is a season, get its parent show ID
-      if (parent.name?.includes('Season')) {
-        return parent.parentId;
-      }
-      // If parent is a show, use its ID
-      return parent.id;
-    }).filter((id): id is string => id !== null && id !== undefined)
-  ));
+  const showIds = Array.from(
+    new Set(
+      parents
+        .map((parent) => {
+          // If parent is a season, get its parent show ID
+          if (parent.name?.includes("Season")) {
+            return parent.parentId;
+          }
+          // If parent is a show, use its ID
+          return parent.id;
+        })
+        .filter((id): id is string => id !== null && id !== undefined),
+    ),
+  );
 
   const shows = await getItemDtosByIds(showIds);
 
@@ -967,16 +999,16 @@ export async function getUnfinishedShows(): Promise<UnfinishedShowDto[]> {
         // Find the last watched date for this show's episodes
         const showEpisodeIds = new Set(
           watchedEpisodes
-            .filter(ep => {
-              const parent = parents.find(p => p.id === ep.parentId);
+            .filter((ep) => {
+              const parent = parents.find((p) => p.id === ep.parentId);
               return parent?.parentId === show.id || ep.parentId === show.id;
             })
-            .map(ep => ep.id)
+            .map((ep) => ep.id),
         );
 
         const lastWatchedDates = data.results
-          .filter(row => showEpisodeIds.has(row[itemIdIndex]))
-          .map(row => new Date(row[lastWatchedIndex]).getTime());
+          .filter((row) => showEpisodeIds.has(row[itemIdIndex]))
+          .map((row) => new Date(row[lastWatchedIndex]).getTime());
 
         const lastWatchedDate = new Date(Math.max(...lastWatchedDates, 0));
 
@@ -993,7 +1025,7 @@ export async function getUnfinishedShows(): Promise<UnfinishedShowDto[]> {
         console.error(`Error processing show ${show.name}:`, error);
       }
       return null;
-    })
+    }),
   );
 
   return unfinishedShows

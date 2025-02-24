@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
-import { UnfinishedShowDto, getUnfinishedShows, getImageUrlById } from "@/lib/playback-reporting-queries";
+import {
+  UnfinishedShowDto,
+  getUnfinishedShows,
+  getImageUrlById,
+} from "@/lib/playback-reporting-queries";
 import { Container, Grid, Box, Button, Spinner } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -32,7 +36,7 @@ export default function UnfinishedShowsPage() {
               ? await getImageUrlById(show.item.id)
               : undefined;
             return { ...show, posterUrl };
-          })
+          }),
         );
 
         setUnfinishedShows(showsWithPosters);
@@ -47,8 +51,22 @@ export default function UnfinishedShowsPage() {
 
   if (isLoading) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
-        <Box style={{ backgroundColor: "var(--violet-8)", minHeight: "100vh", minWidth: "100vw" }} className="min-h-screen">
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <Box
+          style={{
+            backgroundColor: "var(--violet-8)",
+            minHeight: "100vh",
+            minWidth: "100vw",
+          }}
+          className="min-h-screen"
+        >
           <Spinner size={"3"} />
         </Box>
       </div>
@@ -56,7 +74,10 @@ export default function UnfinishedShowsPage() {
   }
 
   return (
-    <Box style={{ backgroundColor: "var(--violet-8)" }} className="min-h-screen">
+    <Box
+      style={{ backgroundColor: "var(--violet-8)" }}
+      className="min-h-screen"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
@@ -87,10 +108,12 @@ export default function UnfinishedShowsPage() {
                       {show.item.name}
                     </h3>
                     <p className="text-lg opacity-80 text-center">
-                      You watched <b>{show.watchedEpisodes}</b> out of <b>{show.totalEpisodes}</b> episodes
+                      You watched <b>{show.watchedEpisodes}</b> out of{" "}
+                      <b>{show.totalEpisodes}</b> episodes
                     </p>
                     <p className="text-sm opacity-60 text-center">
-                      Last watched on {format(show.lastWatchedDate, "MMMM d, yyyy")}
+                      Last watched on{" "}
+                      {format(show.lastWatchedDate, "MMMM d, yyyy")}
                     </p>
                   </div>
                 </div>
