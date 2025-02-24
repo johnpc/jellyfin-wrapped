@@ -3,6 +3,7 @@ import {
   getPluginsApi,
   getUserApi,
   getUserLibraryApi,
+  getItemsApi,
 } from "@jellyfin/sdk/lib/utils/api";
 import { getAuthenticatedJellyfinApi } from "./jellyfin-api";
 import { addDays, startOfDay, subYears } from "date-fns";
@@ -754,3 +755,248 @@ export const getDeviceStats = async (): Promise<{
     osUsage,
   };
 };
+
+export const getMonthlyShowStats = async (): Promise<{
+  month: Date;
+  topShow: {
+    item: SimpleItemDto;
+    watchTimeMinutes: number;
+  };
+  totalWatchTimeMinutes: number;
+}[]> => {
+  const userId = await getCurrentUserId();
+  const oneYearAgo = subYears(new Date(), 1);
+
+  // First get all episodes watched in the last year
+  const queryString = `
+    SELECT
+      strftime('%Y-%m', DateCreated) as Month,
+      ItemId,
+      SUM(PlayDuration) as TotalPlayDuration
+    FROM PlaybackActivity
+    WHERE UserId = "${userId}"
+    AND ItemType = "Episode"
+    AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth() + 1}-${oneYearAgo.getDate()}'
+    GROUP BY Month, ItemId
+    ORDER BY Month DESC, TotalPlayDuration DESC
+  `;
+
+  const data = await playbackReportingSqlRequest(queryString);
+
+  const monthIndex = data.colums.findIndex((i) => i === "Month");
+  const itemIdIndex = data.colums.findIndex((i) => i === "ItemId");
+  const durationIndex = data.colums.findIndex((i) => i === "TotalPlayDuration");
+
+  // Get all episode IDs
+  const episodeIds = Array.from(new Set(data.results.map(row => row[itemIdIndex])));
+
+  // Get episode details
+  const episodes = await getItemDtosByIds(episodeIds);
+
+  // Get season IDs from episodes
+  const seasonIds = Array.from(new Set(episodes
+    .map(episode => episode.parentId)
+    .filter((id): id is string => id !== null && id !== undefined)));
+
+  // Get season details
+  const seasons = await getItemDtosByIds(seasonIds);
+
+  // Get show IDs from seasons
+  const showIds = Array.from(new Set(seasons
+    .map(season => season.parentId)
+    .filter((id): id is string => id !== null && id !== undefined)));
+
+  // Get show details
+  const shows = await getItemDtosByIds(showIds);
+
+  // Create a mapping from episode to show
+  const episodeToShow = new Map<string, SimpleItemDto>();
+  episodes.forEach(episode => {
+    const season = seasons.find(s => s.id === episode.parentId);
+    if (season) {
+      const show = shows.find(s => s.id === season.parentId);
+      if (show) {
+        episodeToShow.set(episode.id!, show);
+      }
+    }
+  });
+
+  // Group by month and show
+  const monthlyShowData = data.results.reduce((acc, row) => {
+    const month = row[monthIndex];
+    const episodeId = row[itemIdIndex];
+    const duration = parseFloat(row[durationIndex]);
+    const show = episodeToShow.get(episodeId);
+
+    if (!show) return acc;
+
+    if (!acc[month]) {
+      acc[month] = {
+        shows: new Map<string, number>(),
+        totalDuration: 0,
+      };
+    }
+
+    const showDuration = acc[month].shows.get(show.id!) || 0;
+    acc[month].shows.set(show.id!, showDuration + duration);
+    acc[month].totalDuration += duration;
+
+    return acc;
+  }, {} as Record<string, {
+    shows: Map<string, number>;
+    totalDuration: number;
+  }>);
+
+  // Convert to final format
+  const monthlyStats = await Promise.all(
+    Object.entries(monthlyShowData).map(async ([month, data]) => {
+      // Get show with highest duration
+      let maxDuration = 0;
+      let topShowId = '';
+
+      data.shows.forEach((duration, showId) => {
+        if (duration > maxDuration) {
+          maxDuration = duration;
+          topShowId = showId;
+        }
+      });
+
+      const topShow = shows.find(show => show.id === topShowId);
+
+      if (!topShow) {
+        throw new Error(`Could not find show with ID ${topShowId}`);
+      }
+
+      return {
+        month: new Date(month + "-01"), // Convert to Date object
+        topShow: {
+          item: topShow,
+          watchTimeMinutes: maxDuration / 60, // Convert to minutes
+        },
+        totalWatchTimeMinutes: data.totalDuration / 60, // Convert to minutes
+      };
+    })
+  );
+
+  return monthlyStats.sort((a, b) => b.month.getTime() - a.month.getTime());
+};
+
+export type UnfinishedShowDto = {
+  item: SimpleItemDto;
+  watchedEpisodes: number;
+  totalEpisodes: number;
+  lastWatchedDate: Date;
+};
+
+export async function getUnfinishedShows(): Promise<UnfinishedShowDto[]> {
+  const userId = await getCurrentUserId();
+  const authenticatedApi = await getAuthenticatedJellyfinApi();
+  const itemsApi = getItemsApi(authenticatedApi);
+
+  // First get all episodes watched in the last year
+  const queryString = `
+    SELECT
+      ItemId,
+      ItemName,
+      MAX(DateCreated) as LastWatched
+    FROM PlaybackActivity
+    WHERE UserId = "${userId}"
+    AND ItemType = "Episode"
+    AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth() + 1}-${oneYearAgo.getDate()}'
+    GROUP BY ItemId
+  `;
+
+  const data = await playbackReportingSqlRequest(queryString);
+
+  const itemIdIndex = data.colums.findIndex(i => i === "ItemId");
+  const lastWatchedIndex = data.colums.findIndex(i => i === "LastWatched");
+
+  // Get all watched episodes
+  const watchedEpisodes = await getItemDtosByIds(
+    data.results.map(row => row[itemIdIndex])
+  );
+
+  // Get parent info from the episode items themselves
+  const parentIds = Array.from(new Set(
+    watchedEpisodes
+      .map(episode => episode.parentId)
+      .filter((id): id is string => id !== null && id !== undefined)
+  ));
+
+  const parents = await getItemDtosByIds(parentIds);
+
+  // Get show IDs - either directly from episodes or via seasons
+  const showIds = Array.from(new Set(
+    parents.map(parent => {
+      // If parent is a season, get its parent show ID
+      if (parent.name?.includes('Season')) {
+        return parent.parentId;
+      }
+      // If parent is a show, use its ID
+      return parent.id;
+    }).filter((id): id is string => id !== null && id !== undefined)
+  ));
+
+  const shows = await getItemDtosByIds(showIds);
+
+  // For each show, get all its episodes to compare with watched episodes
+  const unfinishedShows = await Promise.all(
+    shows.map(async (show) => {
+      try {
+        // Get all episodes for this show
+        const allEpisodes = await itemsApi.getItems({
+          userId,
+          parentId: show.id,
+          includeItemTypes: ["Episode"],
+          recursive: true,
+        });
+
+        const totalEpisodes = allEpisodes.data.TotalRecordCount ?? 0;
+
+        // Get watched episodes for this show
+        const watchedForShow = await itemsApi.getItems({
+          userId,
+          parentId: show.id,
+          includeItemTypes: ["Episode"],
+          recursive: true,
+          filters: ["IsPlayed"],
+        });
+
+        const watchedEpisodeCount = watchedForShow.data.TotalRecordCount ?? 0;
+
+        // Find the last watched date for this show's episodes
+        const showEpisodeIds = new Set(
+          watchedEpisodes
+            .filter(ep => {
+              const parent = parents.find(p => p.id === ep.parentId);
+              return parent?.parentId === show.id || ep.parentId === show.id;
+            })
+            .map(ep => ep.id)
+        );
+
+        const lastWatchedDates = data.results
+          .filter(row => showEpisodeIds.has(row[itemIdIndex]))
+          .map(row => new Date(row[lastWatchedIndex]).getTime());
+
+        const lastWatchedDate = new Date(Math.max(...lastWatchedDates, 0));
+
+        // Only return shows that have been started but not completed
+        if (watchedEpisodeCount > 0 && watchedEpisodeCount < totalEpisodes) {
+          return {
+            item: show,
+            watchedEpisodes: watchedEpisodeCount,
+            totalEpisodes,
+            lastWatchedDate,
+          };
+        }
+      } catch (error) {
+        console.error(`Error processing show ${show.name}:`, error);
+      }
+      return null;
+    })
+  );
+
+  return unfinishedShows
+    .filter((show): show is UnfinishedShowDto => show !== null)
+    .sort((a, b) => b.lastWatchedDate.getTime() - a.lastWatchedDate.getTime());
+}

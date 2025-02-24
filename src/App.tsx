@@ -21,6 +21,8 @@ import GenreReviewPage from "./components/pages/GenreReviewPage";
 import HolidayReviewPage from "./components/pages/HolidayReviewPage";
 import MinutesPlayedPerDayPage from "./components/pages/MinutesPlayedPerDayPage";
 import DeviceStatsPage from "./components/pages/DeviceStatsPage";
+import ShowOfTheMonthPage from "./components/pages/ShowOfTheMonthPage";
+import UnfinishedShowsPage from "./components/pages/UnfinishedShowsPage";
 import { useEffect } from "react";
 
 // Layout component that wraps all routes
@@ -103,6 +105,14 @@ const router = createBrowserRouter([
       {
         path: "/minutes-per-day",
         element: <MinutesPlayedPerDayPage />,
+      },
+      {
+        path: "/show-of-the-month",
+        element: <ShowOfTheMonthPage />,
+      },
+      {
+        path: "/unfinished-shows",
+        element: <UnfinishedShowsPage />,
       },
       {
         path: "/device-stats",
