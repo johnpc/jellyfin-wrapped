@@ -13,6 +13,7 @@ import {
   Text,
   Card,
   Flex,
+  Avatar,
 } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { itemVariants, Title } from "../ui/styled";
@@ -28,50 +29,34 @@ type TopContent = {
 const NEXT_PAGE = "/actors";
 
 // Fallback image component that handles loading errors
-function ContentImage({ itemId, name }: { itemId: string; name: string }) {
-  const [imageError, setImageError] = useState(false);
-  const [src, setSrc] = useState("");
-  useEffect(() => {
-    const setup = async () => {
-      const s = await getImageUrlById(itemId);
-      setSrc(s);
-    };
-    setup();
-  }, []);
+function ContentImage({ item }: { item: SimpleItemDto }) {
+  const [imageUrl, setImageUrl] = useState("");
 
-  if (imageError || !itemId) {
-    return (
-      <Box
-        style={{
-          width: "200px",
-          height: "300px",
-          backgroundColor: "var(--gray-5)",
-          borderRadius: "8px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "16px",
-          textAlign: "center",
-        }}
-      >
-        <Text size="2" color="gray">
-          {name || "Image not available"}
-        </Text>
-      </Box>
-    );
-  }
+  useEffect(() => {
+    const fetchImageUrl = async () => {
+      try {
+        const url = await getImageUrlById(item.id ?? "");
+        setImageUrl(url);
+      } catch (error) {
+        console.error("Failed to fetch image URL:", error);
+      }
+    };
+
+    void fetchImageUrl();
+  }, [item]);
 
   return (
-    <img
-      src={src}
-      alt={name ?? "Content poster"}
+    <Avatar
+      size="8"
+      src={imageUrl}
+      fallback={item.name?.[0] || "?"}
+      // className="w-full h-full"
       style={{
-        width: "200px",
-        height: "300px",
-        objectFit: "cover",
-        borderRadius: "8px",
+        // borderRadius: 0,
+        aspectRatio: "2/3",
+        width: "30%",
+        height: "100%",
       }}
-      onError={() => setImageError(true)}
     />
   );
 }
@@ -171,10 +156,7 @@ export default function CriticallyAcclaimedPage() {
               >
                 <Card size="3">
                   <Flex gap="4" align="center">
-                    <ContentImage
-                      itemId={content.item.id ?? ""}
-                      name={content.item.name ?? ""}
-                    />
+                    <ContentImage item={content.item ?? ""} />
                     <Box>
                       <Grid gap="3">
                         <Box>

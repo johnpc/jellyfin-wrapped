@@ -94,8 +94,7 @@ export const getImageUrlById = async (id: string) => {
   }
   const api = getImageApi(await getAuthenticatedJellyfinApi());
   /* eslint-disable @typescript-eslint/no-unsafe-argument */
-  // @ts-expect-error ImageType.Poster not behaving right
-  const url = api.getItemImageUrlById(id, ImageType.Poster, {
+  const url = api.getItemImageUrlById(id, ImageType.Primary, {
     maxWidth: 300,
     width: 300,
     quality: 90,

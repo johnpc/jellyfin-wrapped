@@ -86,12 +86,15 @@ export default function UnfinishedShowsPage() {
             </Title>
           </div>
 
-          <Grid columns={{ initial: "1", sm: "2" }} gap="4">
+          <Grid columns={{ initial: "2", sm: "2" }} gap="4" align={"center"}>
             {unfinishedShows.slice(0, 20).map((show) => (
               <motion.div
                 key={show.item.id}
                 variants={itemVariants}
                 className="bg-white/10 rounded-lg p-6"
+                style={{
+                  textAlign: "center",
+                }}
               >
                 <div className="flex flex-col gap-6 items-center">
                   {show.posterUrl && (
@@ -100,6 +103,9 @@ export default function UnfinishedShowsPage() {
                         src={show.posterUrl}
                         alt={`${show.item.name} poster`}
                         className="w-full h-full object-cover rounded-lg shadow-lg"
+                        style={{
+                          width: "50%",
+                        }}
                       />
                     </div>
                   )}
@@ -116,6 +122,7 @@ export default function UnfinishedShowsPage() {
                       {format(show.lastWatchedDate, "MMMM d, yyyy")}
                     </p>
                   </div>
+                  <hr />
                 </div>
               </motion.div>
             ))}

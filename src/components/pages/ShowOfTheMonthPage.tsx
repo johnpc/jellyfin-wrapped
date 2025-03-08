@@ -107,12 +107,15 @@ export default function ShowOfTheMonthPage() {
             </Title>
           </div>
 
-          <Grid columns={{ initial: "1", sm: "2" }} gap="4">
+          <Grid columns={{ initial: "1", sm: "1" }} gap="4" align={"center"}>
             {monthlyStats.map((monthStat) => (
               <motion.div
                 key={monthStat.month.toISOString()}
                 variants={itemVariants}
                 className="bg-white/10 rounded-lg p-6 h-full"
+                style={{
+                  textAlign: "center",
+                }}
               >
                 <h2 className="text-3xl font-bold mb-4 text-center">
                   {format(monthStat.month, "MMMM yyyy")}
@@ -124,6 +127,9 @@ export default function ShowOfTheMonthPage() {
                         src={monthStat.posterUrl}
                         alt={`${monthStat.topShow.item.name} poster`}
                         className="w-full h-full object-cover rounded-lg shadow-lg"
+                        style={{
+                          width: "30%",
+                        }}
                       />
                     </div>
                   )}
@@ -153,6 +159,7 @@ export default function ShowOfTheMonthPage() {
                       </p>
                     </div>
                   </div>
+                  <hr />
                 </div>
               </motion.div>
             ))}

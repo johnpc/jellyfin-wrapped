@@ -1,7 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-  getCalendarData,
-} from "@/lib/playback-reporting-queries";
+import { getCalendarData } from "@/lib/playback-reporting-queries";
 import { ResponsiveCalendar } from "@nivo/calendar";
 import { Card } from "@/components/ui/card";
 import { Button, Box, Spinner } from "@radix-ui/themes";
