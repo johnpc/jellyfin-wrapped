@@ -61,7 +61,7 @@ export default function MoviesReviewPage() {
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
-              You Watched {movies.length} Movies This Year
+              You Watched {movies.length} Movies
             </Title>
           </div>
 

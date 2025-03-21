@@ -58,7 +58,7 @@ export default function AudioReviewPage() {
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
-              You Listened to {audios.length} Songs This Year
+              You Listened to {audios.length} Songs
             </Title>
             {audios.length > MAX_DISPLAY_ITEMS && (
               <p style={{ color: "var(--gray-12)" }}>

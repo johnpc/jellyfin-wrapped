@@ -73,7 +73,7 @@ export default function MusicVideoPage() {
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
-              You Listened to {musicVideos.length} Music Videos This Year
+              You Listened to {musicVideos.length} Music Videos
             </Title>
           </div>
 

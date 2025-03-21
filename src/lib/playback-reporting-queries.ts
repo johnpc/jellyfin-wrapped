@@ -6,7 +6,7 @@ import {
   getItemsApi,
 } from "@jellyfin/sdk/lib/utils/api";
 import { getAuthenticatedJellyfinApi } from "./jellyfin-api";
-import { addDays, startOfDay, subYears } from "date-fns";
+import { addDays, format, startOfDay, subYears } from "date-fns";
 import {
   BaseItemPerson,
   ImageType,
@@ -19,6 +19,7 @@ import {
   JELLYFIN_CURRENT_USER_CACHE_KEY,
   setCacheValue,
 } from "./cache";
+import { getCurrentTimeframe } from "./timeframe";
 
 export type SimpleItemDto = {
   id?: string;
@@ -33,7 +34,20 @@ export type SimpleItemDto = {
   durationSeconds: number;
 };
 
-const oneYearAgo = subYears(new Date(), 1);
+// Get the start date for queries based on the current timeframe
+const getStartDate = (): Date => {
+  return getCurrentTimeframe().startDate;
+};
+
+// Get the end date for queries based on the current timeframe
+const getEndDate = (): Date => {
+  return getCurrentTimeframe().endDate;
+};
+
+// Format date for SQL queries
+const formatDateForSql = (date: Date): string => {
+  return format(date, "yyyy-MM-dd");
+};
 
 const getCurrentUserId = async (): Promise<string> => {
   const cachedUserId = getCacheValue(JELLYFIN_CURRENT_USER_CACHE_KEY);
@@ -228,13 +242,16 @@ export const listFavoriteActors = async (): Promise<
 
 export const listMovies = async (): Promise<SimpleItemDto[]> => {
   const userId = await getCurrentUserId();
+  const startDate = getStartDate();
+  const endDate = getEndDate();
 
   const queryString = `
 SELECT ROWID, *
 FROM PlaybackActivity
 WHERE UserId = "${userId}"
 AND ItemType = "Movie"
-AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+AND DateCreated > '${formatDateForSql(startDate)}'
+AND DateCreated <= '${formatDateForSql(endDate)}'
 ORDER BY rowid DESC
 `;
   const data = await playbackReportingSqlRequest(queryString);
@@ -262,8 +279,8 @@ SELECT ROWID, *
 FROM PlaybackActivity
 WHERE UserId = "${userId}"
 AND ItemType = "Movie"
-AND DateCreated > '${startOfDate.getFullYear()}-${startOfDate.getMonth() + 1}-${startOfDate.getDate()}'
-AND DateCreated < '${endOfDate.getFullYear()}-${endOfDate.getMonth() + 1}-${endOfDate.getDate()}'
+AND DateCreated > '${format(startOfDate, "yyyy-MM-dd")}'
+AND DateCreated < '${format(endOfDate, "yyyy-MM-dd")}'
 ORDER BY rowid DESC
 `;
   const data = await playbackReportingSqlRequest(queryString);
@@ -273,8 +290,8 @@ ORDER BY rowid DESC
   FROM PlaybackActivity
   WHERE UserId = "${userId}"
   AND ItemType = "Episode"
-  AND DateCreated > '${startOfDate.getFullYear()}-${startOfDate.getMonth()}-${startOfDate.getDate()}'
-  AND DateCreated < '${endOfDate.getFullYear()}-${endOfDate.getMonth()}-${endOfDate.getDate()}'
+  AND DateCreated > '${format(startOfDate, "yyyy-MM-dd")}'
+  AND DateCreated < '${format(endOfDate, "yyyy-MM-dd")}'
   ORDER BY rowid DESC
   `;
   const data2 = await playbackReportingSqlRequest(queryString2);
@@ -316,13 +333,16 @@ ORDER BY rowid DESC
 
 export const listMusicVideos = async (): Promise<SimpleItemDto[]> => {
   const userId = await getCurrentUserId();
+  const startDate = getStartDate();
+  const endDate = getEndDate();
 
   const queryString = `
   SELECT ROWID, *
   FROM PlaybackActivity
   WHERE UserId = "${userId}"
   AND ItemType = "MusicVideo"
-  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  AND DateCreated > '${formatDateForSql(startDate)}'
+  AND DateCreated <= '${formatDateForSql(endDate)}'
   ORDER BY rowid DESC
   `;
   const data = await playbackReportingSqlRequest(queryString);
@@ -342,13 +362,16 @@ export const listMusicVideos = async (): Promise<SimpleItemDto[]> => {
 
 export const listAudio = async (): Promise<SimpleItemDto[]> => {
   const userId = await getCurrentUserId();
+  const startDate = getStartDate();
+  const endDate = getEndDate();
 
   const queryString = `
   SELECT ROWID, *
   FROM PlaybackActivity
   WHERE UserId = "${userId}"
   AND ItemType = "Audio"
-  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  AND DateCreated > '${formatDateForSql(startDate)}'
+  AND DateCreated <= '${formatDateForSql(endDate)}'
   ORDER BY rowid DESC
   `;
   const data = await playbackReportingSqlRequest(queryString);
@@ -373,13 +396,16 @@ export const listLiveTvChannels = async (): Promise<
   }[]
 > => {
   const userId = await getCurrentUserId();
+  const startDate = getStartDate();
+  const endDate = getEndDate();
 
   const queryString = `
   SELECT ROWID, *
   FROM PlaybackActivity
   WHERE UserId = "${userId}"
   AND ItemType = "TvChannel"
-  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  AND DateCreated > '${formatDateForSql(startDate)}'
+  AND DateCreated <= '${formatDateForSql(endDate)}'
   ORDER BY rowid DESC
   `;
   const data = await playbackReportingSqlRequest(queryString);
@@ -422,13 +448,16 @@ export const listShows = async (): Promise<
   }[]
 > => {
   const userId = await getCurrentUserId();
+  const startDate = getStartDate();
+  const endDate = getEndDate();
 
   const queryString = `
   SELECT ROWID, *
   FROM PlaybackActivity
   WHERE UserId = "${userId}"
   AND ItemType = "Episode"
-  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  AND DateCreated > '${formatDateForSql(startDate)}'
+  AND DateCreated <= '${formatDateForSql(endDate)}'
   ORDER BY rowid DESC
   `;
   const data = await playbackReportingSqlRequest(queryString);
@@ -472,6 +501,16 @@ export const listShows = async (): Promise<
       const season = seasons.find((s) => s.id === episode.parentId);
       return season?.parentId === show.id;
     });
+
+    // Get unique episode IDs from the filtered results to count actual episodes watched
+    const uniqueEpisodeIds = new Set();
+    data.results.forEach((result: string[]) => {
+      const episodeId = result[itemIdIndex];
+      if (showEpisodes.some((episode) => episode.id === episodeId)) {
+        uniqueEpisodeIds.add(episodeId);
+      }
+    });
+
     const showPlaybackDuration = data.results
       .filter((result: string[]) => {
         const showEpisodeIds = showEpisodes.map((episode) => episode.id);
@@ -494,7 +533,7 @@ export const listShows = async (): Promise<
       .reduce((acc, curr) => acc + curr, 0);
     return {
       showName: show.name ?? "",
-      episodeCount: showEpisodes.length,
+      episodeCount: uniqueEpisodeIds.size,
       playbackTime: showPlaybackDuration,
       item: show,
     };
@@ -512,6 +551,8 @@ export const getMinutesPlayedPerDay = async (): Promise<
   }[]
 > => {
   const userId = await getCurrentUserId();
+  const startDate = getStartDate();
+  const endDate = getEndDate();
 
   const queryString = `
   SELECT
@@ -519,7 +560,8 @@ export const getMinutesPlayedPerDay = async (): Promise<
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
   WHERE UserId = "${userId}"
-  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  AND DateCreated > '${formatDateForSql(startDate)}'
+  AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY date(DateCreated)
   ORDER BY PlayDate DESC
   `;
@@ -551,6 +593,8 @@ export const getViewingPatterns = async (): Promise<{
   primeTime: { isPrimeTime: boolean; minutes: number }[];
 }> => {
   const userId = await getCurrentUserId();
+  const startDate = getStartDate();
+  const endDate = getEndDate();
 
   // Time of day query
   const timeOfDayQuery = `
@@ -559,7 +603,8 @@ export const getViewingPatterns = async (): Promise<{
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
   WHERE UserId = "${userId}"
-  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  AND DateCreated > '${formatDateForSql(startDate)}'
+  AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY Hour
   ORDER BY Hour
   `;
@@ -571,7 +616,8 @@ export const getViewingPatterns = async (): Promise<{
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
   WHERE UserId = "${userId}"
-  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  AND DateCreated > '${formatDateForSql(startDate)}'
+  AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY DayOfWeek
   ORDER BY DayOfWeek
   `;
@@ -586,7 +632,8 @@ export const getViewingPatterns = async (): Promise<{
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
   WHERE UserId = "${userId}"
-  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  AND DateCreated > '${formatDateForSql(startDate)}'
+  AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY IsPrimeTime
   ORDER BY IsPrimeTime
   `;
@@ -660,6 +707,8 @@ export const getDeviceStats = async (): Promise<{
   osUsage: { osName: string; minutes: number }[];
 }> => {
   const userId = await getCurrentUserId();
+  const startDate = getStartDate();
+  const endDate = getEndDate();
 
   // Device query
   const deviceQuery = `
@@ -668,7 +717,8 @@ export const getDeviceStats = async (): Promise<{
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
   WHERE UserId = "${userId}"
-  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  AND DateCreated > '${formatDateForSql(startDate)}'
+  AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY DeviceName
   ORDER BY TotalPlayDuration DESC
   `;
@@ -688,7 +738,8 @@ export const getDeviceStats = async (): Promise<{
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
   WHERE UserId = "${userId}"
-  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  AND DateCreated > '${formatDateForSql(startDate)}'
+  AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY BrowserName
   ORDER BY TotalPlayDuration DESC
   `;
@@ -707,7 +758,8 @@ export const getDeviceStats = async (): Promise<{
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
   WHERE UserId = "${userId}"
-  AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth()}-${oneYearAgo.getDate()}'
+  AND DateCreated > '${formatDateForSql(startDate)}'
+  AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY OSName
   ORDER BY TotalPlayDuration DESC
   `;
@@ -774,9 +826,10 @@ export const getMonthlyShowStats = async (): Promise<
   }[]
 > => {
   const userId = await getCurrentUserId();
-  const oneYearAgo = subYears(new Date(), 1);
+  const startDate = getStartDate();
+  const endDate = getEndDate();
 
-  // First get all episodes watched in the last year
+  // Get all episodes watched in the selected timeframe
   const queryString = `
     SELECT
       strftime('%Y-%m', DateCreated) as Month,
@@ -785,7 +838,8 @@ export const getMonthlyShowStats = async (): Promise<
     FROM PlaybackActivity
     WHERE UserId = "${userId}"
     AND ItemType = "Episode"
-    AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth() + 1}-${oneYearAgo.getDate()}'
+    AND DateCreated > '${formatDateForSql(startDate)}'
+    AND DateCreated <= '${formatDateForSql(endDate)}'
     GROUP BY Month, ItemId
     ORDER BY Month DESC, TotalPlayDuration DESC
   `;
@@ -857,7 +911,7 @@ export const getMonthlyShowStats = async (): Promise<
         };
       }
 
-      const showDuration = acc[month].shows.get(show.id!) || 0;
+      const showDuration = acc[month].shows.get(show.id) || 0;
       acc[month].shows.set(show.id!, showDuration + duration);
       acc[month].totalDuration += duration;
 
@@ -874,7 +928,7 @@ export const getMonthlyShowStats = async (): Promise<
 
   // Convert to final format
   const monthlyStats = await Promise.all(
-    Object.entries(monthlyShowData).map(async ([month, data]) => {
+    Object.entries(monthlyShowData).map(([month, data]) => {
       // Get show with highest duration
       let maxDuration = 0;
       let topShowId = "";
@@ -917,8 +971,10 @@ export async function getUnfinishedShows(): Promise<UnfinishedShowDto[]> {
   const userId = await getCurrentUserId();
   const authenticatedApi = await getAuthenticatedJellyfinApi();
   const itemsApi = getItemsApi(authenticatedApi);
+  const startDate = getStartDate();
+  const endDate = getEndDate();
 
-  // First get all episodes watched in the last year
+  // First get all episodes watched in the selected timeframe
   const queryString = `
     SELECT
       ItemId,
@@ -927,7 +983,8 @@ export async function getUnfinishedShows(): Promise<UnfinishedShowDto[]> {
     FROM PlaybackActivity
     WHERE UserId = "${userId}"
     AND ItemType = "Episode"
-    AND DateCreated > '${oneYearAgo.getFullYear()}-${oneYearAgo.getMonth() + 1}-${oneYearAgo.getDate()}'
+    AND DateCreated > '${formatDateForSql(startDate)}'
+    AND DateCreated <= '${formatDateForSql(endDate)}'
     GROUP BY ItemId
   `;
 
@@ -1040,6 +1097,8 @@ export interface PunchCardData {
 
 export async function getPunchCardData(): Promise<PunchCardData[]> {
   const userId = await getCurrentUserId();
+  const startDate = getStartDate();
+  const endDate = getEndDate();
 
   const queryString = `
     SELECT
@@ -1048,6 +1107,8 @@ export async function getPunchCardData(): Promise<PunchCardData[]> {
       COUNT(*) as count
     FROM PlaybackActivity
     WHERE UserId = "${userId}"
+    AND DateCreated > '${formatDateForSql(startDate)}'
+    AND DateCreated <= '${formatDateForSql(endDate)}'
     GROUP BY day_of_week, hour
     ORDER BY day_of_week, hour
   `;

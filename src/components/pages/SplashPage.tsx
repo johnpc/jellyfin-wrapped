@@ -11,6 +11,8 @@ import {
   Subtitle,
   Title,
 } from "../ui/styled";
+import TimeframeSelector from "../TimeframeSelector";
+import { TimeframeOption } from "../../lib/timeframe";
 
 const NEXT_PAGE = "/configure";
 const SplashPage = () => {
@@ -65,6 +67,10 @@ const SplashPage = () => {
     },
   };
 
+  const handleTimeframeChange = (timeframe: TimeframeOption) => {
+    console.log(`Timeframe changed to: ${timeframe.name}`);
+  };
+
   return (
     <Container>
       <ContentWrapper
@@ -79,15 +85,20 @@ const SplashPage = () => {
         <BlinkingStars />
 
         <Subtitle as={motion.p} variants={itemVariants}>
-          Discover your year in entertainment with a personalized recap of your
-          Jellyfin watching habits
+          Discover your entertainment with a personalized recap of your Jellyfin
+          watching habits
         </Subtitle>
+
+        <motion.div variants={itemVariants}>
+          <TimeframeSelector onTimeframeChange={handleTimeframeChange} />
+        </motion.div>
 
         <FeaturesList as={motion.ul} variants={listVariants}>
           {[
             "📺 See your most-watched shows",
             "⭐ Review your favorite movies",
             "📊 Get insights into your viewing patterns",
+            "🗓️ Choose custom timeframes for your stats",
           ].map((feature, index) => (
             <FeatureItem as={motion.li} key={index} variants={featureVariants}>
               {feature}

@@ -99,7 +99,7 @@ export default function LiveTvReviewPage() {
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1}>
-              You Watched {channels.length} Live TV Channels This Year
+              You Watched {channels.length} Live TV Channels
             </Title>
           </div>
 
