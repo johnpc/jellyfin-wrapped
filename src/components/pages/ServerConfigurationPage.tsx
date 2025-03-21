@@ -2,7 +2,8 @@ import React, { ChangeEvent, useState } from "react";
 import { Button, Card, Heading, Text, Flex, Box } from "@radix-ui/themes";
 import { styled } from "@stitches/react";
 import { motion } from "framer-motion";
-import { Textarea } from "../ui/textarea";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import {
   authenticateByUserName,
   authenticateByAuthToken,
@@ -53,25 +54,25 @@ const ServerConfigurationPage = () => {
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleServerUrlChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleServerUrlChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setServerUrl(value);
     setCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY, value);
   };
 
-  const handleUsernameChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setUsername(value);
     setCacheValue(JELLYFIN_USERNAME_CACHE_KEY, value);
   };
 
-  const handleAuthTokenChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleAuthTokenChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setAuthToken(value);
     setCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY, value);
   };
 
-  const handlePasswordChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
     setCacheValue(JELLYFIN_PASSWORD_CACHE_KEY, value);
@@ -108,6 +109,14 @@ const ServerConfigurationPage = () => {
     marginTop: "2rem",
     opacity: 0.9,
   });
+
+  const HelpText = styled("p", {
+    fontSize: "0.75rem",
+    color: "#666",
+    marginTop: "0.25rem",
+    marginBottom: "0.5rem",
+  });
+
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
@@ -123,6 +132,14 @@ const ServerConfigurationPage = () => {
   const hostname = window.location.hostname;
   const port = window.location.port;
   const currentUrl = `${protocol}//${hostname}${port ? ":" + port : ""}`;
+
+  const inputStyle = {
+    width: "100%",
+    padding: "10px",
+    fontSize: "16px",
+    borderRadius: "6px",
+    border: "1px solid #ccc",
+  };
 
   return (
     <Container>
@@ -146,12 +163,22 @@ const ServerConfigurationPage = () => {
               <Flex direction="column" gap="4">
                 {serverUrlOverride ? null : (
                   <>
-                    <Textarea
-                      placeholder="Server URL (e.g., http://localhost:8096)"
-                      value={serverUrl}
-                      onChange={handleServerUrlChange}
-                      required
-                    />
+                    <div className="space-y-1">
+                      <Label htmlFor="server-url">Server URL</Label>
+                      <Input
+                        id="server-url"
+                        type="url"
+                        placeholder="http://192.168.1.100:8096"
+                        value={serverUrl}
+                        onChange={handleServerUrlChange}
+                        required
+                        style={inputStyle}
+                      />
+                      <HelpText>
+                        The full URL of your Jellyfin server including http://
+                        or https:// and port number
+                      </HelpText>
+                    </div>
                     {!protocol.includes("https") ? null : (
                       <Disclaimer as={motion.div} variants={itemVariants}>
                         You are accessing Jellyfin Wrapped via https. You must
@@ -173,26 +200,55 @@ const ServerConfigurationPage = () => {
                 )}
 
                 {serverUrlOverride ? null : (
-                  <Textarea
-                    placeholder="Auth Token - Optional. If supplied, username/password fields are ignored"
-                    value={authToken}
-                    onChange={handleAuthTokenChange}
-                    required={!username && !password}
-                  />
+                  <div className="space-y-1">
+                    <Label htmlFor="auth-token">Auth Token</Label>
+                    <Input
+                      id="auth-token"
+                      type="text"
+                      placeholder="MediaBrowser_abcdef123456..."
+                      value={authToken}
+                      onChange={handleAuthTokenChange}
+                      required={!username && !password}
+                      style={inputStyle}
+                    />
+                    <HelpText>
+                      Optional. See instructions below to find it. If provided,
+                      username and password are not required
+                    </HelpText>
+                  </div>
                 )}
 
-                <Textarea
-                  placeholder={`Username${serverUrlOverride ? "" : " - not required if Auth Token is specified"}`}
-                  value={username}
-                  onChange={handleUsernameChange}
-                  required={!authToken}
-                />
+                <div className="space-y-1">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="admin"
+                    value={username}
+                    onChange={handleUsernameChange}
+                    required={!authToken}
+                    style={inputStyle}
+                  />
+                  {!serverUrlOverride && (
+                    <HelpText>Not required if Auth Token is provided</HelpText>
+                  )}
+                </div>
 
-                <Textarea
-                  placeholder={`Password${serverUrlOverride ? "" : " - not required if Auth Token is specified"}`}
-                  value={password}
-                  onChange={handlePasswordChange}
-                />
+                <div className="space-y-1">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    required={!authToken}
+                    style={inputStyle}
+                  />
+                  {!serverUrlOverride && (
+                    <HelpText>Not required if Auth Token is provided</HelpText>
+                  )}
+                </div>
               </Flex>
 
               <StyledButton size="3" disabled={isLoading}>
