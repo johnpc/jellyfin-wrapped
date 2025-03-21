@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import { listMovies, SimpleItemDto } from "@/lib/playback-reporting-queries";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
-import { Container, Grid, Box, Spinner, Button } from "@radix-ui/themes";
+import { Container, Grid, Spinner } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { itemVariants, Title } from "../ui/styled";
 import { useNavigate } from "react-router-dom";
 import { generateGuid } from "@/lib/utils";
 import { useErrorBoundary } from "react-error-boundary";
 import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
+import PageContainer from "../PageContainer";
 
 const NEXT_PAGE = "/shows";
+
 export default function MoviesReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
@@ -45,27 +47,16 @@ export default function MoviesReviewPage() {
           alignItems: "center",
           justifyContent: "center",
           minHeight: "100vh",
+          backgroundColor: "var(--green-8)",
         }}
       >
-        <Box
-          style={{
-            backgroundColor: "var(--green-8)",
-            minHeight: "100vh",
-            minWidth: "100vw",
-          }}
-          className="min-h-screen"
-        >
-          <Spinner size={"3"} />
-        </Box>
+        <Spinner size={"3"} />
       </div>
     );
   }
 
   return (
-    <Box
-      style={{ backgroundColor: "var(--purple-8)" }}
-      className="min-h-screen"
-    >
+    <PageContainer backgroundColor="var(--purple-8)" nextPage={NEXT_PAGE}>
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
@@ -88,15 +79,6 @@ export default function MoviesReviewPage() {
           </Grid>
         </Grid>
       </Container>
-      <Button
-        size={"4"}
-        style={{ width: "100%" }}
-        onClick={() => {
-          void navigate(NEXT_PAGE);
-        }}
-      >
-        Next
-      </Button>
-    </Box>
+    </PageContainer>
   );
 }

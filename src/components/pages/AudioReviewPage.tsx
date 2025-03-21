@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { listAudio, SimpleItemDto } from "@/lib/playback-reporting-queries";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
-import { Container, Grid, Box, Spinner, Button } from "@radix-ui/themes";
+import { Container, Grid, Spinner } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { itemVariants, Title } from "../ui/styled";
+import PageContainer from "../PageContainer";
 
 const NEXT_PAGE = "/music-videos";
+const MAX_DISPLAY_ITEMS = 20;
 
 export default function AudioReviewPage() {
   const { showBoundary } = useErrorBoundary();
@@ -42,55 +44,36 @@ export default function AudioReviewPage() {
           alignItems: "center",
           justifyContent: "center",
           minHeight: "100vh",
+          backgroundColor: "var(--green-8)",
         }}
       >
-        <Box
-          style={{
-            backgroundColor: "var(--green-8)",
-            minHeight: "100vh",
-            minWidth: "100vw",
-          }}
-          className="min-h-screen"
-        >
-          <Spinner size={"3"} />
-        </Box>
+        <Spinner size={"3"} />
       </div>
     );
   }
 
   return (
-    <Box
-      style={{
-        backgroundColor: "var(--red-8)",
-        minWidth: "100vw",
-        minHeight: "100vh",
-      }}
-      className="min-h-screen"
-    >
+    <PageContainer backgroundColor="var(--red-8)" nextPage={NEXT_PAGE}>
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               You Listened to {audios.length} Songs This Year
             </Title>
+            {audios.length > MAX_DISPLAY_ITEMS && (
+              <p style={{ color: "var(--gray-12)" }}>
+                Showing top {MAX_DISPLAY_ITEMS} songs
+              </p>
+            )}
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
-            {audios.slice(0, 20).map((audio) => (
+            {audios.slice(0, MAX_DISPLAY_ITEMS).map((audio) => (
               <MovieCard key={audio.id} item={audio} />
             ))}
           </Grid>
         </Grid>
       </Container>
-      <Button
-        size={"4"}
-        style={{ width: "100%" }}
-        onClick={() => {
-          void navigate(NEXT_PAGE);
-        }}
-      >
-        Next
-      </Button>
-    </Box>
+    </PageContainer>
   );
 }

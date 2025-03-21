@@ -27,6 +27,7 @@ import UnfinishedShowsPage from "./components/pages/UnfinishedShowsPage";
 import CriticallyAcclaimedPage from "./components/pages/CriticallyAcclaimedPage";
 import { useEffect } from "react";
 import ActivityCalendarPage from "./components/pages/ActivityCalendarPage";
+import Navigation from "./components/Navigation";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -51,6 +52,7 @@ function RootLayout() {
       <ScrollToTop />
       <QueryClientProvider client={queryClient}>
         <Theme>
+          <Navigation />
           <Outlet />
         </Theme>
       </QueryClientProvider>
