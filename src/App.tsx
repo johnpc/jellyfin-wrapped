@@ -25,6 +25,7 @@ import DeviceStatsPage from "./components/pages/DeviceStatsPage";
 import ShowOfTheMonthPage from "./components/pages/ShowOfTheMonthPage";
 import UnfinishedShowsPage from "./components/pages/UnfinishedShowsPage";
 import CriticallyAcclaimedPage from "./components/pages/CriticallyAcclaimedPage";
+import TopTenPage from "./components/pages/TopTenPage";
 import { useEffect } from "react";
 import ActivityCalendarPage from "./components/pages/ActivityCalendarPage";
 import Navigation from "./components/Navigation";
@@ -71,6 +72,10 @@ const router = createBrowserRouter([
       {
         path: "/configure",
         element: <ServerConfigurationPage />,
+      },
+      {
+        path: "/topten",
+        element: <TopTenPage />,
       },
       {
         path: "/movies",
