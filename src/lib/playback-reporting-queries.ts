@@ -6,7 +6,7 @@ import {
   getItemsApi,
 } from "@jellyfin/sdk/lib/utils/api";
 import { getAuthenticatedJellyfinApi } from "./jellyfin-api";
-import { addDays, format, startOfDay, subYears } from "date-fns";
+import { addDays, format, startOfDay } from "date-fns";
 import {
   BaseItemPerson,
   ImageType,
@@ -911,8 +911,8 @@ export const getMonthlyShowStats = async (): Promise<
         };
       }
 
-      const showDuration = acc[month].shows.get(show.id) || 0;
-      acc[month].shows.set(show.id!, showDuration + duration);
+      const showDuration = acc[month].shows.get(show?.id ?? "") || 0;
+      acc[month].shows.set(show?.id ?? "", showDuration + duration);
       acc[month].totalDuration += duration;
 
       return acc;

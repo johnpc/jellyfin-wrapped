@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { styled } from "@stitches/react";
 import { motion } from "framer-motion";
@@ -7,6 +7,7 @@ import { TimeframeOption } from "../lib/timeframe";
 
 // Define navigation items with their paths and display names
 const navigationItems = [
+  { path: "/TopTen", name: "Top 10" },
   { path: "/movies", name: "Movies" },
   { path: "/shows", name: "TV Shows" },
   { path: "/audio", name: "Music" },
@@ -41,7 +42,8 @@ const Navigation = () => {
 
   const handleTimeframeChange = (timeframe: TimeframeOption) => {
     // Refresh the current page to apply the new timeframe
-    navigate(0);
+    console.log({timeframe});
+    void navigate(0);
   };
 
   return (
@@ -69,7 +71,7 @@ const Navigation = () => {
               key={item.path}
               isActive={location.pathname === item.path}
               onClick={() => {
-                navigate(item.path);
+                void navigate(item.path);
                 setIsOpen(false);
               }}
             >

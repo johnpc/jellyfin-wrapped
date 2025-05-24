@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { Box, Button } from "@radix-ui/themes";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@stitches/react";
