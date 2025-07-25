@@ -53,6 +53,7 @@ const ServerConfigurationPage = () => {
     () => getCacheValue(JELLYFIN_PASSWORD_CACHE_KEY) || "",
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [useAuthToken, setUseAuthToken] = useState<boolean>(false);
 
   const handleServerUrlChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -84,7 +85,7 @@ const ServerConfigurationPage = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      if (authToken) {
+      if (useAuthToken && authToken) {
         authenticateByAuthToken(serverUrl, authToken);
       } else {
         await authenticateByUserName(serverUrl, username, password);
@@ -199,7 +200,23 @@ const ServerConfigurationPage = () => {
                   </>
                 )}
 
-                {serverUrlOverride ? null : (
+                {/* Authentication Method Toggle */}
+                <Flex direction="column" gap="2">
+                  <Flex justify="between" align="center">
+                    <Text size="2" weight="medium">Authentication Method</Text>
+                    <Button
+                      type="button"
+                      variant="soft"
+                      size="1"
+                      onClick={() => setUseAuthToken(!useAuthToken)}
+                    >
+                      {useAuthToken ? "Use Username/Password" : "Use Auth Token"}
+                    </Button>
+                  </Flex>
+                </Flex>
+
+                {/* Auth Token Fields */}
+                {useAuthToken ? (
                   <div className="space-y-1">
                     <Label htmlFor="auth-token">Auth Token</Label>
                     <Input
@@ -208,47 +225,44 @@ const ServerConfigurationPage = () => {
                       placeholder="MediaBrowser_abcdef123456..."
                       value={authToken}
                       onChange={handleAuthTokenChange}
-                      required={!username && !password}
+                      required
                       style={inputStyle}
                     />
                     <HelpText>
-                      Optional. See instructions below to find it. If provided,
-                      username and password are not required
+                      Your Jellyfin authentication token. See instructions below to find it.
                     </HelpText>
                   </div>
+                ) : (
+                  /* Username/Password Fields */
+                  <>
+                    <div className="space-y-1">
+                      <Label htmlFor="username">Username</Label>
+                      <Input
+                        id="username"
+                        type="text"
+                        placeholder="admin"
+                        value={username}
+                        onChange={handleUsernameChange}
+                        required
+                        style={inputStyle}
+                      />
+                      <HelpText>Your Jellyfin username</HelpText>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="password">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={handlePasswordChange}
+                        style={inputStyle}
+                      />
+                      <HelpText>Your Jellyfin password (leave empty if no password is set)</HelpText>
+                    </div>
+                  </>
                 )}
-
-                <div className="space-y-1">
-                  <Label htmlFor="username">Username</Label>
-                  <Input
-                    id="username"
-                    type="text"
-                    placeholder="admin"
-                    value={username}
-                    onChange={handleUsernameChange}
-                    required={!authToken}
-                    style={inputStyle}
-                  />
-                  {!serverUrlOverride && (
-                    <HelpText>Not required if Auth Token is provided</HelpText>
-                  )}
-                </div>
-
-                <div className="space-y-1">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={handlePasswordChange}
-                    required={!authToken}
-                    style={inputStyle}
-                  />
-                  {!serverUrlOverride && (
-                    <HelpText>Not required if Auth Token is provided</HelpText>
-                  )}
-                </div>
               </Flex>
 
               <StyledButton size="3" disabled={isLoading}>
@@ -257,22 +271,24 @@ const ServerConfigurationPage = () => {
             </Flex>
           </form>
 
-          <Disclaimer as={motion.div} variants={itemVariants}>
-            Auth token can be found by following these steps:
-            <ol>
-              <li>Log into your Jellyfin web interface</li>
-              <li>
-                Open your browser's Developer Tools (usually F12 or right-click
-                then Inspect)
-              </li>
-              <li>Go to the "Network" tab in Developer Tools</li>
-              <li>Look for requests to your Jellyfin server</li>
-              <li>
-                In the request headers, find "X-MediaBrowser-Token" or
-                "Authorization"
-              </li>
-            </ol>
-          </Disclaimer>
+          {useAuthToken && (
+            <Disclaimer as={motion.div} variants={itemVariants}>
+              Auth token can be found by following these steps:
+              <ol>
+                <li>Log into your Jellyfin web interface</li>
+                <li>
+                  Open your browser's Developer Tools (usually F12 or right-click
+                  then Inspect)
+                </li>
+                <li>Go to the "Network" tab in Developer Tools</li>
+                <li>Look for requests to your Jellyfin server</li>
+                <li>
+                  In the request headers, find "X-MediaBrowser-Token" or
+                  "Authorization"
+                </li>
+              </ol>
+            </Disclaimer>
+          )}
 
           <Disclaimer as={motion.div} variants={itemVariants}>
             Jellyfin Wrapped is an entirely client-side application. Your data
