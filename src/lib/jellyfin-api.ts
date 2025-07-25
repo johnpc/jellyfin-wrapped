@@ -9,19 +9,60 @@ import {
 } from "./cache";
 
 let api: Api | null = null;
+let adminApi: Api | null = null;
 const sleep = (durationMs: number) =>
   new Promise((resolve) => setTimeout(resolve, durationMs));
+
+// Get environment variables
+export const getEnvVar = (name: string): string | undefined => {
+  // Check if we're in a browser environment with window.ENV (production/Docker)
+  if (typeof window !== 'undefined' && (window as any).ENV) {
+    return (window as any).ENV[name];
+  }
+  // Fallback to import.meta.env for Vite (development)
+  return import.meta.env[`VITE_${name}`];
+};
+
+const getServerUrl = (): string => {
+  const envServerUrl = getEnvVar('JELLYFIN_SERVER_URL');
+  if (envServerUrl) {
+    return envServerUrl;
+  }
+
+  const cachedServerUrl = getCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY);
+  if (!cachedServerUrl) {
+    throw new Error("JELLYFIN_SERVER_URL environment variable is required");
+  }
+
+  return cachedServerUrl;
+};
+
+const getAdminApiKey = (): string => {
+  const adminApiKey = getEnvVar('JELLYFIN_API_KEY');
+  if (!adminApiKey) {
+    throw new Error("JELLYFIN_API_KEY environment variable is required");
+  }
+  return adminApiKey;
+};
+
+export const getAdminJellyfinApi = (): Api => {
+  const serverUrl = getServerUrl();
+  const apiKey = getAdminApiKey();
+
+  adminApi = authenticateByAuthToken(serverUrl, apiKey);
+  return adminApi;
+};
 export const getAuthenticatedJellyfinApi = async (): Promise<Api> => {
   if (api && api.accessToken) {
     return api;
   }
 
-  const serverUrl = getCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY);
+  const serverUrl = getServerUrl();
   const username = getCacheValue(JELLYFIN_USERNAME_CACHE_KEY) ?? "";
   const password = getCacheValue(JELLYFIN_PASSWORD_CACHE_KEY) ?? "";
   const jellyfinAuthToken = getCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY);
 
-  if (!serverUrl || (!username && !jellyfinAuthToken)) {
+  if (!username && !jellyfinAuthToken) {
     throw new Error(
       "Missing credentials in localStorage. Please configure your Jellyfin connection.",
     );

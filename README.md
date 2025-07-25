@@ -16,15 +16,50 @@ A web application that generates personalized year-in-review statistics for your
 ### Prerequisites
 
 - A Jellyfin server (version 10.8.0 or higher) with Jellyfin's official [Playback Reporting plugin](https://github.com/jellyfin/jellyfin-plugin-playbackreporting) installed
+- Admin access to your Jellyfin server to generate an API key
 - Your Jellyfin server URL
-- A valid Jellyfin username and password
+- A valid Jellyfin username and password for user authentication
+
+### Environment Variables
+
+The application requires the following environment variables to be set:
+
+**For Development (Vite):**
+- `VITE_JELLYFIN_SERVER_URL`: The URL of your Jellyfin server (e.g., `http://192.168.1.100:8096`)
+- `VITE_JELLYFIN_API_KEY`: An admin API key for accessing playback reporting data
+
+**For Production (Docker/Runtime):**
+- `JELLYFIN_SERVER_URL`: The URL of your Jellyfin server (e.g., `http://192.168.1.100:8096`)
+- `JELLYFIN_API_KEY`: An admin API key for accessing playback reporting data
+
+You can set these in a `.env` file in the project root for development:
+
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit the .env file with your values
+VITE_JELLYFIN_SERVER_URL=http://your-jellyfin-server:8096
+VITE_JELLYFIN_API_KEY=your-admin-api-key-here
+```
+
+#### Getting an Admin API Key
+
+1. Log into your Jellyfin server as an administrator
+2. Go to Dashboard → API Keys
+3. Click "+" to create a new API key
+4. Give it a name (e.g., "Jellyfin Wrapped")
+5. Copy the generated API key and use it as `VITE_JELLYFIN_API_KEY` (development) or `JELLYFIN_API_KEY` (production)
+
+**Note**: The admin API key is required because recent Jellyfin versions restrict the `user_usage_stats/submit_custom_query` endpoint to admin users only.
 
 ### Usage
 
-1. Visit [Jellyfin Wrapped](https://jellyfin-wrapped.jpc.io)
-2. Enter your Jellyfin server URL
-3. Log in with your Jellyfin credentials
-4. View your personalized media statistics!
+1. Set up the required environment variables (see Environment Variables section above)
+2. Visit [Jellyfin Wrapped](https://jellyfin-wrapped.jpc.io) or run locally
+3. If server URL is not configured via environment variables, enter your Jellyfin server URL
+4. Log in with your Jellyfin credentials
+5. View your personalized media statistics!
 
 ## Development
 
@@ -71,12 +106,16 @@ To build with docker, run the following commands
 ```bash
 npm run build
 docker build -t jellyfin-wrapped .
-docker run -p 80:80 jellyfin-wrapped
+docker run -p 80:80 \
+  -e JELLYFIN_SERVER_URL=http://your-jellyfin-server:8096 \
+  -e JELLYFIN_API_KEY=your-admin-api-key \
+  jellyfin-wrapped
 ```
 
 Or, via docker compose:
 
 ```bash
+# Edit docker-compose.yaml to set your environment variables
 # Start the service
 docker compose up -d
 

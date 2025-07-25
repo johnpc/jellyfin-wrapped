@@ -26,18 +26,20 @@ import {
 } from "@/lib/playback-reporting-queries";
 
 const NEXT_PAGE = "/movies";
-type WindowOverride = typeof Window & {
-  ENV:
-    | {
-        FORCE_JELLYFIN_SERVER_URL: string;
-      }
-    | undefined;
+
+const getEnvVar = (name: string): string | undefined => {
+  // Check if we're in a browser environment with window.ENV (production/Docker)
+  if (typeof window !== 'undefined' && (window as any).ENV) {
+    return (window as any).ENV[name];
+  }
+  // Fallback to import.meta.env for Vite (development)
+  return import.meta.env[`VITE_${name}`];
 };
+
 const ServerConfigurationPage = () => {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
-  const serverUrlOverride = (window as unknown as WindowOverride).ENV
-    ?.FORCE_JELLYFIN_SERVER_URL;
+  const serverUrlOverride = getEnvVar('JELLYFIN_SERVER_URL');
 
   const [serverUrl, setServerUrl] = useState<string>(
     () =>
@@ -85,10 +87,16 @@ const ServerConfigurationPage = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      // Ensure server URL is saved to cache if it comes from environment
+      const finalServerUrl = serverUrlOverride || serverUrl;
+      if (finalServerUrl) {
+        setCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY, finalServerUrl);
+      }
+
       if (useAuthToken && authToken) {
-        authenticateByAuthToken(serverUrl, authToken);
+        authenticateByAuthToken(finalServerUrl, authToken);
       } else {
-        await authenticateByUserName(serverUrl, username, password);
+        await authenticateByUserName(finalServerUrl, username, password);
       }
 
       // Warm caches
@@ -162,7 +170,7 @@ const ServerConfigurationPage = () => {
               </Box>
 
               <Flex direction="column" gap="4">
-                {serverUrlOverride ? null : (
+                {!serverUrlOverride && (
                   <>
                     <div className="space-y-1">
                       <Label htmlFor="server-url">Server URL</Label>
@@ -198,6 +206,17 @@ const ServerConfigurationPage = () => {
                       </Disclaimer>
                     )}
                   </>
+                )}
+
+                {serverUrlOverride && (
+                  <div className="space-y-1">
+                    <Text size="2" color="gray">
+                      Server URL: {serverUrlOverride}
+                    </Text>
+                    <HelpText>
+                      Server URL is configured via environment variables
+                    </HelpText>
+                  </div>
                 )}
 
                 {/* Authentication Method Toggle */}

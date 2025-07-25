@@ -14,6 +14,7 @@ services:
       - "80:80"
     restart: unless-stopped
     container_name: jellyfin-wrapped
-    # Optional environment variable to force your Jellyfin Wrapped instance to only work with your Jellyfin server. This simplifies configuration.
-    # environment:
-    #   - FORCE_JELLYFIN_SERVER_URL=http://<your_jellyfin_server>:8096
+    # Required environment variables for Jellyfin Wrapped to function properly
+    environment:
+      - JELLYFIN_SERVER_URL=http://<your_jellyfin_server>:8096
+      - JELLYFIN_API_KEY=<your_admin_api_key>

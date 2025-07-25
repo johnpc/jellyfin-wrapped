@@ -18,5 +18,7 @@ RUN echo "Include conf/extra/apache-config.conf" \
     >> /usr/local/apache2/conf/httpd.conf
 
 # Make sure Apache can read environment variables
-RUN echo "PassEnv FORCE_JELLYFIN_SERVER_URL" \
+RUN echo "PassEnv JELLYFIN_SERVER_URL" \
+    >> /usr/local/apache2/conf/httpd.conf && \
+    echo "PassEnv JELLYFIN_API_KEY" \
     >> /usr/local/apache2/conf/httpd.conf

@@ -5,7 +5,7 @@ import {
   getUserLibraryApi,
   getItemsApi,
 } from "@jellyfin/sdk/lib/utils/api";
-import { getAuthenticatedJellyfinApi } from "./jellyfin-api";
+import { getAuthenticatedJellyfinApi, getAdminJellyfinApi, getEnvVar } from "./jellyfin-api";
 import { addDays, format, startOfDay } from "date-fns";
 import {
   BaseItemPerson,
@@ -69,21 +69,22 @@ const playbackReportingSqlRequest = async (
   colums: string[];
   results: string[][];
 }> => {
-  const authenticatedApi = await getAuthenticatedJellyfinApi();
-  const res = await authenticatedApi.axiosInstance.post(
-    `${authenticatedApi.basePath}/user_usage_stats/submit_custom_query?stamp=1735765350440`,
-    {
-      CustomQueryString: queryString,
-      ReplaceUserId: true,
-    },
-    {
+  const adminApi = getAdminJellyfinApi();
+  const res = await fetch(
+    `${adminApi.basePath}/user_usage_stats/submit_custom_query?stamp=1735765350440`, {
+      method: 'POST',
       headers: {
-        Authorization: authenticatedApi.authorizationHeader,
+        "X-Emby-Token": `${getEnvVar("JELLYFIN_API_KEY")}`,
         "Content-Type": "application/json",
       },
-    },
+      body:JSON.stringify({
+      CustomQueryString: queryString,
+      ReplaceUserId: true,
+    }),
+    }
   );
-  return res.data as {
+  console.log({res});
+  return await res.json() as {
     colums: string[];
     results: string[][];
   };
@@ -255,6 +256,7 @@ AND DateCreated <= '${formatDateForSql(endDate)}'
 ORDER BY rowid DESC
 `;
   const data = await playbackReportingSqlRequest(queryString);
+  console.log({data})
 
   const itemIdIndex = data.colums.findIndex((i: string) => i == "ItemId");
   const movieItemIds = data.results
