@@ -56,7 +56,7 @@ VITE_JELLYFIN_API_KEY=your-admin-api-key-here
 ### Usage
 
 1. Set up the required environment variables (see Environment Variables section above)
-2. Visit [Jellyfin Wrapped](https://jellyfin-wrapped.jpc.io) or run locally
+2. Run the application locally or deploy it to your preferred hosting platform
 3. If server URL is not configured via environment variables, enter your Jellyfin server URL
 4. Log in with your Jellyfin credentials
 5. View your personalized media statistics!
