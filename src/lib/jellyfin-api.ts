@@ -1,5 +1,5 @@
 import { Api, Jellyfin } from "@jellyfin/sdk";
-import { generateGuid } from "./utils";
+
 import {
   getCacheValue,
   JELLYFIN_AUTH_TOKEN_CACHE_KEY,
@@ -92,7 +92,7 @@ export const authenticateByAuthToken = (
     },
     deviceInfo: {
       name: "Jellyfin-Wrapped",
-      id: generateGuid(),
+      id: "Jellyfin-Wrapped",
     },
   });
   api = jellyfin.createApi(serverUrl, jellyfinApiKey);
@@ -114,7 +114,7 @@ export const authenticateByUserName = async (
     },
     deviceInfo: {
       name: "Jellyfin-Wrapped",
-      id: generateGuid(),
+      id: "Jellyfin-Wrapped",
     },
   });
   console.log("Connecting to server...", { serverUrl, username });
