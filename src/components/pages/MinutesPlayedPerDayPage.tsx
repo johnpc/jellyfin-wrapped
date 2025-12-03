@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Container, Grid, Box, Button } from "@radix-ui/themes";
+import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useErrorBoundary } from "react-error-boundary";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import { useViewingPatterns } from "@/hooks/queries/useViewingPatterns";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { LineChart } from "../charts/LineChart";
 import { BarChart } from "../charts/BarChart";
+import PageContainer from "../PageContainer";
 
 const NEXT_PAGE = "/show-of-the-month";
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -85,22 +86,22 @@ export default function MinutesPlayedPerDayPage() {
   const totalHours = Math.floor(totalMinutes / 60);
 
   return (
-    <Box
-      style={{ backgroundColor: "var(--indigo-8)" }}
-      className="min-h-screen"
-    >
+    <PageContainer backgroundColor="var(--amber-8)" nextPage={NEXT_PAGE} previousPage="/holidays">
       <Container size="4" p="4" ref={containerRef}>
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Your Viewing Activity
             </Title>
+            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+              See when you watch the most throughout the day and week
+            </p>
             <p style={{ fontSize: "1.5rem", marginTop: "1rem" }}>
               Total: {totalHours} hours
             </p>
           </div>
 
-          <div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <h3 style={{ textAlign: "center", marginBottom: "1rem" }}>
               Daily Activity
             </h3>
@@ -115,7 +116,7 @@ export default function MinutesPlayedPerDayPage() {
             />
           </div>
 
-          <div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <h3 style={{ textAlign: "center", marginBottom: "1rem" }}>
               Time of Day
             </h3>
@@ -130,7 +131,7 @@ export default function MinutesPlayedPerDayPage() {
             />
           </div>
 
-          <div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <h3 style={{ textAlign: "center", marginBottom: "1rem" }}>
               Day of Week
             </h3>
@@ -145,15 +146,6 @@ export default function MinutesPlayedPerDayPage() {
           </div>
         </Grid>
       </Container>
-      <Button
-        size={"4"}
-        style={{ width: "100%" }}
-        onClick={() => {
-          void navigate(NEXT_PAGE);
-        }}
-      >
-        Next
-      </Button>
-    </Box>
+    </PageContainer>
   );
 }

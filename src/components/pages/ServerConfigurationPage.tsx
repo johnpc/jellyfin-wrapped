@@ -18,16 +18,10 @@ import {
   setCacheValue,
 } from "@/lib/cache";
 import { useErrorBoundary } from "react-error-boundary";
-import {
-  listAudio,
-  listLiveTvChannels,
-  listMovies,
-  listShows,
-} from "@/lib/queries";
 
 import { getEnvVar } from "@/lib/jellyfin-api";
 
-const NEXT_PAGE = "/movies";
+const NEXT_PAGE = "/loading";
 
 const ServerConfigurationPage = () => {
   const { showBoundary } = useErrorBoundary();
@@ -91,12 +85,6 @@ const ServerConfigurationPage = () => {
       } else {
         await authenticateByUserName(finalServerUrl, username, password);
       }
-
-      // Warm caches
-      void listMovies();
-      void listShows();
-      void listAudio();
-      void listLiveTvChannels();
 
       void navigate(NEXT_PAGE);
     } catch (e) {

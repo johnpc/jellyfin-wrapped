@@ -6,23 +6,17 @@ export const JELLYFIN_CURRENT_USER_CACHE_KEY = "jellyfinwrapped_current_user";
 export const JELLYFIN_HIDDEN_ITEMS = "jellyfinwrapped_hidden_items";
 const localCache: Record<string, string> = {};
 export const setCacheValue = (key: string, value: string) => {
-  const userConfigCacheKeys = [
-    JELLYFIN_SERVER_URL_CACHE_KEY,
-    JELLYFIN_AUTH_TOKEN_CACHE_KEY,
-    JELLYFIN_USERNAME_CACHE_KEY,
-    JELLYFIN_PASSWORD_CACHE_KEY,
-  ];
   try {
     localCache[key] = value;
     localStorage.setItem(key, value);
-    if (userConfigCacheKeys.includes(key)) {
+    if (key === JELLYFIN_SERVER_URL_CACHE_KEY || 
+        key === JELLYFIN_AUTH_TOKEN_CACHE_KEY || 
+        key === JELLYFIN_USERNAME_CACHE_KEY || 
+        key === JELLYFIN_PASSWORD_CACHE_KEY) {
       localStorage.removeItem(JELLYFIN_CURRENT_USER_CACHE_KEY);
     }
   } catch (error) {
     console.warn(`Error setting cache value for key ${key}:`, error);
-    if (userConfigCacheKeys.includes(key)) {
-      throw new Error(`Error setting cache value for key ${key}: ${error}`);
-    }
   }
 };
 
@@ -32,15 +26,12 @@ export const getCacheValue = (key: string): string | null => {
     return localCache[key];
   }
 
-  // If not, check if the value is in localStorage
   const value = localStorage.getItem(key);
   if (value) {
-    // Store the value in the local cache for future use
     localCache[key] = value;
     return value;
   }
 
-  // If the value is not in localStorage, return null
   return null;
 };
 

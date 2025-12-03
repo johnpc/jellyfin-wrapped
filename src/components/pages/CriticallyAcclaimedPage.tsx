@@ -1,8 +1,6 @@
 import {
   Container,
   Grid,
-  Box,
-  Button,
   Text,
   Card,
   Flex,
@@ -17,8 +15,9 @@ import { useShows } from "@/hooks/queries/useShows";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { ContentImage } from "../ContentImage";
 import { getTopRatedContent, TopContent } from "@/lib/rating-helpers";
+import PageContainer from "../PageContainer";
 
-const NEXT_PAGE = "/actors";
+const NEXT_PAGE = "/oldest-movie";
 
 export default function CriticallyAcclaimedPage() {
   const { showBoundary } = useErrorBoundary();
@@ -49,13 +48,16 @@ export default function CriticallyAcclaimedPage() {
   }
 
   return (
-    <Box style={{ backgroundColor: "var(--teal-8)" }} className="min-h-screen">
+    <PageContainer backgroundColor="var(--cyan-8)" nextPage={NEXT_PAGE} previousPage="/tv">
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Critically Acclaimed Content You Watched
             </Title>
+            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+              Highly-rated movies and shows from your viewing history
+            </p>
           </div>
 
           <Grid columns={{ initial: "1", sm: "2" }} gap="4">
@@ -85,15 +87,6 @@ export default function CriticallyAcclaimedPage() {
           </Grid>
         </Grid>
       </Container>
-      <Button
-        size={"4"}
-        style={{ width: "100%" }}
-        onClick={() => {
-          void navigate(NEXT_PAGE);
-        }}
-      >
-        Next
-      </Button>
-    </Box>
+    </PageContainer>
   );
 }

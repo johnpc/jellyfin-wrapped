@@ -1,4 +1,4 @@
-import { Container, Grid, Box, Button } from "@radix-ui/themes";
+import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
@@ -8,8 +8,9 @@ import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { Subtitle, Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
 import { SimpleItemDto } from "@/lib/queries";
+import PageContainer from "../PageContainer";
 
-const NEXT_PAGE = "/punch-card";
+const NEXT_PAGE = "/holidays";
 
 export default function OldestShowPage() {
   const { showBoundary } = useErrorBoundary();
@@ -40,13 +41,16 @@ export default function OldestShowPage() {
   }
 
   return (
-    <Box style={{ backgroundColor: "var(--lime-8)" }} className="min-h-screen">
+    <PageContainer backgroundColor="var(--lime-8)" nextPage={NEXT_PAGE} previousPage="/oldest-movie">
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Oldest Show You Watched
             </Title>
+            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+              The most classic series you enjoyed
+            </p>
             <Subtitle as={motion.p} variants={itemVariants}>
               Released in {show.item.productionYear}
             </Subtitle>
@@ -65,15 +69,6 @@ export default function OldestShowPage() {
           </Grid>
         </Grid>
       </Container>
-      <Button
-        size={"4"}
-        style={{ width: "100%" }}
-        onClick={() => {
-          void navigate(NEXT_PAGE);
-        }}
-      >
-        Next
-      </Button>
-    </Box>
+    </PageContainer>
   );
 }

@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Container, Grid, Box, Button } from "@radix-ui/themes";
+import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useErrorBoundary } from "react-error-boundary";
 import { useNavigate } from "react-router-dom";
@@ -9,8 +9,9 @@ import { itemVariants } from "@/lib/styled-variants";
 import { useDeviceStats } from "@/hooks/queries/useDeviceStats";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { PieChart } from "../charts/PieChart";
+import PageContainer from "../PageContainer";
 
-const NEXT_PAGE = "/oldest-movie";
+const NEXT_PAGE = "/punch-card";
 
 const CHART_COLORS = {
   devices: d3.schemeSet3,
@@ -61,16 +62,16 @@ export default function DeviceStatsPage() {
   );
 
   return (
-    <Box
-      style={{ backgroundColor: "var(--purple-8)" }}
-      className="min-h-screen"
-    >
+    <PageContainer backgroundColor="var(--violet-8)" nextPage={NEXT_PAGE} previousPage="/unfinished-shows">
       <Container size="4" p="4" ref={containerRef}>
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Your Viewing Devices
             </Title>
+            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+              Where you watch your content across different devices and apps
+            </p>
           </div>
 
           <Grid columns={{ initial: "1", md: "2" }} gap="4">
@@ -95,15 +96,6 @@ export default function DeviceStatsPage() {
           </Grid>
         </Grid>
       </Container>
-      <Button
-        size={"4"}
-        style={{ width: "100%" }}
-        onClick={() => {
-          void navigate(NEXT_PAGE);
-        }}
-      >
-        Next
-      </Button>
-    </Box>
+    </PageContainer>
   );
 }

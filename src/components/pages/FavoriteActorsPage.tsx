@@ -1,4 +1,4 @@
-import { Container, Grid, Box, Button } from "@radix-ui/themes";
+import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
@@ -7,9 +7,11 @@ import { LoadingSpinner } from "../LoadingSpinner";
 import { ActorCard } from "./MoviesReviewPage/ActorCard";
 import { Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
+import PageContainer from "../PageContainer";
 import { generateGuid } from "@/lib/utils";
 import { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client";
 import { SimpleItemDto } from "@/lib/queries";
+import { useEffect } from "react";
 
 const NEXT_PAGE = "/genres";
 
@@ -17,6 +19,12 @@ export default function FavoriteActorsPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
   const { data: favoriteActors, isLoading, error } = useFavoriteActors();
+
+  useEffect(() => {
+    if (!isLoading && !error && favoriteActors && !favoriteActors.length) {
+      void navigate(NEXT_PAGE);
+    }
+  }, [isLoading, error, favoriteActors, navigate]);
 
   if (error) {
     showBoundary(error);
@@ -27,21 +35,20 @@ export default function FavoriteActorsPage() {
   }
 
   if (!favoriteActors?.length) {
-    void navigate(NEXT_PAGE);
     return null;
   }
 
   return (
-    <Box
-      style={{ backgroundColor: "var(--orange-8)" }}
-      className="min-h-screen"
-    >
+    <PageContainer backgroundColor="var(--orange-8)" nextPage={NEXT_PAGE} previousPage="/music-videos">
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Your Favorite Actors
             </Title>
+            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+              The performers who appeared most in what you watched
+            </p>
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
@@ -68,15 +75,6 @@ export default function FavoriteActorsPage() {
           </Grid>
         </Grid>
       </Container>
-      <Button
-        size={"4"}
-        style={{ width: "100%" }}
-        onClick={() => {
-          void navigate(NEXT_PAGE);
-        }}
-      >
-        Next
-      </Button>
-    </Box>
+    </PageContainer>
   );
 }

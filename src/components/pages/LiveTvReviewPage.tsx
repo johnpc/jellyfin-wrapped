@@ -1,8 +1,6 @@
 import {
   Container,
   Grid,
-  Box,
-  Button,
   Card,
   Text,
   Flex,
@@ -14,8 +12,9 @@ import { useLiveTvChannels } from "@/hooks/queries/useLiveTvChannels";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { formatDuration } from "@/lib/utils";
 import { Title } from "../ui/styled";
+import PageContainer from "../PageContainer";
 
-const NEXT_PAGE = "/audio";
+const NEXT_PAGE = "/critically-acclaimed";
 
 function ChannelCard({
   channelName,
@@ -68,13 +67,16 @@ export default function LiveTvReviewPage() {
   }
 
   return (
-    <Box style={{ backgroundColor: "var(--blue-8)" }} className="min-h-screen">
+    <PageContainer backgroundColor="var(--blue-8)" nextPage={NEXT_PAGE} previousPage="/genres">
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1}>
               You Watched {sortedChannels.length} Live TV Channels
             </Title>
+            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+              Your live television viewing across different channels
+            </p>
           </div>
 
           <Grid columns={{ initial: "1", sm: "2", md: "3" }} gap="4">
@@ -90,15 +92,6 @@ export default function LiveTvReviewPage() {
           </Grid>
         </Grid>
       </Container>
-      <Button
-        size={"4"}
-        style={{ width: "100%" }}
-        onClick={() => {
-          void navigate(NEXT_PAGE);
-        }}
-      >
-        Next
-      </Button>
-    </Box>
+    </PageContainer>
   );
 }

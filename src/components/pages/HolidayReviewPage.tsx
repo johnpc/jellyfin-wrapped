@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Container, Grid, Box, Button } from "@radix-ui/themes";
+import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
@@ -12,8 +12,9 @@ import { generateGuid } from "@/lib/utils";
 import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
 import { getHolidayDates } from "@/lib/holiday-helpers";
 import { subDays } from "date-fns";
+import PageContainer from "../PageContainer";
 
-const NEXT_PAGE = "/tv";
+const NEXT_PAGE = "/minutes-per-day";
 
 export default function HolidayReviewPage() {
   const { showBoundary } = useErrorBoundary();
@@ -82,13 +83,16 @@ export default function HolidayReviewPage() {
   }
 
   return (
-    <Box style={{ backgroundColor: "var(--red-8)" }} className="min-h-screen">
+    <PageContainer backgroundColor="var(--grass-8)" nextPage={NEXT_PAGE} previousPage="/oldest-show">
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               What You Watched on Holidays
             </Title>
+            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+              Your viewing activity during special occasions
+            </p>
           </div>
 
           {christmasItems.length > 0 && (
@@ -184,15 +188,6 @@ export default function HolidayReviewPage() {
           )}
         </Grid>
       </Container>
-      <Button
-        size={"4"}
-        style={{ width: "100%" }}
-        onClick={() => {
-          void navigate(NEXT_PAGE);
-        }}
-      >
-        Next
-      </Button>
-    </Box>
+    </PageContainer>
   );
 }

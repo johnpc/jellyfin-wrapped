@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Container, Grid, Box, Button, Card, Text } from "@radix-ui/themes";
+import { Container, Grid, Card, Text } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
@@ -10,6 +10,7 @@ import { itemVariants } from "@/lib/styled-variants";
 import { format } from "date-fns";
 import { getImageUrlById, SimpleItemDto } from "@/lib/queries";
 import { formatWatchTime } from "@/lib/time-helpers";
+import PageContainer from "../PageContainer";
 
 const NEXT_PAGE = "/unfinished-shows";
 
@@ -63,16 +64,16 @@ export default function ShowOfTheMonthPage() {
   }
 
   return (
-    <Box
-      style={{ backgroundColor: "var(--violet-8)" }}
-      className="min-h-screen"
-    >
+    <PageContainer backgroundColor="var(--bronze-8)" nextPage={NEXT_PAGE} previousPage="/minutes-per-day">
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Your Top Show Each Month
             </Title>
+            <Text size="4" color="gray" style={{ marginTop: "8px" }}>
+              The show you watched the most in each month of the year
+            </Text>
           </div>
 
           <Grid columns={{ initial: "1", sm: "2", md: "3" }} gap="4">
@@ -82,32 +83,25 @@ export default function ShowOfTheMonthPage() {
                   <img
                     src={stat.posterUrl}
                     alt={stat.topShow.item.name ?? ""}
-                    style={{ width: "100%", borderRadius: "8px" }}
+                    style={{ width: "100%", borderRadius: "8px", marginBottom: "12px" }}
                   />
                 )}
-                <Text size="3" weight="bold">
-                  {format(stat.month, "MMMM yyyy")}
-                </Text>
-                <Text size="4" weight="bold">
-                  {stat.topShow.item.name}
-                </Text>
-                <Text size="2" color="gray">
-                  {formatWatchTime(stat.topShow.watchTimeMinutes)}
-                </Text>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <Text size="3" weight="bold">
+                    {format(stat.month, "MMMM yyyy")}
+                  </Text>
+                  <Text size="4" weight="bold">
+                    {stat.topShow.item.name}
+                  </Text>
+                  <Text size="2" color="gray">
+                    {formatWatchTime(stat.topShow.watchTimeMinutes)}
+                  </Text>
+                </div>
               </Card>
             ))}
           </Grid>
         </Grid>
       </Container>
-      <Button
-        size={"4"}
-        style={{ width: "100%" }}
-        onClick={() => {
-          void navigate(NEXT_PAGE);
-        }}
-      >
-        Next
-      </Button>
-    </Box>
+    </PageContainer>
   );
 }

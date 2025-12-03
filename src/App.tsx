@@ -29,9 +29,20 @@ import TopTenPage from "./components/pages/TopTenPage";
 import { useEffect } from "react";
 import ActivityCalendarPage from "./components/pages/ActivityCalendarPage";
 import Navigation from "./components/Navigation";
+import { LoadingPage } from "./components/pages/LoadingPage";
 
-// Create a client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+      gcTime: Infinity,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      retry: 1,
+    },
+  },
+});
 
 // Layout component that wraps all routes
 function ScrollToTop() {
@@ -72,6 +83,10 @@ const router = createBrowserRouter([
       {
         path: "/configure",
         element: <ServerConfigurationPage />,
+      },
+      {
+        path: "/loading",
+        element: <LoadingPage />,
       },
       {
         path: "/movies",

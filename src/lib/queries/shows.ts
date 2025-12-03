@@ -20,6 +20,7 @@ export const listShows = async (): Promise<
   const startDate = getStartDate();
   const endDate = getEndDate();
 
+  // Query only for episodes to get playback data
   const queryString = `
   SELECT ROWID, *
   FROM PlaybackActivity
@@ -53,6 +54,7 @@ export const listShows = async (): Promise<
 
   const showIds: string[] = seasons
     .map((season: SimpleItemDto) => season.parentId ?? "")
+    .filter((v: string) => v)
     .filter(
       (value: string, index: number, self: string[]) =>
         self.indexOf(value) === index

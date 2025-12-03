@@ -4,6 +4,10 @@ import { ContentImage } from "@/components/ContentImage";
 import { RankBadge } from "@/components/RankBadge";
 import { formatWatchTime } from "@/lib/time-helpers";
 import { SimpleItemDto } from "@/lib/queries";
+import PageContainer from "@/components/PageContainer";
+import { Container, Grid } from "@radix-ui/themes";
+import { motion } from "framer-motion";
+import { Title } from "@/components/ui/styled";
 
 export const TopTen = () => {
   const year = new Date().getFullYear();
@@ -14,68 +18,90 @@ export const TopTen = () => {
   if (!data) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white p-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-5xl font-bold mb-12 text-center">
-          Your Top 10 of {year}
-        </h1>
+    <PageContainer backgroundColor="var(--purple-8)" nextPage="/movies" previousPage="/loading">
+      <Container size="4" p="4">
+        <Grid gap="6">
+          <div style={{ textAlign: "center" }}>
+            <Title as={motion.h1}>Your Top 10 of {year}</Title>
+          </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <section>
-            <h2 className="text-3xl font-bold mb-6">Top Movies</h2>
-            <div className="space-y-4">
-              {data.movies.map((movie: SimpleItemDto, index: number) => (
-                <div
-                  key={movie.id}
-                  className="flex items-center gap-4 bg-white/10 rounded-lg p-4 backdrop-blur-sm"
-                >
-                  <RankBadge rank={index + 1} />
-                  <ContentImage item={movie} />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg">{movie.name}</h3>
-                    <p className="text-sm text-gray-300">
-                      {formatWatchTime((movie.durationSeconds ?? 0) / 60)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-3xl font-bold mb-6">Top Shows</h2>
-            <div className="space-y-4">
-              {data.shows.map(
-                (
-                  show: {
-                    item: SimpleItemDto;
-                    episodeCount: number;
-                    playbackTime: number;
-                  },
-                  index: number
-                ) => (
+          <Grid columns={{ initial: "1", md: "2" }} gap="6">
+            <div>
+              <h2 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "1.5rem", color: "white" }}>
+                Top Movies
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                {data.movies.map((movie: SimpleItemDto, index: number) => (
                   <div
-                    key={show.item.id}
-                    className="flex items-center gap-4 bg-white/10 rounded-lg p-4 backdrop-blur-sm"
+                    key={movie.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "1rem",
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      borderRadius: "8px",
+                      padding: "1rem",
+                    }}
                   >
                     <RankBadge rank={index + 1} />
-                    <ContentImage item={show.item} />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">
-                        {show.item.name}
+                    <ContentImage item={movie} />
+                    <div style={{ flex: 1 }}>
+                      <h3 style={{ fontWeight: 600, fontSize: "1.125rem", color: "white" }}>
+                        {movie.name}
                       </h3>
-                      <p className="text-sm text-gray-300">
-                        {show.episodeCount} episodes •{" "}
-                        {formatWatchTime(show.playbackTime / 60)}
+                      <p style={{ fontSize: "0.875rem", color: "rgba(255, 255, 255, 0.7)" }}>
+                        {formatWatchTime((movie.durationSeconds ?? 0) / 60)}
                       </p>
                     </div>
                   </div>
-                )
-              )}
+                ))}
+              </div>
             </div>
-          </section>
-        </div>
-      </div>
-    </div>
+
+            <div>
+              <h2 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "1.5rem", color: "white" }}>
+                Top Shows
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                {data.shows.map(
+                  (
+                    show: {
+                      item: SimpleItemDto;
+                      episodeCount: number;
+                      playbackTime: number;
+                    },
+                    index: number
+                  ) => (
+                    <div
+                      key={show.item.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "1rem",
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        borderRadius: "8px",
+                        padding: "1rem",
+                      }}
+                    >
+                      <RankBadge rank={index + 1} />
+                      <ContentImage item={show.item} />
+                      <div style={{ flex: 1 }}>
+                        <h3 style={{ fontWeight: 600, fontSize: "1.125rem", color: "white" }}>
+                          {show.item.name}
+                        </h3>
+                        <p style={{ fontSize: "0.875rem", color: "rgba(255, 255, 255, 0.7)" }}>
+                          {show.episodeCount} episodes •{" "}
+                          {formatWatchTime(show.playbackTime / 60)}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          </Grid>
+        </Grid>
+      </Container>
+    </PageContainer>
   );
 };

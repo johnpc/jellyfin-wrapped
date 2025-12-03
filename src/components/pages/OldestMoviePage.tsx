@@ -1,4 +1,4 @@
-import { Container, Grid, Box, Button } from "@radix-ui/themes";
+import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
@@ -7,6 +7,7 @@ import { LoadingSpinner } from "../LoadingSpinner";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { Subtitle, Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
+import PageContainer from "../PageContainer";
 
 const NEXT_PAGE = "/oldest-show";
 
@@ -39,13 +40,16 @@ export default function OldestMoviePage() {
   }
 
   return (
-    <Box style={{ backgroundColor: "var(--cyan-8)" }} className="min-h-screen">
+    <PageContainer backgroundColor="var(--teal-8)" nextPage={NEXT_PAGE} previousPage="/critically-acclaimed">
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Oldest Movie You Watched
             </Title>
+            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+              The most vintage film in your viewing history
+            </p>
             <Subtitle as={motion.p} variants={itemVariants}>
               Released in {movie.productionYear}
             </Subtitle>
@@ -60,15 +64,6 @@ export default function OldestMoviePage() {
           </Grid>
         </Grid>
       </Container>
-      <Button
-        size={"4"}
-        style={{ width: "100%" }}
-        onClick={() => {
-          void navigate(NEXT_PAGE);
-        }}
-      >
-        Next
-      </Button>
-    </Box>
+    </PageContainer>
   );
 }

@@ -5,5 +5,7 @@ export function useShows() {
   return useQuery({
     queryKey: ["shows"],
     queryFn: listShows,
+    staleTime: 0,
+    gcTime: 0,
   });
 }
