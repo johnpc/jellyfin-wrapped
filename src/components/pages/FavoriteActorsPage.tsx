@@ -1,98 +1,70 @@
-import { useState, useEffect } from "react";
-import {
-  listFavoriteActors,
-  SimpleItemDto,
-} from "@/lib/playback-reporting-queries";
-import { Container, Grid, Box, Spinner, Button } from "@radix-ui/themes";
+import { Container, Grid, Box, Button } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { itemVariants, Title } from "../ui/styled";
 import { useNavigate } from "react-router-dom";
+import { useErrorBoundary } from "react-error-boundary";
+import { useFavoriteActors } from "@/hooks/queries/useFavoriteActors";
+import { LoadingSpinner } from "../LoadingSpinner";
+import { ActorCard } from "./MoviesReviewPage/ActorCard";
+import { Title } from "../ui/styled";
+import { itemVariants } from "@/lib/styled-variants";
 import { generateGuid } from "@/lib/utils";
 import { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client";
-import { ActorCard } from "./MoviesReviewPage/ActorCard";
-import { useErrorBoundary } from "react-error-boundary";
+import { SimpleItemDto } from "@/lib/queries";
+
 const NEXT_PAGE = "/genres";
+
 export default function FavoriteActorsPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [favoriteActors, setFavoriteActors] = useState<
-    {
-      name: string;
-      count: number;
-      details: BaseItemPerson;
-      seenInMovies: SimpleItemDto[];
-      seenInShows: SimpleItemDto[];
-    }[]
-  >([]);
+  const { data: favoriteActors, isLoading, error } = useFavoriteActors();
 
-  useEffect(() => {
-    const setup = async () => {
-      setIsLoading(true);
-      try {
-        const fetched = await listFavoriteActors();
-        if (!fetched.length) {
-          void navigate(NEXT_PAGE);
-        }
-        setFavoriteActors(fetched);
-      } catch (e) {
-        showBoundary(e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    void setup();
-  }, []);
+  if (error) {
+    showBoundary(error);
+  }
 
   if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <Box
-          style={{
-            backgroundColor: "var(--green-8)",
-            minHeight: "100vh",
-            minWidth: "100vw",
-          }}
-          className="min-h-screen"
-        >
-          <Spinner size={"3"} />
-        </Box>
-      </div>
-    );
+    return <LoadingSpinner />;
+  }
+
+  if (!favoriteActors?.length) {
+    void navigate(NEXT_PAGE);
+    return null;
   }
 
   return (
     <Box
-      style={{ backgroundColor: "var(--purple-8)" }}
+      style={{ backgroundColor: "var(--orange-8)" }}
       className="min-h-screen"
     >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
-              You Watched {favoriteActors.length} Actors That Appeared In
-              Multiple Productions
+              Your Favorite Actors
             </Title>
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
-            {favoriteActors.slice(0, 20).map((actor) => (
-              <ActorCard
-                key={generateGuid()}
-                name={actor.name}
-                count={actor.count}
-                details={actor.details}
-                seenInMovies={actor.seenInMovies}
-                seenInShows={actor.seenInShows}
-              />
-            ))}
+            {favoriteActors
+              .slice(0, 20)
+              .map(
+                (actor: {
+                  name: string;
+                  count: number;
+                  details: BaseItemPerson;
+                  seenInMovies: SimpleItemDto[];
+                  seenInShows: SimpleItemDto[];
+                }) => (
+                  <ActorCard
+                    key={generateGuid()}
+                    name={actor.name}
+                    count={actor.count}
+                    details={actor.details}
+                    seenInMovies={actor.seenInMovies}
+                    seenInShows={actor.seenInShows}
+                  />
+                )
+              )}
           </Grid>
         </Grid>
       </Container>

@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prepare-husky": "husky"
+    "prepare-husky": "husky",
+    "prepare": "husky"
   },
   "dependencies": {
     "@jellyfin/sdk": "^0.11.0",
@@ -44,6 +45,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
+    "husky": "^9.1.7",
     "lint-staged": "^15.3.0",
     "prettier": "^3.4.2",
     "tailwindcss": "^3.4.17",
@@ -52,12 +54,10 @@
     "vite": "^6.0.5"
   },
   "lint-staged": {
-    "*.ts": [
+    "*.{ts,tsx}": [
       "prettier --write",
       "eslint --cache --fix"
     ],
-    "*.json": "prettier --write",
-    "*.yml": "prettier --write",
-    "*.md": "prettier --write"
+    "*.{json,yml,md}": "prettier --write"
   }
 }

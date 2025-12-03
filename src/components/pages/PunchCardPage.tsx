@@ -1,12 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
-import {
-  getPunchCardData,
-  type PunchCardData,
-} from "@/lib/playback-reporting-queries";
 import { ResponsiveScatterPlot } from "@nivo/scatterplot";
 import { Card } from "@/components/ui/card";
-import { Button, Box, Spinner } from "@radix-ui/themes";
+import { Button, Box } from "@radix-ui/themes";
 import { useNavigate } from "react-router-dom";
+import { useErrorBoundary } from "react-error-boundary";
+import { usePunchCard } from "@/hooks/queries/usePunchCard";
+import { LoadingSpinner } from "../LoadingSpinner";
+import { PunchCardData } from "@/lib/queries";
 
 const DAYS = [
   "Sunday",
@@ -19,18 +18,19 @@ const DAYS = [
 ];
 const NEXT_PAGE = "/";
 
-// Create a full dataset with all hour/day combinations
-const createFullDataset = (data: PunchCardData[]) => {
-  const dataset = [];
+const createFullDataset = (
+  data: PunchCardData[]
+): { x: number; y: number; size: number }[] => {
+  const dataset: { x: number; y: number; size: number }[] = [];
   for (let day = 0; day < 7; day++) {
     for (let hour = 0; hour < 24; hour++) {
       const existingPoint = data.find(
-        (p) => p.dayOfWeek === day && p.hour === hour,
+        (p: PunchCardData) => p.dayOfWeek === day && p.hour === hour
       );
       dataset.push({
         x: hour,
         y: day,
-        size: existingPoint?.count || 1, // Use 1 as minimum size
+        size: existingPoint?.count || 1,
       });
     }
   }
@@ -39,111 +39,69 @@ const createFullDataset = (data: PunchCardData[]) => {
 
 export default function PunchCardPage() {
   const navigate = useNavigate();
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["punch-card"],
-    queryFn: getPunchCardData,
-  });
-
-  if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <Box
-          style={{
-            backgroundColor: "var(--gray-8)",
-            minHeight: "100vh",
-            minWidth: "100vw",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Spinner size="3" />
-        </Box>
-      </div>
-    );
-  }
+  const { showBoundary } = useErrorBoundary();
+  const { data, isLoading, error } = usePunchCard();
 
   if (error) {
-    console.error("Error loading punch card data:", error);
-    return <div>Error loading viewing patterns</div>;
+    showBoundary(error);
   }
 
-  if (!data?.length) {
-    return (
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">No viewing data available</h1>
-        <Button
-          size={"4"}
-          style={{ width: "100%" }}
-          onClick={() => {
-            void navigate(NEXT_PAGE);
-          }}
-        >
-          Next
-        </Button>
-      </div>
-    );
+  if (isLoading) {
+    return <LoadingSpinner backgroundColor="var(--gray-8)" />;
   }
 
   const chartData = [
     {
-      id: "Activity",
-      data: createFullDataset(data),
+      id: "viewing",
+      data: createFullDataset(data ?? []),
     },
   ];
 
   return (
     <Box
-      style={{ backgroundColor: "var(--gray-2)" }}
-      className="min-h-screen p-4"
+      style={{ backgroundColor: "var(--gray-8)" }}
+      className="min-h-screen p-8"
     >
-      <div className="container mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Viewing Patterns</h1>
-        <Card className="p-4 mb-4">
-          <div style={{ height: "600px", width: "100%" }}>
-            <ResponsiveScatterPlot
-              data={chartData}
-              margin={{ top: 40, right: 40, bottom: 40, left: 60 }}
-              xScale={{ type: "linear", min: 0, max: 23 }}
-              yScale={{ type: "linear", min: 0, max: 6 }}
-              axisBottom={{
-                tickValues: [...Array(24)].map((_, i) => i),
-                format: (v) => `${v}:00`,
-              }}
-              axisLeft={{
-                tickValues: [...Array(7)].map((_, i) => i),
-                format: (v) => DAYS[v],
-              }}
-              nodeSize={8}
-              colors="#38bdf8"
-              blendMode="multiply"
-              tooltip={({ node }) => (
-                <div className="bg-white dark:bg-gray-800 p-2 shadow rounded">
-                  <strong>{DAYS[node.data.y]}</strong> at {node.data.x}:00
-                  <br />
-                  {node.data.size} views
-                </div>
-              )}
-            />
-          </div>
-        </Card>
-        <Button
-          size={"4"}
-          style={{ width: "100%" }}
-          onClick={() => {
-            void navigate(NEXT_PAGE);
-          }}
-        >
-          Next
-        </Button>
-      </div>
+      <Card className="p-6">
+        <h2 className="text-2xl font-bold mb-4">Your Viewing Patterns</h2>
+        <div style={{ height: "500px" }}>
+          <ResponsiveScatterPlot
+            data={chartData}
+            margin={{ top: 60, right: 140, bottom: 70, left: 90 }}
+            xScale={{ type: "linear", min: 0, max: 23 }}
+            yScale={{ type: "linear", min: 0, max: 6 }}
+            nodeSize={{ key: "size", values: [0, 100], sizes: [4, 32] }}
+            axisTop={null}
+            axisRight={null}
+            axisBottom={{
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: 0,
+              legend: "Hour of Day",
+              legendPosition: "middle",
+              legendOffset: 46,
+            }}
+            axisLeft={{
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: 0,
+              legend: "Day of Week",
+              legendPosition: "middle",
+              legendOffset: -60,
+              format: (value: number) => DAYS[value],
+            }}
+          />
+        </div>
+      </Card>
+      <Button
+        size={"4"}
+        style={{ width: "100%", marginTop: "1rem" }}
+        onClick={() => {
+          void navigate(NEXT_PAGE);
+        }}
+      >
+        Finish
+      </Button>
     </Box>
   );
 }

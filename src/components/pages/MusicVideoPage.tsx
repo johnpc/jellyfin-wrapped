@@ -1,63 +1,31 @@
-import { useState, useEffect } from "react";
-import {
-  listMusicVideos,
-  SimpleItemDto,
-} from "@/lib/playback-reporting-queries";
-import { MovieCard } from "./MoviesReviewPage/MovieCard";
-import { Container, Grid, Box, Spinner, Button } from "@radix-ui/themes";
+import { Container, Grid, Box, Button } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
-import { itemVariants, Title } from "../ui/styled";
+import { useMusicVideos } from "@/hooks/queries/useMusicVideos";
+import { MovieCard } from "./MoviesReviewPage/MovieCard";
+import { LoadingSpinner } from "../LoadingSpinner";
+import { Title } from "../ui/styled";
+import { itemVariants } from "@/lib/styled-variants";
 
 const NEXT_PAGE = "/minutes-per-day";
+
 export default function MusicVideoPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
+  const { data: musicVideos, isLoading, error } = useMusicVideos();
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [musicVideos, setMusicVideos] = useState<SimpleItemDto[]>([]);
-
-  useEffect(() => {
-    const setup = async () => {
-      setIsLoading(true);
-      try {
-        const fetched = await listMusicVideos();
-        if (!fetched.length) {
-          void navigate(NEXT_PAGE);
-        }
-        setMusicVideos(fetched);
-      } catch (error) {
-        showBoundary(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    void setup();
-  }, []);
+  if (error) {
+    showBoundary(error);
+  }
 
   if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <Box
-          style={{
-            backgroundColor: "var(--green-8)",
-            minHeight: "100vh",
-            minWidth: "100vw",
-          }}
-          className="min-h-screen"
-        >
-          <Spinner size={"3"} />
-        </Box>
-      </div>
-    );
+    return <LoadingSpinner />;
+  }
+
+  if (!musicVideos?.length) {
+    void navigate(NEXT_PAGE);
+    return null;
   }
 
   return (
@@ -78,7 +46,7 @@ export default function MusicVideoPage() {
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
-            {musicVideos.slice(0, 20).map((musicVideo) => (
+            {musicVideos.slice(0, 20).map((musicVideo: { id?: string }) => (
               <MovieCard key={musicVideo.id} item={musicVideo} />
             ))}
           </Grid>

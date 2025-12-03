@@ -1,127 +1,63 @@
-import { useState, useEffect } from "react";
-import { listMovies, SimpleItemDto } from "@/lib/playback-reporting-queries";
-import { MovieCard } from "./MoviesReviewPage/MovieCard";
-import { Container, Grid, Box, Button, Spinner } from "@radix-ui/themes";
+import { Container, Grid, Box, Button } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { itemVariants, Subtitle, Title } from "../ui/styled";
 import { useErrorBoundary } from "react-error-boundary";
+import { useMovies } from "@/hooks/queries/useMovies";
+import { LoadingSpinner } from "../LoadingSpinner";
+import { MovieCard } from "./MoviesReviewPage/MovieCard";
+import { Subtitle, Title } from "../ui/styled";
+import { itemVariants } from "@/lib/styled-variants";
 
 const NEXT_PAGE = "/oldest-show";
+
 export default function OldestMoviePage() {
   const { showBoundary } = useErrorBoundary();
-
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [movie, setMovie] = useState<SimpleItemDto>();
+  const { data: movies, isLoading, error } = useMovies();
 
-  useEffect(() => {
-    const setup = async () => {
-      setIsLoading(true);
-      try {
-        const movies = await listMovies();
-        movies.sort((a, b) => {
-          const aDate = new Date(a.date ?? new Date());
-          const bDate = new Date(b.date ?? new Date());
-          return aDate.getTime() - bDate.getTime();
-        });
-        const m = movies.find((s) => s);
-        if (!m) {
-          void navigate(NEXT_PAGE);
-        }
-        setMovie(m);
-      } catch (e) {
-        showBoundary(e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    void setup();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <Box
-          style={{
-            backgroundColor: "var(--green-8)",
-            minHeight: "100vh",
-            minWidth: "100vw",
-          }}
-          className="min-h-screen"
-        >
-          <Spinner size={"3"} />
-        </Box>
-      </div>
-    );
+  if (error) {
+    showBoundary(error);
   }
 
-  if (!movie?.id) {
-    return (
-      <>
-        <>No movies watched.</>{" "}
-        <Button
-          size={"4"}
-          style={{ width: "100%" }}
-          onClick={() => {
-            void navigate(NEXT_PAGE);
-          }}
-        >
-          Next
-        </Button>
-      </>
-    );
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  const sortedMovies = [...(movies ?? [])].sort(
+    (a: { date?: string | null }, b: { date?: string | null }) => {
+      const aDate = new Date(a.date ?? new Date());
+      const bDate = new Date(b.date ?? new Date());
+      return aDate.getTime() - bDate.getTime();
+    }
+  );
+
+  const movie = sortedMovies[0];
+
+  if (!movie) {
+    void navigate(NEXT_PAGE);
+    return null;
   }
 
   return (
-    <Box
-      style={{ backgroundColor: "var(--yellow-8)" }}
-      className="min-h-screen"
-    >
+    <Box style={{ backgroundColor: "var(--cyan-8)" }} className="min-h-screen">
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
-              It's {new Date().getFullYear()}, but you've time traveled back to{" "}
-              {movie?.productionYear}
+              Oldest Movie You Watched
             </Title>
-
-            <Subtitle
-              style={{ backgroundColor: "palevioletred", borderRadius: "10px" }}
-              as={motion.p}
-              variants={itemVariants}
-            >
-              {movie?.name} came out on{" "}
-              {new Date(movie?.date ?? "").toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+            <Subtitle as={motion.p} variants={itemVariants}>
+              Released in {movie.productionYear}
             </Subtitle>
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              width: "100%",
-            }}
+
+          <Grid
+            columns={{ initial: "1", sm: "1", md: "1", lg: "1" }}
+            gap="4"
+            style={{ justifyItems: "center" }}
           >
-            <div
-              style={{
-                maxWidth: "50%",
-                width: "100%",
-              }}
-            >
-              <MovieCard key={movie.id} item={movie} />
-            </div>
-          </div>
+            <MovieCard item={movie} />
+          </Grid>
         </Grid>
       </Container>
       <Button

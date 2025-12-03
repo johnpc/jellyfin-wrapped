@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { Avatar } from "@radix-ui/themes";
-import {
-  getImageUrlById,
-  SimpleItemDto,
-} from "@/lib/playback-reporting-queries";
+import { getImageUrlById, SimpleItemDto } from "@/lib/queries";
 import { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client";
 
 interface ActorCardProps {

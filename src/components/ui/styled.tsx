@@ -1,17 +1,6 @@
 import { Button } from "@radix-ui/themes";
 import { styled } from "@stitches/react";
 
-export const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut",
-    },
-  },
-};
 export const Container = styled("div", {
   minHeight: "100vh",
   display: "flex",

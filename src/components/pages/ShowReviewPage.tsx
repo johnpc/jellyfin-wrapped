@@ -1,71 +1,40 @@
-import { useState, useEffect } from "react";
-import { listShows, SimpleItemDto } from "@/lib/playback-reporting-queries";
-import { MovieCard } from "./MoviesReviewPage/MovieCard";
-import { Container, Grid, Box, Button, Spinner } from "@radix-ui/themes";
+import { useState } from "react";
+import { Container, Grid, Box, Button } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
+import { useShows } from "@/hooks/queries/useShows";
+import { MovieCard } from "./MoviesReviewPage/MovieCard";
+import { LoadingSpinner } from "../LoadingSpinner";
 import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
-import { itemVariants, Title } from "../ui/styled";
+import { Title } from "../ui/styled";
+import { itemVariants } from "@/lib/styled-variants";
 
 const NEXT_PAGE = "/critically-acclaimed";
+
 export default function ShowReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: shows, isLoading, error } = useShows();
   const [hiddenIds, setHiddenIds] = useState<string[]>(getCachedHiddenIds());
-  const [shows, setShows] = useState<
-    {
-      showName: string;
-      episodeCount: number;
-      playbackTime: number;
-      item: SimpleItemDto;
-    }[]
-  >([]);
 
-  useEffect(() => {
-    const setup = async () => {
-      setIsLoading(true);
-      try {
-        const shows = await listShows();
-        const filteredShows = shows.filter(
-          (show) => !hiddenIds.includes(show.item.id ?? ""),
-        );
-        setShows(filteredShows);
-        if (!filteredShows.length) {
-          void navigate(NEXT_PAGE);
-        }
-      } catch (e) {
-        showBoundary(e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    void setup();
-  }, [hiddenIds]);
+  if (error) {
+    showBoundary(error);
+  }
 
   if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <Box
-          style={{
-            backgroundColor: "var(--green-8)",
-            minHeight: "100vh",
-            minWidth: "100vw",
-          }}
-          className="min-h-screen"
-        >
-          <Spinner size={"3"} />
-        </Box>
-      </div>
-    );
+    return <LoadingSpinner />;
+  }
+
+  const visibleShows =
+    shows?.filter(
+      (show: { item: { id?: string } }) =>
+        !hiddenIds.includes(show.item.id ?? "")
+    ) ?? [];
+
+  if (!visibleShows.length) {
+    void navigate(NEXT_PAGE);
+    return null;
   }
 
   return (
@@ -77,25 +46,31 @@ export default function ShowReviewPage() {
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
-              You Watched {shows.length} Shows
+              You Watched {visibleShows.length} Shows
             </Title>
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
-            {shows.slice(0, 20).map((show) => (
-              <>
-                <MovieCard
-                  key={show.item.id}
-                  item={show.item}
-                  episodeCount={show.episodeCount}
-                  playbackTime={show.playbackTime}
-                  onHide={() => {
-                    setCachedHiddenId(show.item.id ?? "");
-                    setHiddenIds([...hiddenIds, show.item.id ?? ""]);
-                  }}
-                />
-              </>
-            ))}
+            {visibleShows
+              .slice(0, 20)
+              .map(
+                (show: {
+                  item: { id?: string };
+                  episodeCount: number;
+                  playbackTime: number;
+                }) => (
+                  <MovieCard
+                    key={show.item.id}
+                    item={show.item}
+                    episodeCount={show.episodeCount}
+                    playbackTime={show.playbackTime}
+                    onHide={() => {
+                      setCachedHiddenId(show.item.id ?? "");
+                      setHiddenIds([...hiddenIds, show.item.id ?? ""]);
+                    }}
+                  />
+                )
+              )}
           </Grid>
         </Grid>
       </Container>

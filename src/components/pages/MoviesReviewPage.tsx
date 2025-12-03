@@ -1,58 +1,41 @@
-import { useState, useEffect } from "react";
-import { listMovies, SimpleItemDto } from "@/lib/playback-reporting-queries";
-import { MovieCard } from "./MoviesReviewPage/MovieCard";
-import { Container, Grid, Spinner } from "@radix-ui/themes";
+import { useState } from "react";
+import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { itemVariants, Title } from "../ui/styled";
 import { useNavigate } from "react-router-dom";
-import { generateGuid } from "@/lib/utils";
 import { useErrorBoundary } from "react-error-boundary";
-import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
+import { useMovies } from "@/hooks/queries/useMovies";
+import { MovieCard } from "./MoviesReviewPage/MovieCard";
+import { Title } from "../ui/styled";
+import { itemVariants } from "@/lib/styled-variants";
 import PageContainer from "../PageContainer";
+import { LoadingSpinner } from "../LoadingSpinner";
+import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
+import { generateGuid } from "@/lib/utils";
 
 const NEXT_PAGE = "/shows";
 
 export default function MoviesReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [movies, setMovies] = useState<SimpleItemDto[]>([]);
+  const { data: movies, isLoading, error } = useMovies();
   const [hiddenIds, setHiddenIds] = useState<string[]>(getCachedHiddenIds());
 
-  useEffect(() => {
-    const setup = async () => {
-      setIsLoading(true);
-      try {
-        const movies = await listMovies();
-        setMovies(
-          movies.filter((movie) => !hiddenIds.includes(movie.id ?? "")),
-        );
-        if (!movies.length) {
-          void navigate(NEXT_PAGE);
-        }
-      } catch (error) {
-        showBoundary(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    void setup();
-  }, [hiddenIds]);
+  if (error) {
+    showBoundary(error);
+  }
 
   if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-          backgroundColor: "var(--green-8)",
-        }}
-      >
-        <Spinner size={"3"} />
-      </div>
-    );
+    return <LoadingSpinner />;
+  }
+
+  const visibleMovies =
+    movies?.filter(
+      (movie: { id?: string }) => !hiddenIds.includes(movie.id ?? "")
+    ) ?? [];
+
+  if (!visibleMovies.length) {
+    void navigate(NEXT_PAGE);
+    return null;
   }
 
   return (
@@ -61,21 +44,23 @@ export default function MoviesReviewPage() {
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
-              You Watched {movies.length} Movies
+              You Watched {visibleMovies.length} Movies
             </Title>
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
-            {movies.map((movie) => (
-              <MovieCard
-                key={generateGuid()}
-                item={movie}
-                onHide={() => {
-                  setCachedHiddenId(movie.id ?? "");
-                  setHiddenIds([...hiddenIds, movie.id ?? ""]);
-                }}
-              />
-            ))}
+            {visibleMovies.map(
+              (movie: { id?: string; name?: string | null }) => (
+                <MovieCard
+                  key={generateGuid()}
+                  item={movie}
+                  onHide={() => {
+                    setCachedHiddenId(movie.id ?? "");
+                    setHiddenIds([...hiddenIds, movie.id ?? ""]);
+                  }}
+                />
+              )
+            )}
           </Grid>
         </Grid>
       </Container>

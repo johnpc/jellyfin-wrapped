@@ -23,36 +23,29 @@ import {
   listLiveTvChannels,
   listMovies,
   listShows,
-} from "@/lib/playback-reporting-queries";
+} from "@/lib/queries";
+
+import { getEnvVar } from "@/lib/jellyfin-api";
 
 const NEXT_PAGE = "/movies";
-
-const getEnvVar = (name: string): string | undefined => {
-  // Check if we're in a browser environment with window.ENV (production/Docker)
-  if (typeof window !== 'undefined' && (window as any).ENV) {
-    return (window as any).ENV[name];
-  }
-  // Fallback to import.meta.env for Vite (development)
-  return import.meta.env[`VITE_${name}`];
-};
 
 const ServerConfigurationPage = () => {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
-  const serverUrlOverride = getEnvVar('JELLYFIN_SERVER_URL');
+  const serverUrlOverride = getEnvVar("JELLYFIN_SERVER_URL");
 
   const [serverUrl, setServerUrl] = useState<string>(
     () =>
-      serverUrlOverride || getCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY) || "",
+      serverUrlOverride || getCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY) || ""
   );
   const [authToken, setAuthToken] = useState<string>(
-    () => getCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY) || "",
+    () => getCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY) || ""
   );
   const [username, setUsername] = useState<string>(
-    () => getCacheValue(JELLYFIN_USERNAME_CACHE_KEY) || "",
+    () => getCacheValue(JELLYFIN_USERNAME_CACHE_KEY) || ""
   );
   const [password, setPassword] = useState<string>(
-    () => getCacheValue(JELLYFIN_PASSWORD_CACHE_KEY) || "",
+    () => getCacheValue(JELLYFIN_PASSWORD_CACHE_KEY) || ""
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [useAuthToken, setUseAuthToken] = useState<boolean>(false);
@@ -222,14 +215,18 @@ const ServerConfigurationPage = () => {
                 {/* Authentication Method Toggle */}
                 <Flex direction="column" gap="2">
                   <Flex justify="between" align="center">
-                    <Text size="2" weight="medium">Authentication Method</Text>
+                    <Text size="2" weight="medium">
+                      Authentication Method
+                    </Text>
                     <Button
                       type="button"
                       variant="soft"
                       size="1"
                       onClick={() => setUseAuthToken(!useAuthToken)}
                     >
-                      {useAuthToken ? "Use Username/Password" : "Use Auth Token"}
+                      {useAuthToken
+                        ? "Use Username/Password"
+                        : "Use Auth Token"}
                     </Button>
                   </Flex>
                 </Flex>
@@ -248,7 +245,8 @@ const ServerConfigurationPage = () => {
                       style={inputStyle}
                     />
                     <HelpText>
-                      Your Jellyfin authentication token. See instructions below to find it.
+                      Your Jellyfin authentication token. See instructions below
+                      to find it.
                     </HelpText>
                   </div>
                 ) : (
@@ -278,7 +276,10 @@ const ServerConfigurationPage = () => {
                         onChange={handlePasswordChange}
                         style={inputStyle}
                       />
-                      <HelpText>Your Jellyfin password (leave empty if no password is set)</HelpText>
+                      <HelpText>
+                        Your Jellyfin password (leave empty if no password is
+                        set)
+                      </HelpText>
                     </div>
                   </>
                 )}
@@ -296,8 +297,8 @@ const ServerConfigurationPage = () => {
               <ol>
                 <li>Log into your Jellyfin web interface</li>
                 <li>
-                  Open your browser's Developer Tools (usually F12 or right-click
-                  then Inspect)
+                  Open your browser's Developer Tools (usually F12 or
+                  right-click then Inspect)
                 </li>
                 <li>Go to the "Network" tab in Developer Tools</li>
                 <li>Look for requests to your Jellyfin server</li>

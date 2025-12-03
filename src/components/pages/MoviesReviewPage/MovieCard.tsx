@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { Avatar } from "@radix-ui/themes";
 import { formatDuration } from "@/lib/utils";
-import {
-  getImageUrlById,
-  SimpleItemDto,
-} from "@/lib/playback-reporting-queries";
+import { getImageUrlById, SimpleItemDto } from "@/lib/queries";
 import { Trash2 } from "lucide-react";
 
 interface MovieCardProps {

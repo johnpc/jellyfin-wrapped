@@ -1,134 +1,83 @@
-import { useState, useEffect } from "react";
-import {
-  listMovies,
-  listShows,
-  SimpleItemDto,
-} from "@/lib/playback-reporting-queries";
-import { MovieCard } from "./MoviesReviewPage/MovieCard";
-import { Container, Grid, Box, Spinner, Button } from "@radix-ui/themes";
+import { useState } from "react";
+import { Container, Grid, Box, Button } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { itemVariants, Title } from "../ui/styled";
 import { useNavigate } from "react-router-dom";
-import { generateGuid } from "@/lib/utils";
 import { useErrorBoundary } from "react-error-boundary";
+import { useMovies } from "@/hooks/queries/useMovies";
+import { useShows } from "@/hooks/queries/useShows";
+import { LoadingSpinner } from "../LoadingSpinner";
+import { MovieCard } from "./MoviesReviewPage/MovieCard";
+import { Title } from "../ui/styled";
+import { itemVariants } from "@/lib/styled-variants";
+import { generateGuid } from "@/lib/utils";
 import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
+import { getTopGenre } from "@/lib/genre-helpers";
 
 const NEXT_PAGE = "/holidays";
+
 export default function GenreReviewPage() {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [movies, setMovies] = useState<SimpleItemDto[]>([]);
-  const [shows, setShows] = useState<SimpleItemDto[]>([]);
+  const {
+    data: movies,
+    isLoading: moviesLoading,
+    error: moviesError,
+  } = useMovies();
+  const {
+    data: shows,
+    isLoading: showsLoading,
+    error: showsError,
+  } = useShows();
   const [hiddenIds, setHiddenIds] = useState<string[]>(getCachedHiddenIds());
 
-  useEffect(() => {
-    const setup = async () => {
-      setIsLoading(true);
-      try {
-        const movies = await listMovies();
-        setMovies(
-          movies.filter((movie) => !hiddenIds.includes(movie.id ?? "")),
-        );
-        const shows = await listShows();
-        setShows(
-          shows
-            .map((show) => show.item)
-            .filter((show) => !hiddenIds.includes(show.id ?? "")),
-        );
-        if (!movies.length && !shows.length) {
-          void navigate(NEXT_PAGE);
-        }
-      } catch (error) {
-        showBoundary(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    void setup();
-  }, [hiddenIds]);
+  if (moviesError) showBoundary(moviesError);
+  if (showsError) showBoundary(showsError);
 
-  if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <Box
-          style={{
-            backgroundColor: "var(--green-8)",
-            minHeight: "100vh",
-            minWidth: "100vw",
-          }}
-          className="min-h-screen"
-        >
-          <Spinner size={"3"} />
-        </Box>
-      </div>
-    );
+  if (moviesLoading || showsLoading) {
+    return <LoadingSpinner />;
   }
 
-  const allGenres = movies.flatMap((movie) => movie.genres).filter((g) => g);
-  const genreCounts = allGenres.reduce(
-    (counts, genre) => {
-      if (!genre) return counts;
-      counts[genre] = (counts[genre] || 0) + 1;
-      return counts;
-    },
-    {} as Record<string, number>,
-  );
+  const visibleMovies =
+    movies?.filter(
+      (movie: { id?: string }) => !hiddenIds.includes(movie.id ?? "")
+    ) ?? [];
 
-  const sortedGenres = Object.entries(genreCounts)
-    .sort(([, a], [, b]) => b - a)
-    .map(([genre]) => genre);
+  const visibleShows =
+    shows
+      ?.map((show: { item: { id?: string } }) => show.item)
+      .filter((show: { id?: string }) => !hiddenIds.includes(show.id ?? "")) ??
+    [];
 
-  const itemsByGenre = sortedGenres.map((genre) => ({
-    genre,
-    count: [...movies, ...shows].filter((movie) =>
-      movie.genres?.includes(genre),
-    ).length,
-    items: [...movies, ...shows].filter((movie) =>
-      movie.genres?.includes(genre),
-    ),
-  }));
+  const topGenreData = getTopGenre(visibleMovies, visibleShows);
+
+  if (!topGenreData) {
+    void navigate(NEXT_PAGE);
+    return null;
+  }
 
   return (
-    <Box
-      style={{ backgroundColor: "var(--orange-8)" }}
-      className="min-h-screen"
-    >
+    <Box style={{ backgroundColor: "var(--pink-8)" }} className="min-h-screen">
       <Container size="4" p="4">
-        <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-          {itemsByGenre.map(({ genre, count, items }) => (
-            <div
-              key={genre}
-              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
-            >
-              <Title as={motion.h1} variants={itemVariants}>
-                {genre} ({count} {count === 1 ? "items" : "items"})
-              </Title>
-              <Grid
-                columns={{ initial: "2", sm: "3", md: "4", lg: "5" }}
-                gap="4"
-              >
-                {items.slice(0, 10).map((movie) => (
-                  <MovieCard
-                    key={generateGuid()}
-                    item={movie}
-                    onHide={() => {
-                      setCachedHiddenId(movie.id ?? "");
-                      setHiddenIds([...hiddenIds, movie.id ?? ""]);
-                    }}
-                  />
-                ))}
-              </Grid>
-            </div>
-          ))}
-        </div>
+        <Grid gap="6">
+          <div style={{ textAlign: "center" }}>
+            <Title as={motion.h1} variants={itemVariants}>
+              Your Top Genre: {topGenreData.genre}
+            </Title>
+          </div>
+
+          <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
+            {topGenreData.items.slice(0, 20).map((item: { id?: string }) => (
+              <MovieCard
+                key={generateGuid()}
+                item={item}
+                onHide={() => {
+                  setCachedHiddenId(item.id ?? "");
+                  setHiddenIds([...hiddenIds, item.id ?? ""]);
+                }}
+              />
+            ))}
+          </Grid>
+        </Grid>
       </Container>
       <Button
         size={"4"}

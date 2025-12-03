@@ -16,15 +16,16 @@ const sleep = (durationMs: number) =>
 // Get environment variables
 export const getEnvVar = (name: string): string | undefined => {
   // Check if we're in a browser environment with window.ENV (production/Docker)
-  if (typeof window !== 'undefined' && (window as any).ENV) {
-    return (window as any).ENV[name];
+  if (typeof window !== "undefined" && "ENV" in window) {
+    const env = (window as { ENV?: Record<string, string> }).ENV;
+    return env?.[name];
   }
   // Fallback to import.meta.env for Vite (development)
-  return import.meta.env[`VITE_${name}`];
+  return import.meta.env[`VITE_${name}`] as string | undefined;
 };
 
 const getServerUrl = (): string => {
-  const envServerUrl = getEnvVar('JELLYFIN_SERVER_URL');
+  const envServerUrl = getEnvVar("JELLYFIN_SERVER_URL");
   if (envServerUrl) {
     return envServerUrl;
   }
@@ -38,7 +39,7 @@ const getServerUrl = (): string => {
 };
 
 const getAdminApiKey = (): string => {
-  const adminApiKey = getEnvVar('JELLYFIN_API_KEY');
+  const adminApiKey = getEnvVar("JELLYFIN_API_KEY");
   if (!adminApiKey) {
     throw new Error("JELLYFIN_API_KEY environment variable is required");
   }
@@ -64,7 +65,7 @@ export const getAuthenticatedJellyfinApi = async (): Promise<Api> => {
 
   if (!username && !jellyfinAuthToken) {
     throw new Error(
-      "Missing credentials in localStorage. Please configure your Jellyfin connection.",
+      "Missing credentials in localStorage. Please configure your Jellyfin connection."
     );
   }
 
@@ -83,7 +84,7 @@ export const getAuthenticatedJellyfinApi = async (): Promise<Api> => {
 
 export const authenticateByAuthToken = (
   serverUrl: string,
-  jellyfinApiKey: string,
+  jellyfinApiKey: string
 ): Api => {
   const jellyfin = new Jellyfin({
     clientInfo: {
@@ -102,7 +103,7 @@ export const authenticateByAuthToken = (
 export const authenticateByUserName = async (
   serverUrl: string,
   username: string,
-  password: string,
+  password: string
 ): Promise<Api> => {
   if (api) {
     return api;

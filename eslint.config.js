@@ -31,10 +31,19 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": [
-        "warn",
+        "error",
         { allowConstantExport: true },
       ],
       "@typescript-eslint/await-thenable": "error",
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unsafe-assignment": "error",
+      "@typescript-eslint/no-unsafe-member-access": "error",
+      "@typescript-eslint/no-unsafe-call": "error",
+      "@typescript-eslint/no-unsafe-return": "error",
+      "react-hooks/exhaustive-deps": "error",
+      "@typescript-eslint/restrict-template-expressions": "error",
+      "@typescript-eslint/no-base-to-string": "error",
+      "@typescript-eslint/unbound-method": "error",
     },
   },
 );
