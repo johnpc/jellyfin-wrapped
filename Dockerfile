@@ -5,6 +5,7 @@ RUN sed -i \
     -e '/LoadModule substitute_module/s/^#//g' \
     -e '/LoadModule filter_module/s/^#//g' \
     -e '/LoadModule env_module/s/^#//g' \
+    -e '/LoadModule rewrite_module/s/^#//g' \
     /usr/local/apache2/conf/httpd.conf
 
 # Copy your static files
