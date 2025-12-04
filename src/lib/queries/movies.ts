@@ -57,11 +57,11 @@ export const listMovies = async (): Promise<MovieWithStats[]> => {
     const movieDuration = movie.durationSeconds ?? 0;
     
     // Calculate completed watches: total watch time divided by movie duration
-    // Always round up - if you started watching again (even for 10 mins), it counts as another watch
+    // Round up if watched more than 50% of the movie, otherwise round down
     let completedWatches = 0;
     if (movieDuration > 0) {
-      // Use ceiling to always round up - any additional viewing counts as another watch
-      completedWatches = Math.ceil(stats.totalWatchTimeSeconds / movieDuration);
+      // Use Math.round - rounds up if >= 50%, rounds down if < 50%
+      completedWatches = Math.round(stats.totalWatchTimeSeconds / movieDuration);
     } else {
       // Fallback if we don't have duration data
       completedWatches = stats.playCount;

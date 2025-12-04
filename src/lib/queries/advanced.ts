@@ -149,27 +149,6 @@ export const getMonthlyShowStats = async (): Promise<
     {}
   );
 
-  // DEBUG: Log all shows and their watch times per month
-  console.log("=== MONTHLY SHOW STATS DEBUG ===");
-  Object.entries(monthlyShowData).forEach(([month, monthData]) => {
-    console.log(`\n📅 Month: ${month}`);
-    console.log("Shows watched this month:");
-    
-    const showsList: { name: string; minutes: number }[] = [];
-    monthData.shows.forEach((durationSeconds: number, showId: string) => {
-      const show = shows.find((s: SimpleItemDto) => s.id === showId);
-      const minutes = Math.round(durationSeconds / 60);
-      showsList.push({ name: show?.name ?? showId, minutes });
-    });
-    
-    // Sort by minutes descending
-    showsList.sort((a, b) => b.minutes - a.minutes);
-    showsList.forEach(({ name, minutes }) => {
-      console.log(`  - ${name}: ${minutes} minutes`);
-    });
-  });
-  console.log("\n=== END DEBUG ===\n");
-
   const monthlyStats = await Promise.all(
     Object.entries(monthlyShowData).map(([month, data]) => {
       let maxDuration = 0;
