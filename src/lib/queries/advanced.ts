@@ -52,7 +52,8 @@ export const getMonthlyShowStats = async (): Promise<
 
   const episodes = await getItemDtosByIds(episodeIds);
 
-  const seasonIds = Array.from(
+  // Get first level parents (usually seasons, but could be shows directly)
+  const level1ParentIds = Array.from(
     new Set(
       episodes
         .map((episode: SimpleItemDto) => episode.parentId)
@@ -60,30 +61,59 @@ export const getMonthlyShowStats = async (): Promise<
     )
   );
 
-  const seasons = await getItemDtosByIds(seasonIds);
+  const level1Parents = await getItemDtosByIds(level1ParentIds);
 
-  const showIds = Array.from(
+  // Get second level parents (usually shows)
+  const level2ParentIds = Array.from(
     new Set(
-      seasons
-        .map((season: SimpleItemDto) => season.parentId)
+      level1Parents
+        .map((item: SimpleItemDto) => item.parentId)
         .filter((id): id is string => id !== null && id !== undefined)
     )
   );
 
-  const shows = await getItemDtosByIds(showIds);
+  const level2Parents = await getItemDtosByIds(level2ParentIds);
 
+  // Build episode to show mapping
+  // For each episode, walk up the hierarchy to find the show
   const episodeToShow = new Map<string, SimpleItemDto>();
+  
   episodes.forEach((episode: SimpleItemDto) => {
-    const season = seasons.find(
-      (s: SimpleItemDto) => s.id === episode.parentId
+    if (!episode.id || !episode.parentId) return;
+    
+    // Find the level 1 parent (season or show)
+    const level1Parent = level1Parents.find(
+      (p: SimpleItemDto) => p.id === episode.parentId
     );
-    if (season) {
-      const show = shows.find((s: SimpleItemDto) => s.id === season.parentId);
-      if (show && episode.id) {
-        episodeToShow.set(episode.id, show);
+    
+    if (!level1Parent) return;
+    
+    // If level1Parent has a parentId, it's likely a season - look up the show
+    if (level1Parent.parentId) {
+      const level2Parent = level2Parents.find(
+        (p: SimpleItemDto) => p.id === level1Parent.parentId
+      );
+      if (level2Parent) {
+        // level2Parent is the show
+        episodeToShow.set(episode.id, level2Parent);
+      } else {
+        // Couldn't find level2, assume level1 is the show
+        episodeToShow.set(episode.id, level1Parent);
       }
+    } else {
+      // level1Parent has no parent, so it's the show itself
+      episodeToShow.set(episode.id, level1Parent);
     }
   });
+  
+  // Collect all unique shows
+  const showsMap = new Map<string, SimpleItemDto>();
+  episodeToShow.forEach((show) => {
+    if (show.id) {
+      showsMap.set(show.id, show);
+    }
+  });
+  const shows = Array.from(showsMap.values());
 
   const monthlyShowData = data.results.reduce(
     (
@@ -119,6 +149,27 @@ export const getMonthlyShowStats = async (): Promise<
     {}
   );
 
+  // DEBUG: Log all shows and their watch times per month
+  console.log("=== MONTHLY SHOW STATS DEBUG ===");
+  Object.entries(monthlyShowData).forEach(([month, monthData]) => {
+    console.log(`\n📅 Month: ${month}`);
+    console.log("Shows watched this month:");
+    
+    const showsList: { name: string; minutes: number }[] = [];
+    monthData.shows.forEach((durationSeconds: number, showId: string) => {
+      const show = shows.find((s: SimpleItemDto) => s.id === showId);
+      const minutes = Math.round(durationSeconds / 60);
+      showsList.push({ name: show?.name ?? showId, minutes });
+    });
+    
+    // Sort by minutes descending
+    showsList.sort((a, b) => b.minutes - a.minutes);
+    showsList.forEach(({ name, minutes }) => {
+      console.log(`  - ${name}: ${minutes} minutes`);
+    });
+  });
+  console.log("\n=== END DEBUG ===\n");
+
   const monthlyStats = await Promise.all(
     Object.entries(monthlyShowData).map(([month, data]) => {
       let maxDuration = 0;
@@ -139,8 +190,13 @@ export const getMonthlyShowStats = async (): Promise<
         throw new Error(`Could not find show with ID ${topShowId}`);
       }
 
+      // Parse the month string (e.g., "2025-11") and create a date in local timezone
+      // Using noon to avoid any timezone edge cases
+      const [year, monthNum] = month.split("-").map(Number);
+      const monthDate = new Date(year, monthNum - 1, 1, 12, 0, 0);
+      
       return {
-        month: new Date(month + "-01"),
+        month: monthDate,
         topShow: {
           item: topShow,
           watchTimeMinutes: maxDuration / 60,

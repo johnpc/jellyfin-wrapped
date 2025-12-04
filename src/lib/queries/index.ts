@@ -32,7 +32,6 @@ export * from "./stats";
 export * from "./actors";
 
 // Patterns
-export * from "./patterns";
 
 // Date-based
 export * from "./date-based";

@@ -1,46 +1,36 @@
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import { useErrorBoundary } from "react-error-boundary";
-import { useMovies } from "@/hooks/queries/useMovies";
+import { useData } from "@/contexts/DataContext";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { Subtitle, Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
 import PageContainer from "../PageContainer";
 
-const NEXT_PAGE = "/oldest-show";
-
 export default function OldestMoviePage() {
-  const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
-  const { data: movies, isLoading, error } = useMovies();
-
-  if (error) {
-    showBoundary(error);
-  }
+  const { movies, isLoading } = useData();
+  const { data: moviesData } = movies;
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  const sortedMovies = [...(movies ?? [])].sort(
-    (a: { date?: string | null }, b: { date?: string | null }) => {
-      const aDate = new Date(a.date ?? new Date());
-      const bDate = new Date(b.date ?? new Date());
-      return aDate.getTime() - bDate.getTime();
-    }
-  );
+  const sortedMovies = [...(moviesData ?? [])]
+    .filter((m: { productionYear?: number | null }) => m.productionYear != null)
+    .sort(
+      (a: { productionYear?: number | null }, b: { productionYear?: number | null }) => {
+        return (a.productionYear ?? 9999) - (b.productionYear ?? 9999);
+      }
+    );
 
   const movie = sortedMovies[0];
 
   if (!movie) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return <LoadingSpinner />;
   }
 
   return (
-    <PageContainer backgroundColor="var(--teal-8)" nextPage={NEXT_PAGE} previousPage="/critically-acclaimed">
+    <PageContainer>
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>

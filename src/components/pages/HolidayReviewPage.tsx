@@ -1,89 +1,47 @@
-import { useState, useMemo } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
-import { useNavigate } from "react-router-dom";
-import { useErrorBoundary } from "react-error-boundary";
-import { useWatchedOnDate } from "@/hooks/queries/useWatchedOnDate";
-import { LoadingSpinner } from "../LoadingSpinner";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { generateGuid } from "@/lib/utils";
-import { getCachedHiddenIds, setCachedHiddenId } from "@/lib/cache";
-import { getHolidayDates } from "@/lib/holiday-helpers";
-import { subDays } from "date-fns";
 import PageContainer from "../PageContainer";
-
-const NEXT_PAGE = "/minutes-per-day";
+import { useData } from "@/contexts/DataContext";
+import { LoadingSpinner } from "../LoadingSpinner";
+import { getNextPage, getAvailablePages } from "@/lib/navigation";
 
 export default function HolidayReviewPage() {
-  const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
-  const [hiddenIds, setHiddenIds] = useState<string[]>(getCachedHiddenIds());
+  const { holidays, isLoading } = useData();
 
-  const dates = useMemo(() => {
-    const today = new Date();
-    const holidays = getHolidayDates(today);
-    return {
-      christmas: holidays.christmas,
-      christmasEve: subDays(holidays.christmas, 1),
-      halloween: holidays.halloween,
-      valentines: holidays.valentines,
-    };
-  }, []);
+  const christmasItems = holidays.christmas.data ?? [];
+  const christmasEveItems = holidays.christmasEve.data ?? [];
+  const halloweenItems = holidays.halloween.data ?? [];
+  const valentinesItems = holidays.valentines.data ?? [];
 
-  const {
-    data: christmas,
-    isLoading: l1,
-    error: e1,
-  } = useWatchedOnDate(dates.christmas);
-  const {
-    data: christmasEve,
-    isLoading: l2,
-    error: e2,
-  } = useWatchedOnDate(dates.christmasEve);
-  const {
-    data: halloween,
-    isLoading: l3,
-    error: e3,
-  } = useWatchedOnDate(dates.halloween);
-  const {
-    data: valentines,
-    isLoading: l4,
-    error: e4,
-  } = useWatchedOnDate(dates.valentines);
+  // Redirect if no holiday content after data is loaded
+  useEffect(() => {
+    if (!isLoading && !holidays.hasContent) {
+      const nextPage = getNextPage("/holidays");
+      const availablePages = getAvailablePages();
+      const destination = nextPage || availablePages[0] || "/TopTen";
+      navigate(destination, { replace: true });
+    }
+  }, [isLoading, holidays.hasContent, navigate]);
 
-  const firstError = e1 || e2 || e3 || e4;
-  if (firstError) {
-    showBoundary(firstError);
-  }
-
-  if (l1 || l2 || l3 || l4) {
+  // Show loading spinner while data is being fetched
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  const filterHidden = (items: { id?: string }[] | undefined) =>
-    items?.filter(
-      (item: { id?: string }) => !hiddenIds.includes(item.id ?? "")
-    ) ?? [];
-
-  const christmasItems = filterHidden(christmas);
-  const christmasEveItems = filterHidden(christmasEve);
-  const halloweenItems = filterHidden(halloween);
-  const valentinesItems = filterHidden(valentines);
-
-  if (
-    !christmasItems.length &&
-    !christmasEveItems.length &&
-    !halloweenItems.length &&
-    !valentinesItems.length
-  ) {
-    void navigate(NEXT_PAGE);
-    return null;
+  // Don't render while redirecting
+  if (!holidays.hasContent) {
+    return <LoadingSpinner />;
   }
 
   return (
-    <PageContainer backgroundColor="var(--grass-8)" nextPage={NEXT_PAGE} previousPage="/oldest-show">
+    <PageContainer>
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
@@ -105,14 +63,7 @@ export default function HolidayReviewPage() {
                 gap="4"
               >
                 {christmasItems.map((item: { id?: string }) => (
-                  <MovieCard
-                    key={generateGuid()}
-                    item={item}
-                    onHide={() => {
-                      setCachedHiddenId(item.id ?? "");
-                      setHiddenIds([...hiddenIds, item.id ?? ""]);
-                    }}
-                  />
+                  <MovieCard key={generateGuid()} item={item} />
                 ))}
               </Grid>
             </>
@@ -128,14 +79,7 @@ export default function HolidayReviewPage() {
                 gap="4"
               >
                 {christmasEveItems.map((item: { id?: string }) => (
-                  <MovieCard
-                    key={generateGuid()}
-                    item={item}
-                    onHide={() => {
-                      setCachedHiddenId(item.id ?? "");
-                      setHiddenIds([...hiddenIds, item.id ?? ""]);
-                    }}
-                  />
+                  <MovieCard key={generateGuid()} item={item} />
                 ))}
               </Grid>
             </>
@@ -151,14 +95,7 @@ export default function HolidayReviewPage() {
                 gap="4"
               >
                 {halloweenItems.map((item: { id?: string }) => (
-                  <MovieCard
-                    key={generateGuid()}
-                    item={item}
-                    onHide={() => {
-                      setCachedHiddenId(item.id ?? "");
-                      setHiddenIds([...hiddenIds, item.id ?? ""]);
-                    }}
-                  />
+                  <MovieCard key={generateGuid()} item={item} />
                 ))}
               </Grid>
             </>
@@ -174,14 +111,7 @@ export default function HolidayReviewPage() {
                 gap="4"
               >
                 {valentinesItems.map((item: { id?: string }) => (
-                  <MovieCard
-                    key={generateGuid()}
-                    item={item}
-                    onHide={() => {
-                      setCachedHiddenId(item.id ?? "");
-                      setHiddenIds([...hiddenIds, item.id ?? ""]);
-                    }}
-                  />
+                  <MovieCard key={generateGuid()} item={item} />
                 ))}
               </Grid>
             </>

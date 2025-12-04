@@ -6,45 +6,99 @@ import {
   playbackReportingSqlRequest,
 } from "./utils";
 
-export const getMinutesPlayedPerDay = async (): Promise<
-  {
-    date: string;
-    minutes: number;
-  }[]
-> => {
+export const getDeviceStats = async (): Promise<{
+  deviceUsage: { name: string; count: number }[];
+  browserUsage: { name: string; count: number }[];
+  osUsage: { name: string; count: number }[];
+}> => {
   const userId = await getCurrentUserId();
   const startDate = getStartDate();
   const endDate = getEndDate();
 
-  const queryString = `
-  SELECT
-    date(DateCreated) as PlayDate,
-    SUM(PlayDuration) as TotalPlayDuration
-  FROM PlaybackActivity
-  WHERE UserId = "${userId}"
-  AND DateCreated > '${formatDateForSql(startDate)}'
-  AND DateCreated <= '${formatDateForSql(endDate)}'
-  GROUP BY date(DateCreated)
-  ORDER BY PlayDate DESC
+  // Device usage query
+  const deviceQuery = `
+    SELECT
+      DeviceName as device,
+      COUNT(*) as count
+    FROM PlaybackActivity
+    WHERE UserId = "${userId}"
+    AND DateCreated > '${formatDateForSql(startDate)}'
+    AND DateCreated <= '${formatDateForSql(endDate)}'
+    AND DeviceName IS NOT NULL
+    AND DeviceName != ''
+    GROUP BY DeviceName
+    ORDER BY count DESC
   `;
 
-  const data = await playbackReportingSqlRequest(queryString);
+  const deviceData = await playbackReportingSqlRequest(deviceQuery);
+  const deviceNameIndex = deviceData.colums.findIndex((i: string) => i === "device");
+  const deviceCountIndex = deviceData.colums.findIndex((i: string) => i === "count");
 
-  const dateIndex = data.colums.findIndex((i: string) => i === "PlayDate");
-  const durationIndex = data.colums.findIndex(
-    (i: string) => i === "TotalPlayDuration"
-  );
+  const deviceUsage = deviceData.results.map((row: string[]) => ({
+    name: row[deviceNameIndex] || "Unknown Device",
+    count: parseInt(row[deviceCountIndex]) || 0,
+  }));
 
-  return data.results.map((result: string[]) => {
-    const duration = parseInt(result[durationIndex]);
-    const zeroBoundDuration = Math.max(0, duration);
-    const minutes = Math.floor(zeroBoundDuration / 60);
+  // Client usage query (browser/app)
+  const clientQuery = `
+    SELECT
+      ClientName as client,
+      COUNT(*) as count
+    FROM PlaybackActivity
+    WHERE UserId = "${userId}"
+    AND DateCreated > '${formatDateForSql(startDate)}'
+    AND DateCreated <= '${formatDateForSql(endDate)}'
+    AND ClientName IS NOT NULL
+    AND ClientName != ''
+    GROUP BY ClientName
+    ORDER BY count DESC
+  `;
 
-    return {
-      date: result[dateIndex],
-      minutes: minutes,
-    };
+  const clientData = await playbackReportingSqlRequest(clientQuery);
+  const clientNameIndex = clientData.colums.findIndex((i: string) => i === "client");
+  const clientCountIndex = clientData.colums.findIndex((i: string) => i === "count");
+
+  const browserUsage = clientData.results.map((row: string[]) => ({
+    name: row[clientNameIndex] || "Unknown Client",
+    count: parseInt(row[clientCountIndex]) || 0,
+  }));
+
+  // Derive OS from device names - common patterns
+  const osPatterns: { [key: string]: RegExp } = {
+    "Windows": /windows|win\d+|pc/i,
+    "macOS": /mac|macos|osx/i,
+    "iOS": /iphone|ipad|ios/i,
+    "Android": /android/i,
+    "Linux": /linux|ubuntu|debian|fedora/i,
+    "Chrome OS": /chromebook|chrome\s?os/i,
+    "Smart TV": /tv|roku|firestick|chromecast|apple\s?tv/i,
+  };
+
+  const osCounts: { [key: string]: number } = {};
+  
+  deviceUsage.forEach(device => {
+    let matched = false;
+    for (const [osName, pattern] of Object.entries(osPatterns)) {
+      if (pattern.test(device.name)) {
+        osCounts[osName] = (osCounts[osName] || 0) + device.count;
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      osCounts["Other"] = (osCounts["Other"] || 0) + device.count;
+    }
   });
+
+  const osUsage = Object.entries(osCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count);
+
+  return {
+    deviceUsage,
+    browserUsage,
+    osUsage,
+  };
 };
 
 export const getPunchCardData = async (): Promise<
