@@ -8,7 +8,11 @@ services:
     #   dockerfile: Dockerfile
 
     # ...Or use published image from Dockerhub
-    image: mrorbitman/jellyfin-wrapped:latest
+    # image: mrorbitman/jellyfin-wrapped:latest
+
+    # ...Or use published image from GitHub Container Registry
+    # Replace <your-github-username> with your actual GitHub username
+    image: ghcr.io/sraja7272/jellyfin-wrapped:latest
 
     ports:
       - "80:80"
