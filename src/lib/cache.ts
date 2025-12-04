@@ -1,18 +1,17 @@
-export const JELLYFIN_SERVER_URL_CACHE_KEY = "jellyfinServerUrl";
-export const JELLYFIN_AUTH_TOKEN_CACHE_KEY = "jellyfinAuthToken";
+// Cache keys for user preferences and session data
+// Note: Sensitive data like passwords are NEVER stored client-side
 export const JELLYFIN_USERNAME_CACHE_KEY = "jellyfinUsername";
-export const JELLYFIN_PASSWORD_CACHE_KEY = "jellyfinPassword";
 export const JELLYFIN_CURRENT_USER_CACHE_KEY = "jellyfinwrapped_current_user";
 export const JELLYFIN_HIDDEN_ITEMS = "jellyfinwrapped_hidden_items";
+
 const localCache: Record<string, string> = {};
+
 export const setCacheValue = (key: string, value: string) => {
   try {
     localCache[key] = value;
     localStorage.setItem(key, value);
-    if (key === JELLYFIN_SERVER_URL_CACHE_KEY || 
-        key === JELLYFIN_AUTH_TOKEN_CACHE_KEY || 
-        key === JELLYFIN_USERNAME_CACHE_KEY || 
-        key === JELLYFIN_PASSWORD_CACHE_KEY) {
+    // Clear user cache when username changes (forces re-fetch)
+    if (key === JELLYFIN_USERNAME_CACHE_KEY) {
       localStorage.removeItem(JELLYFIN_CURRENT_USER_CACHE_KEY);
     }
   } catch (error) {

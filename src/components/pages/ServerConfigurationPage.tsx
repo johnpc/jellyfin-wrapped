@@ -1,20 +1,13 @@
 import React, { ChangeEvent, useState } from "react";
 import { styled } from "@stitches/react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
-import { Server, Key, User, Lock, ChevronRight, AlertCircle, Shield, Zap } from "lucide-react";
+import { User, Lock, ChevronRight, Shield, Zap } from "lucide-react";
 
-import {
-  authenticateByUserName,
-  authenticateByAuthToken,
-  getEnvVar,
-} from "@/lib/jellyfin-api";
+import { login as backendLogin } from "@/lib/backend-api";
 import {
   getCacheValue,
-  JELLYFIN_AUTH_TOKEN_CACHE_KEY,
-  JELLYFIN_PASSWORD_CACHE_KEY,
-  JELLYFIN_SERVER_URL_CACHE_KEY,
   JELLYFIN_USERNAME_CACHE_KEY,
   setCacheValue,
 } from "@/lib/cache";
@@ -24,29 +17,12 @@ const NEXT_PAGE = "/loading";
 const ServerConfigurationPage = () => {
   const { showBoundary } = useErrorBoundary();
   const navigate = useNavigate();
-  const serverUrlOverride = getEnvVar("JELLYFIN_SERVER_URL");
 
-  const [serverUrl, setServerUrl] = useState<string>(
-    () =>
-      serverUrlOverride || getCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY) || ""
-  );
-  const [authToken, setAuthToken] = useState<string>(
-    () => getCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY) || ""
-  );
   const [username, setUsername] = useState<string>(
     () => getCacheValue(JELLYFIN_USERNAME_CACHE_KEY) || ""
   );
-  const [password, setPassword] = useState<string>(
-    () => getCacheValue(JELLYFIN_PASSWORD_CACHE_KEY) || ""
-  );
+  const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [useAuthToken, setUseAuthToken] = useState<boolean>(false);
-
-  const handleServerUrlChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setServerUrl(value);
-    setCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY, value);
-  };
 
   const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -54,33 +30,15 @@ const ServerConfigurationPage = () => {
     setCacheValue(JELLYFIN_USERNAME_CACHE_KEY, value);
   };
 
-  const handleAuthTokenChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setAuthToken(value);
-    setCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY, value);
-  };
-
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setPassword(value);
-    setCacheValue(JELLYFIN_PASSWORD_CACHE_KEY, value);
+    setPassword(e.target.value);
   };
 
   const handleConnect = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const finalServerUrl = serverUrlOverride || serverUrl;
-      if (finalServerUrl) {
-        setCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY, finalServerUrl);
-      }
-
-      if (useAuthToken && authToken) {
-        authenticateByAuthToken(finalServerUrl, authToken);
-      } else {
-        await authenticateByUserName(finalServerUrl, username, password);
-      }
-
+      await backendLogin(username, password);
       void navigate(NEXT_PAGE);
     } catch (e) {
       showBoundary(e);
@@ -88,11 +46,6 @@ const ServerConfigurationPage = () => {
       setIsLoading(false);
     }
   };
-
-  const protocol = window.location.protocol;
-  const hostname = window.location.hostname;
-  const port = window.location.port;
-  const currentUrl = `${protocol}//${hostname}${port ? ":" + port : ""}`;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -176,150 +129,58 @@ const ServerConfigurationPage = () => {
             <Zap size={26} />
           </IconWrapper>
           <Title>Connect to Jellyfin</Title>
-          <Subtitle>Enter your server details to begin your personalized recap</Subtitle>
+          <Subtitle>Enter your credentials to begin your personalized recap</Subtitle>
         </CardHeader>
 
         <form onSubmit={(e) => void handleConnect(e)}>
           <FormContent>
-            {!serverUrlOverride && (
-              <motion.div variants={itemVariants}>
-                <InputGroup>
-                  <InputLabel>
-                    <Server size={14} />
-                    Server URL
-                  </InputLabel>
-                  <InputWrapper>
-                    <StyledInput
-                      type="url"
-                      placeholder="https://jellyfin.example.com"
-                      value={serverUrl}
-                      onChange={handleServerUrlChange}
-                      required
-                    />
-                  </InputWrapper>
-                  <InputHint>
-                    Include protocol (http:// or https://) and port if needed
-                  </InputHint>
-                </InputGroup>
-
-                {protocol.includes("https") && (
-                  <WarningBox as={motion.div} variants={itemVariants}>
-                    <AlertCircle size={18} />
-                    <WarningContent>
-                      <strong>HTTPS Notice:</strong> You're accessing via HTTPS. Use an HTTPS server URL or enable mixed content for {currentUrl}.
-                    </WarningContent>
-                  </WarningBox>
-                )}
-              </motion.div>
-            )}
-
-            {serverUrlOverride && (
-              <motion.div variants={itemVariants}>
-                <ServerDisplay>
-                  <Server size={16} />
-                  <span>{serverUrlOverride}</span>
-                </ServerDisplay>
-              </motion.div>
-            )}
-
             <motion.div variants={itemVariants}>
-              <AuthToggle>
-                <AuthToggleButton
-                  type="button"
-                  isActive={!useAuthToken}
-                  onClick={() => setUseAuthToken(false)}
-                >
-                  <User size={16} />
-                  <span>Credentials</span>
-                </AuthToggleButton>
-                <AuthToggleButton
-                  type="button"
-                  isActive={useAuthToken}
-                  onClick={() => setUseAuthToken(true)}
-                >
-                  <Key size={16} />
-                  <span>API Token</span>
-                </AuthToggleButton>
-              </AuthToggle>
+              <ServerDisplay>
+                <Shield size={16} />
+                <span>Secure connection</span>
+              </ServerDisplay>
             </motion.div>
 
-            <AnimatePresence mode="wait">
-              {useAuthToken ? (
-                <motion.div
-                  key="token"
-                  initial={{ opacity: 0, x: 24 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -24 }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <InputGroup>
-                    <InputLabel>
-                      <Key size={14} />
-                      API Token
-                    </InputLabel>
-                    <InputWrapper>
-                      <StyledInput
-                        type="text"
-                        placeholder="Your Jellyfin API token"
-                        value={authToken}
-                        onChange={handleAuthTokenChange}
-                        required
-                      />
-                    </InputWrapper>
-                    <InputHint>
-                      Find this in your browser's dev tools under request headers
-                    </InputHint>
-                  </InputGroup>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="credentials"
-                  initial={{ opacity: 0, x: -24 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 24 }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <InputGroup>
-                    <InputLabel>
-                      <User size={14} />
-                      Username
-                    </InputLabel>
-                    <InputWrapper>
-                      <StyledInput
-                        type="text"
-                        placeholder="Your Jellyfin username"
-                        value={username}
-                        onChange={handleUsernameChange}
-                        required
-                      />
-                    </InputWrapper>
-                  </InputGroup>
+            <motion.div variants={itemVariants}>
+              <InputGroup>
+                <InputLabel>
+                  <User size={14} />
+                  Username
+                </InputLabel>
+                <InputWrapper>
+                  <StyledInput
+                    type="text"
+                    placeholder="Your Jellyfin username"
+                    value={username}
+                    onChange={handleUsernameChange}
+                    required
+                  />
+                </InputWrapper>
+              </InputGroup>
 
-                  <InputGroup>
-                    <InputLabel>
-                      <Lock size={14} />
-                      Password
-                    </InputLabel>
-                    <InputWrapper>
-                      <StyledInput
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={handlePasswordChange}
-                      />
-                    </InputWrapper>
-                    <InputHint>Leave empty if no password is set</InputHint>
-                  </InputGroup>
-                </motion.div>
-              )}
-            </AnimatePresence>
+              <InputGroup>
+                <InputLabel>
+                  <Lock size={14} />
+                  Password
+                </InputLabel>
+                <InputWrapper>
+                  <StyledInput
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={handlePasswordChange}
+                  />
+                </InputWrapper>
+                <InputHint>Leave empty if no password is set</InputHint>
+              </InputGroup>
+            </motion.div>
 
             <motion.div variants={itemVariants}>
               <SubmitButton type="submit" disabled={isLoading}>
                 <ButtonContent>
                   <span>{isLoading ? "Connecting..." : "Connect to Server"}</span>
                   {!isLoading && <ChevronRight size={20} />}
-                  {isLoading && <LoadingSpinner />}
+                  {isLoading && <LoadingSpinnerStyled />}
                 </ButtonContent>
                 <ButtonGlow />
               </SubmitButton>
@@ -332,7 +193,9 @@ const ServerConfigurationPage = () => {
             <Shield size={14} />
             <span>100% Private</span>
           </FooterBadge>
-          <FooterText>Credentials are stored locally and never leave your device</FooterText>
+          <FooterText>
+            Credentials are sent securely to the backend
+          </FooterText>
         </Footer>
       </FormCard>
     </Container>
@@ -518,32 +381,6 @@ const InputHint = styled("p", {
   marginTop: "10px",
 });
 
-const WarningBox = styled("div", {
-  display: "flex",
-  gap: "14px",
-  padding: "16px 18px",
-  background: "rgba(245, 158, 11, 0.06)",
-  border: "1px solid rgba(245, 158, 11, 0.12)",
-  borderRadius: "14px",
-  marginTop: "16px",
-  
-  "& svg": {
-    color: "#f59e0b",
-    flexShrink: 0,
-    marginTop: "2px",
-  },
-});
-
-const WarningContent = styled("div", {
-  fontSize: "0.85rem",
-  color: "#94a3b8",
-  lineHeight: 1.6,
-  
-  "& strong": {
-    color: "#f59e0b",
-  },
-});
-
 const ServerDisplay = styled("div", {
   display: "flex",
   alignItems: "center",
@@ -555,50 +392,6 @@ const ServerDisplay = styled("div", {
   fontSize: "0.9rem",
   color: "#10b981",
   fontFamily: "'JetBrains Mono', monospace",
-});
-
-const AuthToggle = styled("div", {
-  display: "flex",
-  gap: "8px",
-  padding: "5px",
-  background: "rgba(18, 21, 28, 0.7)",
-  borderRadius: "16px",
-  border: "1px solid rgba(255, 255, 255, 0.03)",
-});
-
-const AuthToggleButton = styled("button", {
-  flex: 1,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "10px",
-  padding: "14px 18px",
-  background: "transparent",
-  border: "none",
-  borderRadius: "12px",
-  fontSize: "0.9rem",
-  fontWeight: 500,
-  fontFamily: "'Sora', sans-serif",
-  color: "#475569",
-  cursor: "pointer",
-  transition: "all 0.25s ease",
-  
-  variants: {
-    isActive: {
-      true: {
-        background: "rgba(0, 240, 255, 0.1)",
-        color: "#00f0ff",
-        
-        "& svg": {
-          color: "#00f0ff",
-        },
-      },
-    },
-  },
-  
-  "&:hover:not([data-active])": {
-    color: "#94a3b8",
-  },
 });
 
 const SubmitButton = styled("button", {
@@ -654,7 +447,7 @@ const ButtonGlow = styled("div", {
   borderRadius: "16px",
 });
 
-const LoadingSpinner = styled("div", {
+const LoadingSpinnerStyled = styled("div", {
   width: "22px",
   height: "22px",
   border: "2px solid rgba(3, 3, 4, 0.3)",

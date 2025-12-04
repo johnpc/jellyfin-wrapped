@@ -4,14 +4,8 @@ export * from "./types";
 // Utils
 export * from "./utils";
 
-// Plugin
-export * from "./plugin";
-
 // Images
 export * from "./images";
-
-// Items
-export * from "./items";
 
 // Movies
 export * from "./movies";
@@ -30,8 +24,6 @@ export * from "./stats";
 
 // Actors
 export * from "./actors";
-
-// Patterns
 
 // Date-based
 export * from "./date-based";

@@ -35,13 +35,7 @@ import { NavigationButtons } from "./components/NavigationButtons";
 import { LoadingPage } from "./components/pages/LoadingPage";
 import { DataProvider } from "./contexts/DataContext";
 import { styled } from "@stitches/react";
-import {
-  getCacheValue,
-  JELLYFIN_SERVER_URL_CACHE_KEY,
-  JELLYFIN_AUTH_TOKEN_CACHE_KEY,
-  JELLYFIN_USERNAME_CACHE_KEY,
-} from "./lib/cache";
-import { getEnvVar, getAuthenticatedJellyfinApi } from "./lib/jellyfin-api";
+import { isAuthenticated, verifySession } from "./lib/backend-api";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 
 const queryClient = new QueryClient({
@@ -260,21 +254,9 @@ function RootLayout() {
   );
 }
 
-// Check if Jellyfin credentials are configured
+// Check if user has valid JWT token
 function hasValidCredentials(): boolean {
-  // Check for environment variables first
-  const envServerUrl = getEnvVar("JELLYFIN_SERVER_URL");
-  if (envServerUrl) {
-    return true;
-  }
-  
-  // Check for cached credentials
-  const serverUrl = getCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY);
-  const authToken = getCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY);
-  const username = getCacheValue(JELLYFIN_USERNAME_CACHE_KEY);
-  
-  // Need server URL and either auth token or username
-  return !!(serverUrl && (authToken || username));
+  return isAuthenticated();
 }
 
 // AuthGuard: Ensures the user is authenticated before rendering children
@@ -283,16 +265,16 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const authenticate = async () => {
-      // First check if credentials exist
+      // Check if JWT token exists
       if (!hasValidCredentials()) {
         setAuthState("unauthenticated");
         return;
       }
 
       try {
-        // Try to authenticate with stored credentials
-        await getAuthenticatedJellyfinApi();
-        setAuthState("authenticated");
+        // Verify session with backend
+        const isValid = await verifySession();
+        setAuthState(isValid ? "authenticated" : "unauthenticated");
       } catch (error) {
         console.error("Authentication failed:", error);
         setAuthState("unauthenticated");

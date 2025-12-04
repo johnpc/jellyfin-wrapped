@@ -1,24 +1,54 @@
 version: "3"
 
 services:
-  web:
+  backend:
+    # Build docker image from source
+    # build:
+    #   context: ./backend
+    #   dockerfile: Dockerfile
+
+    # Use published image from GitHub Container Registry
+    image: ghcr.io/sraja7272/jellyfin-wrapped-backend:latest
+
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    container_name: jellyfin-wrapped-backend
+    environment:
+      # Required: Your Jellyfin server URL (as accessible from the backend container)
+      - JELLYFIN_SERVER_URL=http://<your_jellyfin_server>:8096
+      # Required: Admin API key from Jellyfin Dashboard > API Keys
+      - JELLYFIN_API_KEY=<your_admin_api_key>
+      # Required: Secret for signing JWT tokens (must be at least 32 characters)
+      # Generate one with: openssl rand -base64 32
+      - JWT_SECRET=<generate_a_random_secret_here>
+      # Set to 'production' for production deployments
+      # Production: CORS allows only https://warped.raja-house.com
+      # Development: CORS allows https://warped.raja-house.com and http://localhost:5173
+      - NODE_ENV=production
+
+  frontend:
     # Build docker image from source
     # build:
     #   context: .
     #   dockerfile: Dockerfile
 
-    # ...Or use published image from Dockerhub
-    # image: mrorbitman/jellyfin-wrapped:latest
-
-    # ...Or use published image from GitHub Container Registry
-    # Replace <your-github-username> with your actual GitHub username
+    # Use published image from GitHub Container Registry
     image: ghcr.io/sraja7272/jellyfin-wrapped:latest
 
     ports:
       - "80:80"
     restart: unless-stopped
     container_name: jellyfin-wrapped
-    # Required environment variables for Jellyfin Wrapped to function properly
     environment:
+      # Required: URL where the backend is accessible FROM THE BROWSER
+      # This should be the public URL users will use to reach the backend
+      # Examples:
+      #   - http://localhost:3001 (if accessing locally)
+      #   - http://your-server-ip:3001 (if accessing over network)
+      #   - https://api.yourdomain.com (if using reverse proxy with HTTPS)
+      - BACKEND_URL=http://localhost:3001
+      # Required: Your Jellyfin server URL (as accessible from the browser, for images)
       - JELLYFIN_SERVER_URL=http://<your_jellyfin_server>:8096
-      - JELLYFIN_API_KEY=<your_admin_api_key>
+    depends_on:
+      - backend
