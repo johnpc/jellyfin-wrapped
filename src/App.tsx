@@ -10,7 +10,7 @@ import {
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 import { getAvailablePages } from "./lib/navigation";
 import SplashPage from "./components/pages/SplashPage";
 import ServerConfigurationPage from "./components/pages/ServerConfigurationPage";
@@ -41,7 +41,8 @@ import {
   JELLYFIN_AUTH_TOKEN_CACHE_KEY,
   JELLYFIN_USERNAME_CACHE_KEY,
 } from "./lib/cache";
-import { getEnvVar } from "./lib/jellyfin-api";
+import { getEnvVar, getAuthenticatedJellyfinApi } from "./lib/jellyfin-api";
+import { LoadingSpinner } from "./components/LoadingSpinner";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -276,24 +277,63 @@ function hasValidCredentials(): boolean {
   return !!(serverUrl && (authToken || username));
 }
 
-// Wrap content pages with DataProvider
-function DataWrappedLayout() {
-  // Check for credentials before trying to load data
-  if (!hasValidCredentials()) {
+// AuthGuard: Ensures the user is authenticated before rendering children
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const [authState, setAuthState] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
+
+  useEffect(() => {
+    const authenticate = async () => {
+      // First check if credentials exist
+      if (!hasValidCredentials()) {
+        setAuthState("unauthenticated");
+        return;
+      }
+
+      try {
+        // Try to authenticate with stored credentials
+        await getAuthenticatedJellyfinApi();
+        setAuthState("authenticated");
+      } catch (error) {
+        console.error("Authentication failed:", error);
+        setAuthState("unauthenticated");
+      }
+    };
+
+    void authenticate();
+  }, []);
+
+  if (authState === "loading") {
+    return <LoadingSpinner />;
+  }
+
+  if (authState === "unauthenticated") {
     return <Navigate to="/configure" replace />;
   }
-  
+
+  return <>{children}</>;
+}
+
+// Wrap content pages with DataProvider
+function DataWrappedLayout() {
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallbackComponent}>
+    <ErrorBoundary 
+      FallbackComponent={ErrorFallbackComponent}
+      onReset={() => {
+        // On error reset, redirect to loading page to re-fetch data
+        window.location.href = "/loading";
+      }}
+    >
       <ScrollToTop />
       <QueryClientProvider client={queryClient}>
-        <DataProvider>
-          <Theme>
-            <Navigation />
-            <AnimatedOutlet />
-            <NavigationButtons />
-          </Theme>
-        </DataProvider>
+        <AuthGuard>
+          <DataProvider>
+            <Theme>
+              <Navigation />
+              <AnimatedOutlet />
+              <NavigationButtons />
+            </Theme>
+          </DataProvider>
+        </AuthGuard>
       </QueryClientProvider>
     </ErrorBoundary>
   );
