@@ -72,7 +72,6 @@ function getNavigationDirection(currentPath: string): number {
   const currentIndex = pages.indexOf(currentPath);
   
   // Update previous path for next navigation
-  const oldPrevPath = previousPath;
   previousPath = currentPath;
   
   if (prevIndex === -1 || currentIndex === -1) {

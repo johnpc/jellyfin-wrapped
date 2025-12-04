@@ -12,7 +12,7 @@ import {
 } from "../ui/styled";
 import TimeframeSelector from "../TimeframeSelector";
 import { TimeframeOption } from "../../lib/timeframe";
-import { Film, BarChart3, Calendar, Sparkles, Play, Zap, Star, Tv } from "lucide-react";
+import { Film, BarChart3, Calendar, Sparkles, Play, Star, Tv } from "lucide-react";
 import { styled } from "@stitches/react";
 
 const NEXT_PAGE = "/configure";
