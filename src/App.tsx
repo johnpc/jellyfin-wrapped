@@ -6,6 +6,7 @@ import {
   RouterProvider,
   useLocation,
   useOutlet,
+  Navigate,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
@@ -34,6 +35,13 @@ import { NavigationButtons } from "./components/NavigationButtons";
 import { LoadingPage } from "./components/pages/LoadingPage";
 import { DataProvider } from "./contexts/DataContext";
 import { styled } from "@stitches/react";
+import {
+  getCacheValue,
+  JELLYFIN_SERVER_URL_CACHE_KEY,
+  JELLYFIN_AUTH_TOKEN_CACHE_KEY,
+  JELLYFIN_USERNAME_CACHE_KEY,
+} from "./lib/cache";
+import { getEnvVar } from "./lib/jellyfin-api";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -251,8 +259,30 @@ function RootLayout() {
   );
 }
 
+// Check if Jellyfin credentials are configured
+function hasValidCredentials(): boolean {
+  // Check for environment variables first
+  const envServerUrl = getEnvVar("JELLYFIN_SERVER_URL");
+  if (envServerUrl) {
+    return true;
+  }
+  
+  // Check for cached credentials
+  const serverUrl = getCacheValue(JELLYFIN_SERVER_URL_CACHE_KEY);
+  const authToken = getCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY);
+  const username = getCacheValue(JELLYFIN_USERNAME_CACHE_KEY);
+  
+  // Need server URL and either auth token or username
+  return !!(serverUrl && (authToken || username));
+}
+
 // Wrap content pages with DataProvider
 function DataWrappedLayout() {
+  // Check for credentials before trying to load data
+  if (!hasValidCredentials()) {
+    return <Navigate to="/configure" replace />;
+  }
+  
   return (
     <ErrorBoundary FallbackComponent={ErrorFallbackComponent}>
       <ScrollToTop />
