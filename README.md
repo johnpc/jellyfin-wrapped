@@ -2,6 +2,16 @@
 
 A web application that generates personalized year-in-review statistics for your Jellyfin media server, inspired by Spotify Wrapped.
 
+## ⚠️ Security Warning
+
+**DO NOT host this application publicly on the internet when using API keys as environment variables.** The API key is embedded in the frontend JavaScript bundle and will be visible to anyone who visits your site. This could expose your Jellyfin server to unauthorized access.
+
+**Recommended deployment options:**
+- Host locally on your home network only
+- Use behind a VPN or authentication proxy
+- Deploy on a private network/intranet
+- Consider implementing server-side API key handling for public deployments
+
 ## Features
 
 - 📊 View your most watched movies and TV shows
