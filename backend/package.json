@@ -15,7 +15,7 @@
   "dependencies": {
     "@fastify/cors": "^11.0.0",
     "@fastify/jwt": "^10.0.0",
-    "fastify": "^4.28.1"
+    "fastify": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",
