@@ -5,6 +5,7 @@ import { ContentImage } from "@/components/ContentImage";
 import { RankBadge } from "@/components/RankBadge";
 import { formatWatchTime } from "@/lib/time-helpers";
 import { SimpleItemDto } from "@/lib/queries";
+import { MovieWithStats } from "@/lib/queries/movies";
 import PageContainer from "@/components/PageContainer";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -39,7 +40,7 @@ export const TopTen = () => {
   }, [data?.shows, topShow]);
 
   if (isLoading) return <LoadingSpinner />;
-  if (error) return <div>Error loading top ten</div>;
+  if (error) return <div>Error loading top 5</div>;
   if (!data) return null;
 
   const handleMovieSelect = (movieId: string) => {
@@ -168,7 +169,7 @@ export const TopTen = () => {
                     </BadgeIcon>
                     <span>Your Top Picks</span>
                   </HeaderBadge>
-                  <PageTitle>Your Top 10 of {year}</PageTitle>
+                  <PageTitle>Your Top 5 of {year}</PageTitle>
                   <PageSubtitle>
                     {data.movies.length > 0 && data.shows.length > 0
                       ? "The movies and shows that stole your heart this year ❤️"
@@ -237,7 +238,7 @@ export const TopTen = () => {
                 </SectionTitleWrapper>
               </SectionHeader>
               <ItemList>
-                {data.movies.map((movie: SimpleItemDto & { completedWatches?: number }, index: number) => {
+                {data.movies.map((movie: MovieWithStats, index: number) => {
                   const isTopMovie = index === 0 && topMovie && movie.id === topMovie.id;
                   const wasGuessed = selectedMovie === movie.id;
                   const wasWrongGuess = wasGuessed && !isTopMovie;
@@ -264,7 +265,7 @@ export const TopTen = () => {
                           )}
                         </ItemTitle>
                         <ItemMeta>
-                          <MetaHighlight>{movie.completedWatches ?? 1}x</MetaHighlight> watched • {formatWatchTime((movie.durationSeconds ?? 0) / 60)}
+                          <MetaHighlight>{movie.completedWatches ?? 1}x</MetaHighlight> watched • {formatWatchTime(((movie as MovieWithStats).totalWatchTimeSeconds ?? 0) / 60)}
                         </ItemMeta>
                       </ItemInfo>
                     </RankItem>

@@ -7,8 +7,8 @@ export const useTopTen = () => {
     queryFn: async () => {
       const [movies, shows] = await Promise.all([listMovies(), listShows()]);
       return {
-        movies: movies.slice(0, 10),
-        shows: shows.slice(0, 10),
+        movies: movies.slice(0, 5),
+        shows: shows.slice(0, 5),
       };
     },
   });

@@ -82,12 +82,12 @@ export async function listMovies(
     };
   });
 
-  // Sort by completed watches, then by duration
+  // Sort by completed watches, then by total watch time
   moviesWithStats.sort((a, b) => {
     if (b.completedWatches !== a.completedWatches) {
       return b.completedWatches - a.completedWatches;
     }
-    return (b.durationSeconds ?? 0) - (a.durationSeconds ?? 0);
+    return (b.totalWatchTimeSeconds ?? 0) - (a.totalWatchTimeSeconds ?? 0);
   });
 
   return moviesWithStats;
@@ -161,7 +161,13 @@ export async function listShows(
     };
   });
 
-  showInfo.sort((a, b) => b.episodeCount - a.episodeCount);
+  // Sort by episode count, then by playback time
+  showInfo.sort((a, b) => {
+    if (b.episodeCount !== a.episodeCount) {
+      return b.episodeCount - a.episodeCount;
+    }
+    return (b.playbackTime ?? 0) - (a.playbackTime ?? 0);
+  });
   return showInfo;
 }
 
