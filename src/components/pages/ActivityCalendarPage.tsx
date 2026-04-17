@@ -1,13 +1,13 @@
+import React from "react";
 import { useData } from "@/contexts/DataContext";
 import { useTimePersonality } from "@/hooks/queries/useTimePersonality";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { PunchCardData } from "@/lib/queries";
 import PageContainer from "../PageContainer";
 import { Container, Grid } from "@radix-ui/themes";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
-import { styled } from "@stitches/react";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
@@ -15,13 +15,13 @@ const HOURS = Array.from({ length: 24 }, (_, i) => i);
 // Create a 7x24 grid with count data
 const createPunchCardGrid = (data: PunchCardData[]): number[][] => {
   const grid: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
-  
+
   data.forEach((point) => {
     if (point.dayOfWeek >= 0 && point.dayOfWeek < 7 && point.hour >= 0 && point.hour < 24) {
       grid[point.dayOfWeek][point.hour] = point.count;
     }
   });
-  
+
   return grid;
 };
 
@@ -89,9 +89,9 @@ export default function ActivityCalendarPage() {
       <Container size="4" p="4">
         <Grid gap="6">
           <HeaderSection>
-            <Title as={motion.h1} variants={itemVariants}>
-              Your Viewing Patterns
-            </Title>
+            <motion.div variants={itemVariants}>
+              <Title>Your Viewing Patterns</Title>
+            </motion.div>
             <Subtitle>
               When you watch content throughout the week
             </Subtitle>
@@ -99,7 +99,6 @@ export default function ActivityCalendarPage() {
 
           {timePersonality && (
             <PersonalityCard
-              as={motion.div}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -130,7 +129,6 @@ export default function ActivityCalendarPage() {
 
           {peakCount > 0 && (
             <PeakInfo
-              as={motion.div}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -144,7 +142,6 @@ export default function ActivityCalendarPage() {
           )}
 
           <ChartCard
-            as={motion.div}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -207,223 +204,110 @@ export default function ActivityCalendarPage() {
   );
 }
 
-const HeaderSection = styled("div", {
-  textAlign: "center",
-  marginBottom: "1rem",
-  
-  "@media (max-width: 768px)": {
-    marginBottom: "0.75rem",
-  },
-});
+const HeaderSection = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ textAlign: "center", marginBottom: "1rem", ...style }} {...props}>{children}</div>
+);
 
-const Subtitle = styled("p", {
-  fontSize: "1.125rem",
-  color: "#94a3b8",
-  marginTop: "0.5rem",
-});
+const Subtitle = ({ children, style, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  <p style={{ fontSize: "1.125rem", color: "#94a3b8", marginTop: "0.5rem", ...style }} {...props}>{children}</p>
+);
 
-const PeakInfo = styled("div", {
-  textAlign: "center",
-  padding: "24px",
-  background: "rgba(0, 240, 255, 0.05)",
-  borderRadius: "16px",
-  border: "1px solid rgba(0, 240, 255, 0.1)",
-  
-  "@media (max-width: 768px)": {
-    padding: "16px",
-  },
-});
+const PeakInfo = ({ children, style, ...props }: React.ComponentProps<typeof motion.div>) => (
+  <motion.div style={{ textAlign: "center", padding: "24px", background: "rgba(0, 240, 255, 0.05)", borderRadius: "16px", border: "1px solid rgba(0, 240, 255, 0.1)", ...style }} {...props}>{children}</motion.div>
+);
 
-const PeakLabel = styled("span", {
-  display: "block",
-  fontSize: "0.85rem",
-  color: "#64748b",
-  textTransform: "uppercase",
-  letterSpacing: "0.05em",
-  marginBottom: "8px",
-});
+const PeakLabel = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ display: "block", fontSize: "0.85rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px", ...style }} {...props}>{children}</span>
+);
 
-const PeakValue = styled("span", {
-  display: "block",
-  fontSize: "1.5rem",
-  fontWeight: 700,
-  color: "#00f0ff",
-  marginBottom: "4px",
-});
+const PeakValue = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ display: "block", fontSize: "1.5rem", fontWeight: 700, color: "#00f0ff", marginBottom: "4px", ...style }} {...props}>{children}</span>
+);
 
-const PeakCount = styled("span", {
-  display: "block",
-  fontSize: "0.9rem",
-  color: "#94a3b8",
-});
+const PeakCount = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ display: "block", fontSize: "0.9rem", color: "#94a3b8", ...style }} {...props}>{children}</span>
+);
 
-const ChartCard = styled("div", {
-  background: "rgba(18, 21, 28, 0.8)",
-  backdropFilter: "blur(12px)",
-  WebkitBackdropFilter: "blur(12px)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
-  borderRadius: "18px",
-  padding: "24px",
-  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
-  overflowX: "auto",
-  
-  "@media (max-width: 768px)": {
-    padding: "16px",
-    borderRadius: "12px",
-  },
-});
+const ChartCard = ({ children, style, ...props }: React.ComponentProps<typeof motion.div>) => (
+  <motion.div style={{ background: "rgba(18, 21, 28, 0.8)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(255, 255, 255, 0.05)", borderRadius: "18px", padding: "24px", boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)", overflowX: "auto", ...style }} {...props}>{children}</motion.div>
+);
 
-const ChartContainer = styled("div", {
-  minWidth: "700px",
-  
-  "@media (max-width: 768px)": {
-    minWidth: "600px",
-  },
-  
-  "@media (max-width: 640px)": {
-    minWidth: "500px",
-  },
-});
+const ChartContainer = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ minWidth: "700px", ...style }} {...props}>{children}</div>
+);
 
-const HourLabels = styled("div", {
-  display: "grid",
-  gridTemplateColumns: "60px repeat(8, 1fr)",
-  marginBottom: "8px",
-});
+const HourLabels = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "grid", gridTemplateColumns: "60px repeat(8, 1fr)", marginBottom: "8px", ...style }} {...props}>{children}</div>
+);
 
-const EmptyCell = styled("div", {});
+const EmptyCell = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ ...style }} {...props} />
+);
 
-const HourLabel = styled("span", {
-  fontSize: "0.7rem",
-  color: "#64748b",
-  textAlign: "center",
-});
+const HourLabel = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ fontSize: "0.7rem", color: "#64748b", textAlign: "center", ...style }} {...props}>{children}</span>
+);
 
-const GridRow = styled("div", {
-  display: "grid",
-  gridTemplateColumns: "60px repeat(24, 1fr)",
-  alignItems: "center",
-  marginBottom: "4px",
-});
+const GridRow = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "grid", gridTemplateColumns: "60px repeat(24, 1fr)", alignItems: "center", marginBottom: "4px", ...style }} {...props}>{children}</div>
+);
 
-const DayLabel = styled("span", {
-  fontSize: "0.8rem",
-  fontWeight: 600,
-  color: "#94a3b8",
-  paddingRight: "12px",
-});
+const DayLabel = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#94a3b8", paddingRight: "12px", ...style }} {...props}>{children}</span>
+);
 
-const Cell = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  height: "36px",
-});
+const Cell = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "36px", ...style }} {...props}>{children}</div>
+);
 
-const Dot = styled("div", {
-  borderRadius: "50%",
-  transition: "all 0.2s ease",
-  cursor: "pointer",
-  
-  "&:hover": {
-    transform: "scale(1.3)",
-  },
-});
+const Dot = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ borderRadius: "50%", transition: "all 0.2s ease", cursor: "pointer", ...style }} {...props} />
+);
 
-const Legend = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "12px",
-  marginTop: "24px",
-  paddingTop: "16px",
-  borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-});
+const Legend = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", marginTop: "24px", paddingTop: "16px", borderTop: "1px solid rgba(255, 255, 255, 0.05)", ...style }} {...props}>{children}</div>
+);
 
-const LegendLabel = styled("span", {
-  fontSize: "0.75rem",
-  color: "#64748b",
-});
+const LegendLabel = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ fontSize: "0.75rem", color: "#64748b", ...style }} {...props}>{children}</span>
+);
 
-const LegendDots = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  gap: "6px",
-});
+const LegendDots = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", alignItems: "center", gap: "6px", ...style }} {...props}>{children}</div>
+);
 
-const LegendDot = styled("div", {
-  borderRadius: "50%",
-});
+const LegendDot = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ borderRadius: "50%", ...style }} {...props} />
+);
 
-const PersonalityCard = styled("div", {
-  textAlign: "center",
-  padding: "24px",
-  background: "rgba(168, 85, 247, 0.05)",
-  borderRadius: "16px",
-  border: "1px solid rgba(168, 85, 247, 0.1)",
-  marginBottom: "1.5rem",
-  
-  "@media (max-width: 768px)": {
-    padding: "16px",
-    marginBottom: "1rem",
-  },
-});
+const PersonalityCard = ({ children, style, ...props }: React.ComponentProps<typeof motion.div>) => (
+  <motion.div style={{ textAlign: "center", padding: "24px", background: "rgba(168, 85, 247, 0.05)", borderRadius: "16px", border: "1px solid rgba(168, 85, 247, 0.1)", marginBottom: "1.5rem", ...style }} {...props}>{children}</motion.div>
+);
 
-const PersonalityLabel = styled("span", {
-  display: "block",
-  fontSize: "0.85rem",
-  color: "#64748b",
-  textTransform: "uppercase",
-  letterSpacing: "0.05em",
-  marginBottom: "8px",
-});
+const PersonalityLabel = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ display: "block", fontSize: "0.85rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px", ...style }} {...props}>{children}</span>
+);
 
-const PersonalityValue = styled("span", {
-  display: "block",
-  fontSize: "1.75rem",
-  fontWeight: 700,
-  color: "#c084fc",
-  marginBottom: "12px",
-});
+const PersonalityValue = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ display: "block", fontSize: "1.75rem", fontWeight: 700, color: "#c084fc", marginBottom: "12px", ...style }} {...props}>{children}</span>
+);
 
-const PersonalitySubtext = styled("span", {
-  display: "block",
-  fontSize: "0.9rem",
-  color: "#94a3b8",
-  marginBottom: "16px",
-});
+const PersonalitySubtext = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ display: "block", fontSize: "0.9rem", color: "#94a3b8", marginBottom: "16px", ...style }} {...props}>{children}</span>
+);
 
-const BreakdownGrid = styled("div", {
-  display: "grid",
-  gridTemplateColumns: "repeat(4, 1fr)",
-  gap: "12px",
-  marginTop: "16px",
-  
-  "@media (max-width: 640px)": {
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: "8px",
-  },
-});
+const BreakdownGrid = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginTop: "16px", ...style }} {...props}>{children}</div>
+);
 
-const BreakdownItem = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  gap: "4px",
-  padding: "12px",
-  background: "rgba(255, 255, 255, 0.02)",
-  borderRadius: "8px",
-});
+const BreakdownItem = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", padding: "12px", background: "rgba(255, 255, 255, 0.02)", borderRadius: "8px", ...style }} {...props}>{children}</div>
+);
 
-const BreakdownLabel = styled("span", {
-  fontSize: "0.75rem",
-  color: "#64748b",
-  textAlign: "center",
-});
+const BreakdownLabel = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ fontSize: "0.75rem", color: "#64748b", textAlign: "center", ...style }} {...props}>{children}</span>
+);
 
-const BreakdownValue = styled("span", {
-  fontSize: "1.1rem",
-  fontWeight: 700,
-  color: "#c084fc",
-  fontFamily: "'JetBrains Mono', monospace",
-});
+const BreakdownValue = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "#c084fc", fontFamily: "'JetBrains Mono', monospace", ...style }} {...props}>{children}</span>
+);

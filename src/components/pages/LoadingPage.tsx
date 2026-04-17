@@ -24,8 +24,7 @@ import { getTopGenre } from "../../lib/genre-helpers";
 import { getTopRatedContent } from "../../lib/rating-helpers";
 import { getHolidayDates } from "../../lib/holiday-helpers";
 import { SimpleItemDto } from "../../lib/queries/types";
-import { styled } from "@stitches/react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { subDays } from "date-fns";
 
 const messages = [
@@ -79,7 +78,7 @@ export function LoadingPage() {
   const deviceStats = useDeviceStats();
   const monthlyShowStats = useMonthlyShowStats();
   const punchCard = usePunchCard();
-  
+
   // Fetch holiday data
   const christmas = useWatchedOnDate(holidayDates.christmas);
   const christmasEve = useWatchedOnDate(holidayDates.christmasEve);
@@ -126,7 +125,7 @@ export function LoadingPage() {
           // Quickly animate to 100%
           return Math.min(prev + 10, 100);
         }
-        
+
         // Normal progress behavior
         if (prev >= 99) return 99; // Cap at 99% until all data is loaded
         if (prev < 90) {
@@ -155,12 +154,12 @@ export function LoadingPage() {
     if (allLoaded && !hasNavigated.current) {
       // Set progress to 100%
       setProgress(100);
-      
+
       // Wait a brief moment to show 100%, then navigate
       const timer = setTimeout(() => {
         // Get redirect URL from query params (read it here to ensure we get the latest value)
         const redirectUrl = searchParams.get("redirect");
-        
+
         // Determine which pages have content
       const availablePages: PageDataKey[] = [];
 
@@ -250,7 +249,7 @@ export function LoadingPage() {
       }
 
       // Holidays - check if any holiday has content
-      const hasHolidayContent = 
+      const hasHolidayContent =
         (christmas.data?.length ?? 0) > 0 ||
         (christmasEve.data?.length ?? 0) > 0 ||
         (halloween.data?.length ?? 0) > 0 ||
@@ -298,7 +297,7 @@ export function LoadingPage() {
 
       // Determine where to navigate
       let targetPage = "/";
-      
+
       if (redirectUrl && redirectUrl !== "/loading") {
         // Use the provided redirect URL if it's not /loading
         targetPage = redirectUrl;
@@ -336,129 +335,152 @@ export function LoadingPage() {
           targetPage = "/total-time";
         }
       }
-      
+
       // Never redirect back to /loading
       if (targetPage === "/loading") {
         targetPage = "/total-time";
       }
-      
+
         // Mark that we've navigated to prevent multiple navigations
         hasNavigated.current = true;
-        
+
         // Mark that we've completed the loading cycle to prevent redirect loops
         sessionStorage.setItem("hasCompletedLoading", "true");
         void navigate(targetPage);
       }, 500); // Wait 500ms to show 100% before navigating
-      
+
       return () => clearTimeout(timer);
     }
-  }, [allLoaded, topTen.data, movies.data, shows.data, actors.data, audio.data, 
+  }, [allLoaded, topTen.data, movies.data, shows.data, actors.data, audio.data,
       musicVideos.data, liveTV.data, unfinishedShows.data, deviceStats.data,
-      monthlyShowStats.data, punchCard.data, 
+      monthlyShowStats.data, punchCard.data,
       christmas.data, christmasEve.data, halloween.data, valentines.data,
       streaks.data, personality.data, decades.data, watchEvolution.data, navigate, searchParams]);
 
   return (
-    <Container>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden", background: "linear-gradient(180deg, #030304 0%, #08090c 50%, #030304 100%)" }}>
       {/* Background effects */}
-      <BackgroundMesh />
-      
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "radial-gradient(ellipse at 50% 30%, rgba(0, 240, 255, 0.06) 0%, transparent 50%), radial-gradient(ellipse at 30% 70%, rgba(168, 85, 247, 0.04) 0%, transparent 40%), radial-gradient(ellipse at 70% 60%, rgba(245, 158, 11, 0.03) 0%, transparent 40%)", pointerEvents: "none" }} />
+
       {/* Geometric patterns */}
-      <GeometricLayer>
-        <Ring
-          style={{ 
+      <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", pointerEvents: "none" }}>
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
             width: "220px",
             height: "220px",
+            border: "1px dashed rgba(0, 240, 255, 0.08)",
+            borderRadius: "50%",
             animation: "spin 25s linear infinite",
           }}
         />
-        <Ring
-          style={{ 
-            width: "350px", 
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "350px",
             height: "350px",
+            border: "1px dashed rgba(0, 240, 255, 0.08)",
+            borderRadius: "50%",
             animation: "spin-reverse 30s linear infinite",
           }}
         />
-        <HexGrid />
-      </GeometricLayer>
-      
-      <OrbLayer>
-        <Orb 
-          style={{ 
-            top: "30%", 
-            left: "50%", 
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='70' viewBox='0 0 60 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill='none' stroke='rgba(0,240,255,0.015)' stroke-width='1'/%3E%3C/svg%3E")`, backgroundSize: "60px 70px", opacity: 0.6 }} />
+      </div>
+
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, overflow: "hidden", pointerEvents: "none" }}>
+        <div
+          style={{
+            position: "absolute",
+            top: "30%",
+            left: "50%",
             transform: "translateX(-50%) translateZ(0)",
             WebkitTransform: "translateX(-50%) translateZ(0)",
-            width: "700px", 
-            height: "700px", 
+            width: "700px",
+            height: "700px",
             background: "radial-gradient(circle, rgba(0, 240, 255, 0.1) 0%, transparent 70%)",
+            borderRadius: "50%",
+            filter: "blur(100px)",
             animation: "pulse-scale 5s ease-in-out infinite",
           }}
         />
-        <Orb 
-          style={{ 
-            top: "40%", 
-            left: "30%", 
-            width: "400px", 
-            height: "400px", 
+        <div
+          style={{
+            position: "absolute",
+            top: "40%",
+            left: "30%",
+            width: "400px",
+            height: "400px",
             background: "radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%)",
             transform: "translateZ(0)",
             WebkitTransform: "translateZ(0)",
+            borderRadius: "50%",
+            filter: "blur(100px)",
             animation: "pulse-scale 7s ease-in-out infinite 1s",
           }}
         />
-      </OrbLayer>
-      
-      <Content>
+      </div>
+
+      <div style={{ position: "relative", zIndex: 1, textAlign: "center", padding: "48px", maxWidth: "540px", width: "100%" }}>
         {/* Floating emojis */}
-        <EmojiContainer>
+        <div style={{ position: "absolute", top: "-90px", left: 0, right: 0, height: "70px", pointerEvents: "none" }}>
           {emojis.map((emoji, i) => (
-            <FloatingEmoji
+            <div
               key={i}
               style={{
+                position: "absolute",
+                fontSize: "2.25rem",
+                filter: "drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4))",
                 left: `${8 + i * 13}%`,
                 animation: `float-emoji ${5 + i}s ease-in-out infinite ${i * 0.4}s`,
               }}
             >
               {emoji}
-            </FloatingEmoji>
+            </div>
           ))}
-        </EmojiContainer>
+        </div>
 
-        <MessageContainer>
+        <div style={{ minHeight: "90px", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <motion.div
             key={messageIndex}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -24 }}
-            transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+            transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const }}
           >
-            <LoadingMessage>{messages[messageIndex]}</LoadingMessage>
+            <h1 style={{ fontSize: "clamp(1.85rem, 5vw, 2.75rem)", fontWeight: 700, letterSpacing: "-0.04em", background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 40%, #a855f7 70%, #f59e0b 100%)", backgroundSize: "250% 250%", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "gradient-flow 5s ease infinite" }}>
+              {messages[messageIndex]}
+            </h1>
           </motion.div>
-        </MessageContainer>
+        </div>
 
-        <ProgressContainer>
-          <ProgressTrack>
-            <ProgressFill
-              as={motion.div}
+        <div style={{ marginTop: "56px" }}>
+          <div style={{ position: "relative", width: "100%", height: "8px", background: "rgba(255, 255, 255, 0.04)", borderRadius: "4px", overflow: "visible" }}>
+            <motion.div
+              style={{ position: "absolute", top: 0, left: 0, height: "100%", background: "linear-gradient(90deg, #00f0ff, #22d3ee, #a855f7)", borderRadius: "4px", boxShadow: "0 0 30px rgba(0, 240, 255, 0.4)" }}
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.35, ease: "easeOut" }}
             />
-            <ProgressGlow style={{ left: `${progress}%` }} />
-          </ProgressTrack>
-          
-          <ProgressText>
+            <div style={{ position: "absolute", top: "50%", transform: "translate(-50%, -50%)", width: "20px", height: "20px", background: "#00f0ff", borderRadius: "50%", boxShadow: "0 0 25px rgba(0, 240, 255, 0.8), 0 0 50px rgba(0, 240, 255, 0.4)", transition: "left 0.35s ease-out", left: `${progress}%` }} />
+          </div>
+
+          <div style={{ marginTop: "24px", fontSize: "1.75rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: "#00f0ff", textShadow: "0 0 40px rgba(0, 240, 255, 0.5)" }}>
             <span>{Math.round(progress)}%</span>
-          </ProgressText>
-        </ProgressContainer>
+          </div>
+        </div>
 
         {/* Animated dots */}
-        <DotsContainer>
+        <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "48px" }}>
           {[0, 1, 2].map((i) => (
-            <Dot
+            <motion.div
               key={i}
-              as={motion.div}
+              style={{ width: "10px", height: "10px", borderRadius: "50%", background: "linear-gradient(135deg, #00f0ff, #22d3ee)", boxShadow: "0 0 12px rgba(0, 240, 255, 0.5)" }}
               animate={{
                 scale: [1, 1.5, 1],
                 opacity: [0.3, 1, 0.3],
@@ -470,180 +492,8 @@ export function LoadingPage() {
               }}
             />
           ))}
-        </DotsContainer>
-      </Content>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 }
-
-const Container = styled("div", {
-  minHeight: "100vh",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  position: "relative",
-  overflow: "hidden",
-  background: "linear-gradient(180deg, #030304 0%, #08090c 50%, #030304 100%)",
-});
-
-const BackgroundMesh = styled("div", {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  background: `
-    radial-gradient(ellipse at 50% 30%, rgba(0, 240, 255, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 30% 70%, rgba(168, 85, 247, 0.04) 0%, transparent 40%),
-    radial-gradient(ellipse at 70% 60%, rgba(245, 158, 11, 0.03) 0%, transparent 40%)
-  `,
-  pointerEvents: "none",
-});
-
-const GeometricLayer = styled("div", {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  pointerEvents: "none",
-});
-
-const Ring = styled("div", {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "280px",
-  height: "280px",
-  border: "1px dashed rgba(0, 240, 255, 0.08)",
-  borderRadius: "50%",
-});
-
-const HexGrid = styled("div", {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='70' viewBox='0 0 60 70' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill='none' stroke='rgba(0,240,255,0.015)' stroke-width='1'/%3E%3C/svg%3E")`,
-  backgroundSize: "60px 70px",
-  opacity: 0.6,
-});
-
-const OrbLayer = styled("div", {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  overflow: "hidden",
-  pointerEvents: "none",
-});
-
-const Orb = styled("div", {
-  position: "absolute",
-  borderRadius: "50%",
-  filter: "blur(100px)",
-});
-
-const Content = styled("div", {
-  position: "relative",
-  zIndex: 1,
-  textAlign: "center",
-  padding: "48px",
-  maxWidth: "540px",
-  width: "100%",
-});
-
-const EmojiContainer = styled("div", {
-  position: "absolute",
-  top: "-90px",
-  left: 0,
-  right: 0,
-  height: "70px",
-  pointerEvents: "none",
-});
-
-const FloatingEmoji = styled("div", {
-  position: "absolute",
-  fontSize: "2.25rem",
-  filter: "drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4))",
-});
-
-const MessageContainer = styled("div", {
-  minHeight: "90px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-});
-
-const LoadingMessage = styled("h1", {
-  fontSize: "clamp(1.85rem, 5vw, 2.75rem)",
-  fontWeight: 700,
-  letterSpacing: "-0.04em",
-  background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 40%, #a855f7 70%, #f59e0b 100%)",
-  backgroundSize: "250% 250%",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent",
-  backgroundClip: "text",
-  animation: "gradient-flow 5s ease infinite",
-});
-
-const ProgressContainer = styled("div", {
-  marginTop: "56px",
-});
-
-const ProgressTrack = styled("div", {
-  position: "relative",
-  width: "100%",
-  height: "8px",
-  background: "rgba(255, 255, 255, 0.04)",
-  borderRadius: "4px",
-  overflow: "visible",
-});
-
-const ProgressFill = styled("div", {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  height: "100%",
-  background: "linear-gradient(90deg, #00f0ff, #22d3ee, #a855f7)",
-  borderRadius: "4px",
-  boxShadow: "0 0 30px rgba(0, 240, 255, 0.4)",
-});
-
-const ProgressGlow = styled("div", {
-  position: "absolute",
-  top: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "20px",
-  height: "20px",
-  background: "#00f0ff",
-  borderRadius: "50%",
-  boxShadow: "0 0 25px rgba(0, 240, 255, 0.8), 0 0 50px rgba(0, 240, 255, 0.4)",
-  transition: "left 0.35s ease-out",
-});
-
-const ProgressText = styled("div", {
-  marginTop: "24px",
-  fontSize: "1.75rem",
-  fontWeight: 700,
-  fontFamily: "'JetBrains Mono', monospace",
-  color: "#00f0ff",
-  textShadow: "0 0 40px rgba(0, 240, 255, 0.5)",
-});
-
-const DotsContainer = styled("div", {
-  display: "flex",
-  gap: "10px",
-  justifyContent: "center",
-  marginTop: "48px",
-});
-
-const Dot = styled("div", {
-  width: "10px",
-  height: "10px",
-  borderRadius: "50%",
-  background: "linear-gradient(135deg, #00f0ff, #22d3ee)",
-  boxShadow: "0 0 12px rgba(0, 240, 255, 0.5)",
-});

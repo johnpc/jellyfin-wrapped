@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Container, Box, Progress, Text } from "@radix-ui/themes";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { Title } from "../ui/styled";
 import { listMovies, listShows, listAudio, listLiveTvChannels } from "@/lib/queries";

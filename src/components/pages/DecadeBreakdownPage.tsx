@@ -1,9 +1,9 @@
+import React from "react";
 import { useDecades } from "@/hooks/queries/useDecades";
 import { LoadingSpinner } from "../LoadingSpinner";
 import PageContainer from "../PageContainer";
 import { Container } from "@radix-ui/themes";
-import { motion } from "framer-motion";
-import { styled } from "@stitches/react";
+import { motion } from "motion/react";
 import { Sparkles, Calendar } from "lucide-react";
 import { PieChart } from "../charts/PieChart";
 import { useState, useEffect } from "react";
@@ -50,11 +50,15 @@ export default function DecadeBreakdownPage() {
   return (
     <PageContainer>
       <Container size="4" p="4">
-        <HeaderSection
-          as={motion.div}
+        <motion.div
+          style={{
+            textAlign: "center",
+            marginBottom: "3rem",
+            paddingTop: "2rem",
+          }}
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const }}
         >
           <Badge>
             <BadgeIcon>
@@ -64,11 +68,20 @@ export default function DecadeBreakdownPage() {
           </Badge>
           <Title>Decade Breakdown</Title>
           <Subtitle>When your content was made</Subtitle>
-        </HeaderSection>
+        </motion.div>
 
         <ContentGrid>
-          <ChartCard
-            as={motion.div}
+          <motion.div
+            style={{
+              background: "rgba(18, 21, 28, 0.65)",
+              backdropFilter: "blur(24px) saturate(180%)",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
+              borderRadius: "24px",
+              padding: "2rem",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
@@ -95,10 +108,20 @@ export default function DecadeBreakdownPage() {
                 </LegendItem>
               ))}
             </Legend>
-          </ChartCard>
+          </motion.div>
 
-          <StatsCard
-            as={motion.div}
+          <motion.div
+            style={{
+              background: "rgba(18, 21, 28, 0.65)",
+              backdropFilter: "blur(24px) saturate(180%)",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
+              borderRadius: "24px",
+              padding: "2rem",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+            }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
@@ -116,266 +139,341 @@ export default function DecadeBreakdownPage() {
               <PersonalityBadge>{data.personality}</PersonalityBadge>
               <PersonalityMessage>{data.message}</PersonalityMessage>
             </PersonalitySection>
-          </StatsCard>
+          </motion.div>
         </ContentGrid>
       </Container>
     </PageContainer>
   );
 }
 
-const HeaderSection = styled("div", {
-  textAlign: "center",
-  marginBottom: "3rem",
-  paddingTop: "2rem",
-  
-  "@media (max-width: 768px)": {
-    marginBottom: "2rem",
-    paddingTop: "1.5rem",
-  },
-});
+const Badge = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "10px",
+      padding: "10px 20px",
+      background: "rgba(0, 240, 255, 0.06)",
+      border: "1px solid rgba(0, 240, 255, 0.12)",
+      borderRadius: "999px",
+      fontSize: "0.85rem",
+      fontWeight: 600,
+      color: "#00f0ff",
+      marginBottom: "1.5rem",
+      backdropFilter: "blur(12px)",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const Badge = styled("div", {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "10px",
-  padding: "10px 20px",
-  background: "rgba(0, 240, 255, 0.06)",
-  border: "1px solid rgba(0, 240, 255, 0.12)",
-  borderRadius: "999px",
-  fontSize: "0.85rem",
-  fontWeight: 600,
-  color: "#00f0ff",
-  marginBottom: "1.5rem",
-  backdropFilter: "blur(12px)",
-});
+const BadgeIcon = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "24px",
+      height: "24px",
+      borderRadius: "7px",
+      background: "rgba(0, 240, 255, 0.15)",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </span>
+);
 
-const BadgeIcon = styled("span", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "24px",
-  height: "24px",
-  borderRadius: "7px",
-  background: "rgba(0, 240, 255, 0.15)",
-});
+const Title = ({ children, style, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h1
+    style={{
+      fontSize: "clamp(2.25rem, 6vw, 4rem)",
+      fontWeight: 800,
+      marginBottom: "0.5rem",
+      letterSpacing: "-0.04em",
+      background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 50%, #a855f7 100%)",
+      backgroundSize: "200% 200%",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      backgroundClip: "text",
+      animation: "gradient-flow 8s ease infinite",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </h1>
+);
 
-const Title = styled("h1", {
-  fontSize: "clamp(2.25rem, 6vw, 4rem)",
-  fontWeight: 800,
-  marginBottom: "0.5rem",
-  letterSpacing: "-0.04em",
-  background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 50%, #a855f7 100%)",
-  backgroundSize: "200% 200%",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent",
-  backgroundClip: "text",
-  animation: "gradient-flow 8s ease infinite",
-});
+const Subtitle = ({ children, style, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  <p
+    style={{
+      fontSize: "1.15rem",
+      color: "#94a3b8",
+      fontWeight: 400,
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </p>
+);
 
-const Subtitle = styled("p", {
-  fontSize: "1.15rem",
-  color: "#94a3b8",
-  fontWeight: 400,
-});
+const ContentGrid = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))",
+      gap: "2rem",
+      marginBottom: "3rem",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const ContentGrid = styled("div", {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))",
-  gap: "2rem",
-  marginBottom: "3rem",
-  
-  "@media (max-width: 768px)": {
-    gridTemplateColumns: "1fr",
-    gap: "1.5rem",
-    marginBottom: "2rem",
-  },
-});
+const ChartTitle = ({ children, style, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h2
+    style={{
+      fontSize: "1.5rem",
+      fontWeight: 700,
+      color: "#f8fafc",
+      marginBottom: "2rem",
+      textAlign: "center",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </h2>
+);
 
-const ChartCard = styled("div", {
-  background: "rgba(18, 21, 28, 0.65)",
-  backdropFilter: "blur(24px) saturate(180%)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
-  borderRadius: "24px",
-  padding: "2rem",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  
-  "@media (max-width: 768px)": {
-    padding: "1.5rem",
-    borderRadius: "20px",
-  },
-});
+const ChartContainer = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: "2rem",
+      width: "100%",
+      overflow: "visible",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const ChartTitle = styled("h2", {
-  fontSize: "1.5rem",
-  fontWeight: 700,
-  color: "#f8fafc",
-  marginBottom: "2rem",
-  textAlign: "center",
-});
+const Legend = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "1rem",
+      marginTop: "2rem",
+      width: "100%",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const ChartContainer = styled("div", {
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  marginBottom: "2rem",
-  width: "100%",
-  overflow: "visible",
-  
-  "@media (max-width: 768px)": {
-    marginBottom: "1.5rem",
-  },
-  
-  "& > div": {
-    width: "100%",
-    maxWidth: "400px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    
-    "@media (max-width: 768px)": {
-      maxWidth: "100%",
-    },
-  },
-  
-  "& svg": {
-    maxWidth: "100%",
-    height: "auto",
-    display: "block",
-  },
-});
+const LegendItem = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "1rem",
+      padding: "0.75rem",
+      background: "rgba(255, 255, 255, 0.02)",
+      borderRadius: "12px",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const Legend = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  gap: "1rem",
-  marginTop: "2rem",
-  width: "100%",
-});
+const LegendColor = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      width: "20px",
+      height: "20px",
+      borderRadius: "4px",
+      ...style,
+    }}
+    {...props}
+  />
+);
 
-const LegendItem = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  gap: "1rem",
-  padding: "0.75rem",
-  background: "rgba(255, 255, 255, 0.02)",
-  borderRadius: "12px",
-});
+const LegendLabel = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span
+    style={{
+      flex: 1,
+      fontSize: "1rem",
+      color: "#f8fafc",
+      fontWeight: 500,
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </span>
+);
 
-const LegendColor = styled("div", {
-  width: "20px",
-  height: "20px",
-  borderRadius: "4px",
-});
+const LegendValue = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span
+    style={{
+      fontSize: "1rem",
+      color: "#00f0ff",
+      fontWeight: 700,
+      fontFamily: "'JetBrains Mono', monospace",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </span>
+);
 
-const LegendLabel = styled("span", {
-  flex: 1,
-  fontSize: "1rem",
-  color: "#f8fafc",
-  fontWeight: 500,
-});
+const StatIcon = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "64px",
+      height: "64px",
+      borderRadius: "16px",
+      background: "linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%)",
+      border: "1px solid rgba(0, 240, 255, 0.2)",
+      color: "#00f0ff",
+      marginBottom: "1.5rem",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const LegendValue = styled("span", {
-  fontSize: "1rem",
-  color: "#00f0ff",
-  fontWeight: 700,
-  fontFamily: "'JetBrains Mono', monospace",
-});
+const StatTitle = ({ children, style, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h3
+    style={{
+      fontSize: "1.1rem",
+      fontWeight: 600,
+      color: "#94a3b8",
+      marginBottom: "0.5rem",
+      textTransform: "uppercase",
+      letterSpacing: "0.1em",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </h3>
+);
 
-const StatsCard = styled("div", {
-  background: "rgba(18, 21, 28, 0.65)",
-  backdropFilter: "blur(24px) saturate(180%)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
-  borderRadius: "24px",
-  padding: "2rem",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  textAlign: "center",
-  
-  "@media (max-width: 768px)": {
-    padding: "1.5rem",
-    borderRadius: "20px",
-  },
-});
+const StatValue = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      fontSize: "3.5rem",
+      fontWeight: 800,
+      fontFamily: "'JetBrains Mono', monospace",
+      color: "#00f0ff",
+      textShadow: "0 0 40px rgba(0, 240, 255, 0.5)",
+      marginBottom: "0.5rem",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const StatIcon = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "64px",
-  height: "64px",
-  borderRadius: "16px",
-  background: "linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%)",
-  border: "1px solid rgba(0, 240, 255, 0.2)",
-  color: "#00f0ff",
-  marginBottom: "1.5rem",
-});
+const StatSubtext = ({ children, style, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  <p
+    style={{
+      fontSize: "0.9rem",
+      color: "#64748b",
+      marginBottom: "2rem",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </p>
+);
 
-const StatTitle = styled("h3", {
-  fontSize: "1.1rem",
-  fontWeight: 600,
-  color: "#94a3b8",
-  marginBottom: "0.5rem",
-  textTransform: "uppercase",
-  letterSpacing: "0.1em",
-});
+const Divider = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      width: "100%",
+      height: "1px",
+      background: "rgba(255, 255, 255, 0.1)",
+      margin: "2rem 0",
+      ...style,
+    }}
+    {...props}
+  />
+);
 
-const StatValue = styled("div", {
-  fontSize: "3.5rem",
-  fontWeight: 800,
-  fontFamily: "'JetBrains Mono', monospace",
-  color: "#00f0ff",
-  textShadow: "0 0 40px rgba(0, 240, 255, 0.5)",
-  marginBottom: "0.5rem",
-  
-  "@media (max-width: 768px)": {
-    fontSize: "2.5rem",
-  },
-  
-  "@media (max-width: 480px)": {
-    fontSize: "2rem",
-  },
-});
+const PersonalitySection = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      gap: "1rem",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const StatSubtext = styled("p", {
-  fontSize: "0.9rem",
-  color: "#64748b",
-  marginBottom: "2rem",
-});
+const PersonalityBadge = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "inline-block",
+      padding: "0.5rem 1rem",
+      background: "rgba(168, 85, 247, 0.1)",
+      border: "1px solid rgba(168, 85, 247, 0.2)",
+      borderRadius: "8px",
+      fontSize: "0.9rem",
+      fontWeight: 600,
+      color: "#c084fc",
+      alignSelf: "center",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const Divider = styled("div", {
-  width: "100%",
-  height: "1px",
-  background: "rgba(255, 255, 255, 0.1)",
-  margin: "2rem 0",
-});
-
-const PersonalitySection = styled("div", {
-  width: "100%",
-  display: "flex",
-  flexDirection: "column",
-  gap: "1rem",
-});
-
-const PersonalityBadge = styled("div", {
-  display: "inline-block",
-  padding: "0.5rem 1rem",
-  background: "rgba(168, 85, 247, 0.1)",
-  border: "1px solid rgba(168, 85, 247, 0.2)",
-  borderRadius: "8px",
-  fontSize: "0.9rem",
-  fontWeight: 600,
-  color: "#c084fc",
-  alignSelf: "center",
-});
-
-const PersonalityMessage = styled("p", {
-  fontSize: "1.1rem",
-  color: "#f8fafc",
-  lineHeight: 1.6,
-  fontStyle: "italic",
-  textAlign: "center",
-});
-
+const PersonalityMessage = ({ children, style, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  <p
+    style={{
+      fontSize: "1.1rem",
+      color: "#f8fafc",
+      lineHeight: 1.6,
+      fontStyle: "italic",
+      textAlign: "center",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </p>
+);

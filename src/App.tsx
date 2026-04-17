@@ -9,8 +9,8 @@ import {
   Navigate,
 } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import React, { useMemo, useEffect, useRef, useState } from "react";
 import { getAvailablePages, ALL_PAGES } from "./lib/navigation";
 import SplashPage from "./components/pages/SplashPage";
 import ServerConfigurationPage from "./components/pages/ServerConfigurationPage";
@@ -40,7 +40,6 @@ import Navigation from "./components/Navigation";
 import { NavigationButtons } from "./components/NavigationButtons";
 import { LoadingPage } from "./components/pages/LoadingPage";
 import { DataProvider } from "./contexts/DataContext";
-import { styled } from "@stitches/react";
 import { isAuthenticated, verifySession } from "./lib/backend-api";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 
@@ -79,14 +78,14 @@ function getNavigationDirection(currentPath: string): number {
   const pages = getAvailablePages();
   const prevIndex = pages.indexOf(previousPath);
   const currentIndex = pages.indexOf(currentPath);
-  
+
   // Update previous path for next navigation
   previousPath = currentPath;
-  
+
   if (prevIndex === -1 || currentIndex === -1) {
     return 1; // Default to forward
   }
-  
+
   return currentIndex > prevIndex ? 1 : -1;
 }
 
@@ -103,7 +102,7 @@ const pageVariants = {
     zIndex: 1,
     transition: {
       duration: 0.4,
-      ease: [0.25, 0.46, 0.45, 0.94], // Optimized easing for mobile
+      ease: [0.25, 0.46, 0.45, 0.94] as const,
     },
   },
   exit: (direction: number) => ({
@@ -111,57 +110,22 @@ const pageVariants = {
     zIndex: 0,
     transition: {
       duration: 0.4,
-      ease: [0.25, 0.46, 0.45, 0.94], // Optimized easing for mobile
+      ease: [0.25, 0.46, 0.45, 0.94] as const,
     },
   }),
 };
 
-const PageWrapper = styled("div", {
-  width: "100%",
-  minHeight: "100vh",
-  background: "linear-gradient(180deg, #030304 0%, #08090c 50%, #030304 100%)",
-});
+const PageWrapper = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ width: "100%", minHeight: "100vh", background: "linear-gradient(180deg, #030304 0%, #08090c 50%, #030304 100%)", ...style }} {...props}>{children}</div>
+);
 
-const TransitionContainer = styled("div", {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  overflow: "hidden",
-  background: "#030304",
-});
+const TransitionContainer = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, overflow: "hidden", background: "#030304", ...style }} {...props}>{children}</div>
+);
 
-const ScrollablePageWrapper = styled(motion.div, {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  width: "100%",
-  height: "100%",
-  overflowY: "auto",
-  overflowX: "hidden",
-  background: "linear-gradient(180deg, #030304 0%, #08090c 50%, #030304 100%)",
-  willChange: "transform",
-  transform: "translateZ(0)",
-  WebkitTransform: "translateZ(0)",
-  backfaceVisibility: "hidden",
-  WebkitBackfaceVisibility: "hidden",
-  // Custom scrollbar
-  "&::-webkit-scrollbar": {
-    width: "8px",
-  },
-  "&::-webkit-scrollbar-track": {
-    background: "rgba(0, 0, 0, 0.2)",
-  },
-  "&::-webkit-scrollbar-thumb": {
-    background: "rgba(0, 240, 255, 0.3)",
-    borderRadius: "4px",
-  },
-  "&::-webkit-scrollbar-thumb:hover": {
-    background: "rgba(0, 240, 255, 0.5)",
-  },
-});
+const ScrollablePageWrapper = ({ children, style, ...props }: React.ComponentProps<typeof motion.div>) => (
+  <motion.div style={{ position: "absolute", top: 0, left: 0, right: 0, width: "100%", height: "100%", overflowY: "auto", overflowX: "hidden", background: "linear-gradient(180deg, #030304 0%, #08090c 50%, #030304 100%)", willChange: "transform", transform: "translateZ(0)", WebkitTransform: "translateZ(0)", backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden", ...style }} {...props}>{children}</motion.div>
+);
 
 // Component that freezes its children on first render
 function FrozenRoute({ outlet }: { outlet: React.ReactNode }) {
@@ -173,12 +137,12 @@ function FrozenRoute({ outlet }: { outlet: React.ReactNode }) {
 function AnimatedOutlet() {
   const location = useLocation();
   const outlet = useOutlet();
-  
+
   // Calculate direction synchronously before render
   const direction = useMemo(() => {
     return getNavigationDirection(location.pathname);
   }, [location.pathname]);
-  
+
   return (
     <TransitionContainer>
       <AnimatePresence initial={false} mode="popLayout" custom={direction}>
@@ -201,50 +165,16 @@ function AnimatedOutlet() {
 }
 
 // Error fallback component
-const ErrorFallback = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  minHeight: "100vh",
-  background: "linear-gradient(180deg, #030304 0%, #08090c 50%, #030304 100%)",
-  color: "#f8fafc",
-  fontFamily: "'Sora', sans-serif",
-  textAlign: "center",
-  padding: "2rem",
-  
-  "& h1": {
-    fontSize: "2rem",
-    marginBottom: "1rem",
-    color: "#f43f5e",
-  },
-  
-  "& p": {
-    color: "#94a3b8",
-    marginBottom: "2rem",
-  },
-  
-  "& button": {
-    padding: "12px 24px",
-    background: "linear-gradient(135deg, #00f0ff 0%, #22d3ee 100%)",
-    border: "none",
-    borderRadius: "12px",
-    color: "#030304",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "transform 0.2s ease",
-    
-    "&:hover": {
-      transform: "scale(1.05)",
-    },
-  },
-});
+const ErrorFallback = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "linear-gradient(180deg, #030304 0%, #08090c 50%, #030304 100%)", color: "#f8fafc", fontFamily: "'Sora', sans-serif", textAlign: "center", padding: "2rem", ...style }} {...props}>{children}</div>
+);
 
-function ErrorFallbackComponent({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
+function ErrorFallbackComponent({ error, resetErrorBoundary }: { error: unknown; resetErrorBoundary: () => void }) {
+  const message = error instanceof Error ? error.message : "An unexpected error occurred";
   return (
     <ErrorFallback>
       <h1>Something went wrong</h1>
-      <p>{error.message || "An unexpected error occurred"}</p>
+      <p>{message}</p>
       <button onClick={resetErrorBoundary}>Try again</button>
     </ErrorFallback>
   );
@@ -289,42 +219,42 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
         // Verify session with backend
         const isValid = await verifySession();
         setAuthState(isValid ? "authenticated" : "unauthenticated");
-        
+
         // On refresh/initial load, redirect to loading page to show the recap loading screen
         // Only check once on mount, and only if we're not already on /loading
         // Use window.location.pathname to get the actual browser URL (more reliable on refresh)
         const currentPath = window.location.pathname;
         if (isValid && !hasCheckedRedirect.current && currentPath !== "/loading") {
           hasCheckedRedirect.current = true;
-          
+
           // Check if this is a page load/refresh (not a client-side navigation)
           const navEntries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
-          const isPageLoad = navEntries.length > 0 && 
+          const isPageLoad = navEntries.length > 0 &&
             (navEntries[0].type === "reload" || navEntries[0].type === "navigate");
-          
+
           // On page load, clear the completed loading flag so we can redirect again
           // This allows refreshes to show the loading screen
           if (isPageLoad) {
             sessionStorage.removeItem("hasCompletedLoading");
           }
-          
+
           // Check if we've already completed a loading cycle in this navigation session
           // This prevents redirect loops when navigating from /loading to content pages
           const hasCompletedLoading = sessionStorage.getItem("hasCompletedLoading") === "true";
-          
+
           // Only redirect if:
           // 1. This is a page load (refresh or initial navigation)
           // 2. We haven't already redirected in this session
           // 3. We haven't completed a loading cycle in this navigation session
           if (isPageLoad && !sessionStorage.getItem("hasRedirectedToLoading") && !hasCompletedLoading) {
             sessionStorage.setItem("hasRedirectedToLoading", "true");
-            
+
             // Determine redirect URL:
             // - If on a content page, redirect back to that page
             // - Otherwise, use first available page or default to /total-time
             let redirectUrl: string = "/total-time";
             const contentPages = ALL_PAGES.map(p => p.path) as string[];
-            
+
             if (contentPages.includes(currentPath)) {
               // Coming from a specific content page, redirect back to it
               redirectUrl = currentPath;
@@ -335,7 +265,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
                 redirectUrl = availablePages[0];
               }
             }
-            
+
             // Store redirect URL and trigger navigation
             sessionStorage.setItem("loadingRedirectUrl", redirectUrl);
             setShouldRedirectToLoading(true);
@@ -397,7 +327,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 // Wrap content pages with DataProvider
 function DataWrappedLayout() {
   return (
-    <ErrorBoundary 
+    <ErrorBoundary
       FallbackComponent={ErrorFallbackComponent}
       onReset={() => {
         // On error reset, redirect to loading page to re-fetch data
@@ -543,4 +473,3 @@ function App() {
 }
 
 export default App;
-

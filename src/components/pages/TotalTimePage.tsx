@@ -3,9 +3,9 @@ import { useData } from "@/contexts/DataContext";
 import { useComparisons } from "@/hooks/queries/useComparisons";
 import { LoadingSpinner } from "../LoadingSpinner";
 import PageContainer from "../PageContainer";
-import { motion } from "framer-motion";
-import { styled } from "@stitches/react";
+import { motion } from "motion/react";
 import { formatWatchTime } from "@/lib/time-helpers";
+import { getCurrentTimeframe } from "@/lib/timeframe";
 
 // Fun messages based on total watch time
 function getWatchTimeMessage(totalMinutes: number): { message: string; emoji: string } {
@@ -58,6 +58,7 @@ function getWatchTimeMessage(totalMinutes: number): { message: string; emoji: st
 export default function TotalTimePage() {
   const { movies, shows, isLoading } = useData();
   const { data: comparisons, isLoading: comparisonsLoading } = useComparisons();
+  const timeframe = getCurrentTimeframe();
 
   const totalWatchTime = useMemo(() => {
     if (isLoading || !movies.data || !shows.data) return 0;
@@ -84,309 +85,99 @@ export default function TotalTimePage() {
 
   return (
     <PageContainer>
-      <ContentWrapper
-        as={motion.div}
+      <motion.div
+        style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "calc(100vh - 8rem)", textAlign: "center", padding: "0.75rem 1rem 0.25rem 1rem", width: "100%", maxWidth: "100%", margin: "0 auto", boxSizing: "border-box" }}
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const }}
       >
-          <Badge
-            as={motion.div}
+          <motion.div
+            style={{ display: "inline-flex", alignItems: "center", gap: "10px", padding: "10px 20px", background: "rgba(0, 240, 255, 0.06)", border: "1px solid rgba(0, 240, 255, 0.12)", borderRadius: "999px", fontSize: "0.85rem", fontWeight: 600, color: "#00f0ff", marginBottom: "1rem", backdropFilter: "blur(12px)" }}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
           >
-            <span>Your Year in Review</span>
-          </Badge>
+            <span>{timeframe.name} in Review</span>
+          </motion.div>
 
-          <Title
-            as={motion.h1}
+          <motion.h1
+            style={{ fontSize: "clamp(2rem, 6vw, 3.5rem)", fontWeight: 700, marginBottom: "1rem", letterSpacing: "-0.04em", background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 50%, #a855f7 100%)", backgroundSize: "200% 200%", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "gradient-flow 8s ease infinite", textAlign: "center", width: "100%" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.6 }}
           >
             You Watched
-          </Title>
+          </motion.h1>
 
-          <TimeDisplay
-            as={motion.div}
+          <motion.div
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1.5rem", marginBottom: "1rem", flexWrap: "wrap", width: "100%", maxWidth: "100%" }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.8, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+            transition={{ delay: 0.8, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const }}
           >
-            <TimeValue>{formatWatchTime(totalWatchTime)}</TimeValue>
-          </TimeDisplay>
+            <div style={{ fontSize: "clamp(3rem, 10vw, 6rem)", fontWeight: 800, fontFamily: "'JetBrains Mono', monospace", color: "#00f0ff", textShadow: "0 0 60px rgba(0, 240, 255, 0.5), 0 0 120px rgba(0, 240, 255, 0.3)", letterSpacing: "-0.02em", textAlign: "center", lineHeight: 1.2 }}>
+              {formatWatchTime(totalWatchTime)}
+            </div>
+          </motion.div>
 
           {totalDays >= 1 && (
-            <StatsRow
-              as={motion.div}
+            <motion.div
+              style={{ display: "flex", alignItems: "center", gap: "2rem", marginBottom: "1rem", padding: "1rem 1.5rem", background: "rgba(18, 21, 28, 0.5)", borderRadius: "20px", border: "1px solid rgba(255, 255, 255, 0.05)", backdropFilter: "blur(12px)" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1, duration: 0.6 }}
             >
-              <StatItem>
-                <StatValue>{Math.round(totalDays)}</StatValue>
-                <StatLabel>Days</StatLabel>
-              </StatItem>
-              <StatDivider />
-              <StatItem>
-                <StatValue>{Math.round(totalHours)}</StatValue>
-                <StatLabel>Hours</StatLabel>
-              </StatItem>
-              <StatDivider />
-              <StatItem>
-                <StatValue>{Math.round(totalWatchTime)}</StatValue>
-                <StatLabel>Minutes</StatLabel>
-              </StatItem>
-            </StatsRow>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem" }}>
+                <div style={{ fontSize: "2rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: "#00f0ff" }}>{Math.round(totalDays)}</div>
+                <div style={{ fontSize: "0.85rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>Days</div>
+              </div>
+              <div style={{ width: "1px", height: "40px", background: "rgba(255, 255, 255, 0.1)" }} />
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem" }}>
+                <div style={{ fontSize: "2rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: "#00f0ff" }}>{Math.round(totalHours)}</div>
+                <div style={{ fontSize: "0.85rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>Hours</div>
+              </div>
+              <div style={{ width: "1px", height: "40px", background: "rgba(255, 255, 255, 0.1)" }} />
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem" }}>
+                <div style={{ fontSize: "2rem", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: "#00f0ff" }}>{Math.round(totalWatchTime)}</div>
+                <div style={{ fontSize: "0.85rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>Minutes</div>
+              </div>
+            </motion.div>
           )}
 
-          <Message
-            as={motion.p}
+          <motion.p
+            style={{ fontSize: "clamp(1.25rem, 3vw, 1.75rem)", fontWeight: 500, color: "#f8fafc", maxWidth: "600px", lineHeight: 1.6, marginBottom: "1rem", marginLeft: "auto", marginRight: "auto", textAlign: "center" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2, duration: 0.6 }}
           >
             {message}
-          </Message>
+          </motion.p>
 
           {comparisons && comparisons.comparisons.length > 0 && (
-            <ComparisonsSection
-              as={motion.div}
+            <motion.div
+              style={{ width: "100%", maxWidth: "900px", marginTop: "1rem", marginBottom: "0.5rem" }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.4, duration: 0.6 }}
             >
-              <ComparisonsGrid>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
                 {comparisons.comparisons.map((comparison, index) => (
-                  <ComparisonCard
+                  <motion.div
                     key={index}
-                    as={motion.div}
+                    style={{ background: "rgba(18, 21, 28, 0.5)", border: "1px solid rgba(255, 255, 255, 0.05)", borderRadius: "16px", padding: "1.5rem", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: "0.5rem", transition: "all 0.3s ease" }}
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 1.7 + index * 0.1, duration: 0.4 }}
                   >
-                    <ComparisonLabel>{comparison.label}</ComparisonLabel>
-                    <ComparisonValue>{comparison.value}</ComparisonValue>
-                    <ComparisonUnit>{comparison.unit}</ComparisonUnit>
-                  </ComparisonCard>
+                    <div style={{ fontSize: "0.85rem", color: "#94a3b8", marginBottom: "0.5rem" }}>{comparison.label}</div>
+                    <div style={{ fontSize: "2rem", fontWeight: 800, fontFamily: "'JetBrains Mono', monospace", color: "#00f0ff", textShadow: "0 0 30px rgba(0, 240, 255, 0.4)" }}>{comparison.value}</div>
+                    <div style={{ fontSize: "0.9rem", color: "#64748b", fontWeight: 500 }}>{comparison.unit}</div>
+                  </motion.div>
                 ))}
-              </ComparisonsGrid>
-            </ComparisonsSection>
+              </div>
+            </motion.div>
           )}
-        </ContentWrapper>
+        </motion.div>
     </PageContainer>
   );
 }
-
-const ContentWrapper = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  minHeight: "calc(100vh - 8rem)",
-  textAlign: "center",
-  padding: "0.75rem 1rem 0.25rem 1rem",
-  width: "100%",
-  maxWidth: "100%",
-  margin: "0 auto",
-  boxSizing: "border-box",
-  
-  "@media (max-width: 768px)": {
-    padding: "0.5rem 0.75rem 0.25rem 0.75rem",
-    minHeight: "calc(100vh - 6rem)",
-  },
-});
-
-const Badge = styled("div", {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "10px",
-  padding: "10px 20px",
-  background: "rgba(0, 240, 255, 0.06)",
-  border: "1px solid rgba(0, 240, 255, 0.12)",
-  borderRadius: "999px",
-  fontSize: "0.85rem",
-  fontWeight: 600,
-  color: "#00f0ff",
-  marginBottom: "1rem",
-  backdropFilter: "blur(12px)",
-});
-
-const Title = styled("h1", {
-  fontSize: "clamp(2rem, 6vw, 3.5rem)",
-  fontWeight: 700,
-  marginBottom: "1rem",
-  letterSpacing: "-0.04em",
-  background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 50%, #a855f7 100%)",
-  backgroundSize: "200% 200%",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent",
-  backgroundClip: "text",
-  animation: "gradient-flow 8s ease infinite",
-  textAlign: "center",
-  width: "100%",
-});
-
-const TimeDisplay = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "1.5rem",
-  marginBottom: "1rem",
-  flexWrap: "wrap",
-  width: "100%",
-  maxWidth: "100%",
-});
-
-const TimeValue = styled("div", {
-  fontSize: "clamp(3rem, 10vw, 6rem)",
-  fontWeight: 800,
-  fontFamily: "'JetBrains Mono', monospace",
-  color: "#00f0ff",
-  textShadow: "0 0 60px rgba(0, 240, 255, 0.5), 0 0 120px rgba(0, 240, 255, 0.3)",
-  letterSpacing: "-0.02em",
-  textAlign: "center",
-  lineHeight: 1.2,
-});
-
-const StatsRow = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  gap: "2rem",
-  marginBottom: "1rem",
-  padding: "1rem 1.5rem",
-  background: "rgba(18, 21, 28, 0.5)",
-  borderRadius: "20px",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
-  backdropFilter: "blur(12px)",
-  
-  "@media (max-width: 768px)": {
-    gap: "1rem",
-    padding: "0.75rem 1rem",
-    borderRadius: "16px",
-  },
-  
-  "@media (max-width: 480px)": {
-    gap: "0.75rem",
-    padding: "0.75rem 0.5rem",
-  },
-});
-
-const StatItem = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  gap: "0.5rem",
-});
-
-const StatValue = styled("div", {
-  fontSize: "2rem",
-  fontWeight: 700,
-  fontFamily: "'JetBrains Mono', monospace",
-  color: "#00f0ff",
-  
-  "@media (max-width: 768px)": {
-    fontSize: "1.5rem",
-  },
-  
-  "@media (max-width: 480px)": {
-    fontSize: "1.25rem",
-  },
-});
-
-const StatLabel = styled("div", {
-  fontSize: "0.85rem",
-  color: "#64748b",
-  textTransform: "uppercase",
-  letterSpacing: "0.1em",
-  fontWeight: 600,
-});
-
-const StatDivider = styled("div", {
-  width: "1px",
-  height: "40px",
-  background: "rgba(255, 255, 255, 0.1)",
-  
-  "@media (max-width: 768px)": {
-    height: "32px",
-  },
-  
-  "@media (max-width: 480px)": {
-    height: "28px",
-  },
-});
-
-const Message = styled("p", {
-  fontSize: "clamp(1.25rem, 3vw, 1.75rem)",
-  fontWeight: 500,
-  color: "#f8fafc",
-  maxWidth: "600px",
-  lineHeight: 1.6,
-  marginBottom: "1rem",
-  marginLeft: "auto",
-  marginRight: "auto",
-  textAlign: "center",
-});
-
-const ComparisonsSection = styled("div", {
-  width: "100%",
-  maxWidth: "900px",
-  marginTop: "1rem",
-  marginBottom: "0.5rem",
-});
-
-const ComparisonsGrid = styled("div", {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-  gap: "1rem",
-  
-  "@media (max-width: 640px)": {
-    gridTemplateColumns: "1fr",
-    gap: "0.75rem",
-  },
-});
-
-const ComparisonCard = styled("div", {
-  background: "rgba(18, 21, 28, 0.5)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
-  borderRadius: "16px",
-  padding: "1.5rem",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  textAlign: "center",
-  gap: "0.5rem",
-  transition: "all 0.3s ease",
-  
-  "&:hover": {
-    transform: "translateY(-4px)",
-    borderColor: "rgba(0, 240, 255, 0.2)",
-    boxShadow: "0 8px 24px rgba(0, 240, 255, 0.1)",
-  },
-  
-  "@media (max-width: 768px)": {
-    padding: "1.25rem",
-  },
-});
-
-const ComparisonLabel = styled("div", {
-  fontSize: "0.85rem",
-  color: "#94a3b8",
-  marginBottom: "0.5rem",
-});
-
-const ComparisonValue = styled("div", {
-  fontSize: "2rem",
-  fontWeight: 800,
-  fontFamily: "'JetBrains Mono', monospace",
-  color: "#00f0ff",
-  textShadow: "0 0 30px rgba(0, 240, 255, 0.4)",
-});
-
-const ComparisonUnit = styled("div", {
-  fontSize: "0.9rem",
-  color: "#64748b",
-  fontWeight: 500,
-});
-

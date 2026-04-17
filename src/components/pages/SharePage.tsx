@@ -1,16 +1,17 @@
+import React from "react";
 import { useData } from "@/contexts/DataContext";
 import { useComparisons } from "@/hooks/queries/useComparisons";
 import { useTopTen } from "@/hooks/queries/useTopTen";
 import { LoadingSpinner } from "../LoadingSpinner";
 import PageContainer from "../PageContainer";
 import { Container } from "@radix-ui/themes";
-import { motion, PanInfo } from "framer-motion";
-import { styled } from "@stitches/react";
+import { motion, PanInfo } from "motion/react";
 import { Sparkles, Clock, Film, Tv, ChevronLeft, ChevronRight, TrendingUp } from "lucide-react";
 import { ShareCard } from "../ShareCard";
 import { formatWatchTime } from "@/lib/time-helpers";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { getCurrentTimeframe } from "@/lib/timeframe";
 
 export default function SharePage() {
   const { movies, shows, isLoading } = useData();
@@ -42,7 +43,7 @@ export default function SharePage() {
   }, [shows.data]);
 
   // Calculate derived values before early return
-  const year = new Date().getFullYear();
+  const timeframe = getCurrentTimeframe();
   const topMovie = topTen?.movies?.[0];
   const topShow = topTen?.shows?.[0];
   const top3Movies = topTen?.movies?.slice(0, 3) || [];
@@ -201,11 +202,11 @@ export default function SharePage() {
   return (
     <PageContainer>
       <Container size="4" p={isMobile ? "0" : "4"}>
-        <HeaderSection
-          as={motion.div}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const }}
+          style={{ textAlign: "center", marginBottom: "3rem", paddingTop: "2rem" }}
         >
           <Badge>
             <BadgeIcon>
@@ -215,34 +216,39 @@ export default function SharePage() {
           </Badge>
           <Title>Shareable Cards</Title>
           <Subtitle>Download and share your Jellyfin Wrapped highlights</Subtitle>
-        </HeaderSection>
+        </motion.div>
 
         <CarouselSection>
           <CarouselContainer ref={containerRef}>
             <CarouselWrapper ref={wrapperRef}>
-              <CarouselTrack
-                as={motion.div}
+              <motion.div
                 drag={!isMobile ? "x" : false}
-                dragConstraints={!isMobile && centerOffset > 0 ? { 
+                dragConstraints={!isMobile && centerOffset > 0 ? {
                   left: centerOffset - (cards.length - 1) * (cardWidth + gap),
-                  right: centerOffset 
+                  right: centerOffset
                 } : undefined}
                 dragElastic={0.05}
                 dragMomentum={false}
                 dragPropagation={false}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
-                style={{ 
-                  transform: !isMobile && !isDragging ? carouselTransform : undefined,
+                style={{
+                  display: "flex",
+                  gap: "2rem",
+                  cursor: "grab",
+                  userSelect: "none",
+                  transform: !isMobile && !isDragging ? carouselTransform : "translateZ(0)",
+                  backfaceVisibility: "hidden",
+                  willChange: "transform",
                   transition: !isMobile && !isDragging ? "transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)" : "none",
                 }}
               >
                 {/* Total Time Card */}
                 {totalWatchTime > 0 && (
                   <CardSlide>
-                    <ShareCard title="Total Watch Time" filename={`jellyfin-wrapped-${year}-total-time.png`}>
+                    <ShareCard title="Total Watch Time" filename={`jellyfin-wrapped-${timeframe.id}-total-time.png`}>
                       <TotalTimeCardContent>
-                        <CardTitle>My Jellyfin Wrapped {year}</CardTitle>
+                        <CardTitle>My Jellyfin Wrapped — {timeframe.name}</CardTitle>
                         <TimeDisplay>
                           <TimeValue>{formatWatchTime(totalWatchTime)}</TimeValue>
                           <TimeLabel>Total Watch Time</TimeLabel>
@@ -260,9 +266,9 @@ export default function SharePage() {
                 {/* Top Movie Card */}
                 {topMovie && (
                   <CardSlide>
-                    <ShareCard title="Top Movie" filename={`jellyfin-wrapped-${year}-top-movie.png`}>
+                    <ShareCard title="Top Movie" filename={`jellyfin-wrapped-${timeframe.id}-top-movie.png`}>
                       <TopItemCardContent>
-                        <CardTitle>My Jellyfin Wrapped {year}</CardTitle>
+                        <CardTitle>My Jellyfin Wrapped — {timeframe.name}</CardTitle>
                         <ItemLabel>#1 Movie</ItemLabel>
                         <ItemImage>
                           {topMovie.imageUrl ? (
@@ -285,9 +291,9 @@ export default function SharePage() {
                 {/* Top Show Card */}
                 {topShow && (
                   <CardSlide>
-                    <ShareCard title="Top Show" filename={`jellyfin-wrapped-${year}-top-show.png`}>
+                    <ShareCard title="Top Show" filename={`jellyfin-wrapped-${timeframe.id}-top-show.png`}>
                       <TopItemCardContent>
-                        <CardTitle>My Jellyfin Wrapped {year}</CardTitle>
+                        <CardTitle>My Jellyfin Wrapped — {timeframe.name}</CardTitle>
                         <ItemLabel>#1 Show</ItemLabel>
                         <ItemImage>
                           {topShow.item.imageUrl ? (
@@ -308,9 +314,9 @@ export default function SharePage() {
                 {/* Top 3 Movies Card */}
                 {top3Movies.length > 0 && (
                   <CardSlide>
-                    <ShareCard title="Top 3 Movies" filename={`jellyfin-wrapped-${year}-top-3-movies.png`}>
+                    <ShareCard title="Top 3 Movies" filename={`jellyfin-wrapped-${timeframe.id}-top-3-movies.png`}>
                       <Top3CardContent>
-                        <CardTitle>My Jellyfin Wrapped {year}</CardTitle>
+                        <CardTitle>My Jellyfin Wrapped — {timeframe.name}</CardTitle>
                         <ItemLabel>Top 3 Movies</ItemLabel>
                         <Top3Grid>
                           {top3Movies.map((movie, index) => (
@@ -340,9 +346,9 @@ export default function SharePage() {
                 {/* Top 3 Shows Card */}
                 {top3Shows.length > 0 && (
                   <CardSlide>
-                    <ShareCard title="Top 3 Shows" filename={`jellyfin-wrapped-${year}-top-3-shows.png`}>
+                    <ShareCard title="Top 3 Shows" filename={`jellyfin-wrapped-${timeframe.id}-top-3-shows.png`}>
                       <Top3CardContent>
-                        <CardTitle>My Jellyfin Wrapped {year}</CardTitle>
+                        <CardTitle>My Jellyfin Wrapped — {timeframe.name}</CardTitle>
                         <ItemLabel>Top 3 Shows</ItemLabel>
                         <Top3Grid>
                           {top3Shows.map((show, index) => (
@@ -370,9 +376,9 @@ export default function SharePage() {
                 {/* Stats Card */}
                 {(movieCount > 0 || showCount > 0) && (
                   <CardSlide>
-                    <ShareCard title="Your Stats" filename={`jellyfin-wrapped-${year}-stats.png`}>
+                    <ShareCard title="Your Stats" filename={`jellyfin-wrapped-${timeframe.id}-stats.png`}>
                       <StatsCardContent>
-                        <CardTitle>My Jellyfin Wrapped {year}</CardTitle>
+                        <CardTitle>My Jellyfin Wrapped — {timeframe.name}</CardTitle>
                         <ItemLabel>Your Viewing Stats</ItemLabel>
                         <StatsGrid>
                           <StatItem>
@@ -408,7 +414,7 @@ export default function SharePage() {
                     </ShareCard>
                   </CardSlide>
                 )}
-              </CarouselTrack>
+              </motion.div>
             </CarouselWrapper>
 
             {/* Dots Indicator */}
@@ -450,621 +456,154 @@ export default function SharePage() {
   );
 }
 
-const HeaderSection = styled("div", {
-  textAlign: "center",
-  marginBottom: "3rem",
-  paddingTop: "2rem",
-  
-  "@media (max-width: 768px)": {
-    marginBottom: "2rem",
-    paddingTop: "1.5rem",
-  },
-});
+const Badge = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "inline-flex", alignItems: "center", gap: "10px", padding: "10px 20px", background: "rgba(0, 240, 255, 0.06)", border: "1px solid rgba(0, 240, 255, 0.12)", borderRadius: "999px", fontSize: "0.85rem", fontWeight: 600, color: "#00f0ff", marginBottom: "1.5rem", backdropFilter: "blur(12px)", ...style }} {...props}>{children}</div>
+);
 
-const Badge = styled("div", {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "10px",
-  padding: "10px 20px",
-  background: "rgba(0, 240, 255, 0.06)",
-  border: "1px solid rgba(0, 240, 255, 0.12)",
-  borderRadius: "999px",
-  fontSize: "0.85rem",
-  fontWeight: 600,
-  color: "#00f0ff",
-  marginBottom: "1.5rem",
-  backdropFilter: "blur(12px)",
-});
+const BadgeIcon = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "24px", height: "24px", borderRadius: "7px", background: "rgba(0, 240, 255, 0.15)", ...style }} {...props}>{children}</span>
+);
 
-const BadgeIcon = styled("span", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "24px",
-  height: "24px",
-  borderRadius: "7px",
-  background: "rgba(0, 240, 255, 0.15)",
-});
+const Title = ({ children, style, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h1 style={{ fontSize: "clamp(2.25rem, 6vw, 4rem)", fontWeight: 800, marginBottom: "0.5rem", letterSpacing: "-0.04em", background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 50%, #a855f7 100%)", backgroundSize: "200% 200%", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", animation: "gradient-flow 8s ease infinite", ...style }} {...props}>{children}</h1>
+);
 
-const Title = styled("h1", {
-  fontSize: "clamp(2.25rem, 6vw, 4rem)",
-  fontWeight: 800,
-  marginBottom: "0.5rem",
-  letterSpacing: "-0.04em",
-  background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 50%, #a855f7 100%)",
-  backgroundSize: "200% 200%",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent",
-  backgroundClip: "text",
-  animation: "gradient-flow 8s ease infinite",
-});
+const Subtitle = ({ children, style, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  <p style={{ fontSize: "1.15rem", color: "#94a3b8", fontWeight: 400, ...style }} {...props}>{children}</p>
+);
 
-const Subtitle = styled("p", {
-  fontSize: "1.15rem",
-  color: "#94a3b8",
-  fontWeight: 400,
-  
-  "@media (max-width: 768px)": {
-    fontSize: "1rem",
-  },
-});
+const TotalTimeCardContent = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", width: "100%", height: "100%", gap: "2rem", padding: "2rem 0", ...style }} {...props}>{children}</div>
+);
 
-const TotalTimeCardContent = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  textAlign: "center",
-  width: "100%",
-  height: "100%",
-  gap: "2rem",
-  padding: "2rem 0",
-  
-  "@media (max-width: 768px)": {
-    gap: "clamp(0.75rem, 2vh, 1.5rem)",
-    padding: "clamp(0.5rem, 1.5vh, 1rem) 0",
-  },
-});
+const CardTitle = ({ children, style, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h2 style={{ fontSize: "1.1rem", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: "0.5rem", ...style }} {...props}>{children}</h2>
+);
 
-const CardTitle = styled("h2", {
-  fontSize: "1.1rem",
-  fontWeight: 600,
-  color: "#94a3b8",
-  textTransform: "uppercase",
-  letterSpacing: "0.15em",
-  marginBottom: "0.5rem",
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(0.75rem, 2vw, 1rem)",
-    marginBottom: "clamp(0.25rem, 1vh, 0.5rem)",
-  },
-});
+const TimeDisplay = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem", background: "transparent", backgroundColor: "transparent", ...style }} {...props}>{children}</div>
+);
 
-const TimeDisplay = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  gap: "1rem",
-  background: "transparent", // Ensure no background on container
-  backgroundColor: "transparent",
-});
+const TimeValue = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ fontSize: "2.5rem", fontWeight: 900, fontFamily: "'Inter', -apple-system, sans-serif", background: "linear-gradient(135deg, #00f0ff 0%, #a855f7 50%, #f59e0b 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1.2, letterSpacing: "-0.02em", ...style }} {...props}>{children}</div>
+);
 
-const TimeValue = styled("div", {
-  fontSize: "2.5rem",
-  fontWeight: 900,
-  fontFamily: "'Inter', -apple-system, sans-serif",
-  background: "linear-gradient(135deg, #00f0ff 0%, #a855f7 50%, #f59e0b 100%)",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent",
-  backgroundClip: "text",
-  lineHeight: 1.2,
-  letterSpacing: "-0.02em",
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(1.5rem, 6vw, 2.5rem)",
-  },
-});
+const TimeLabel = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "#f8fafc", letterSpacing: "-0.01em", ...style }} {...props}>{children}</div>
+);
 
-const TimeLabel = styled("div", {
-  fontSize: "1.75rem",
-  fontWeight: 700,
-  color: "#f8fafc",
-  letterSpacing: "-0.01em",
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(1rem, 4vw, 1.5rem)",
-  },
-});
+const ComparisonText = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ fontSize: "1.1rem", color: "#94a3b8", fontStyle: "italic", fontWeight: 500, ...style }} {...props}>{children}</div>
+);
 
-const ComparisonText = styled("div", {
-  fontSize: "1.1rem",
-  color: "#94a3b8",
-  fontStyle: "italic",
-  fontWeight: 500,
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(0.75rem, 2.5vw, 1rem)",
-  },
-});
+const TopItemCardContent = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", width: "100%", height: "100%", gap: "1.75rem", padding: "2rem 0", ...style }} {...props}>{children}</div>
+);
 
-const TopItemCardContent = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  textAlign: "center",
-  width: "100%",
-  height: "100%",
-  gap: "1.75rem",
-  padding: "2rem 0",
-  
-  "@media (max-width: 768px)": {
-    gap: "clamp(0.75rem, 2vh, 1.5rem)",
-    padding: "clamp(0.5rem, 1.5vh, 1rem) 0",
-  },
-});
+const ItemLabel = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.2em", ...style }} {...props}>{children}</div>
+);
 
-const ItemLabel = styled("div", {
-  fontSize: "0.9rem",
-  fontWeight: 600,
-  color: "#94a3b8",
-  textTransform: "uppercase",
-  letterSpacing: "0.2em",
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
-  },
-});
+const ItemImage = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ width: "220px", height: "330px", borderRadius: "20px", overflow: "hidden", border: "3px solid rgba(0, 240, 255, 0.3)", boxShadow: "0 20px 60px rgba(0, 240, 255, 0.2)", ...style }} {...props}>{children}</div>
+);
 
-const ItemImage = styled("div", {
-  width: "220px",
-  height: "330px",
-  borderRadius: "20px",
-  overflow: "hidden",
-  border: "3px solid rgba(0, 240, 255, 0.3)",
-  boxShadow: "0 20px 60px rgba(0, 240, 255, 0.2)",
-  
-  "@media (max-width: 768px)": {
-    width: "clamp(120px, 30vw, 180px)",
-    height: "clamp(180px, 45vw, 270px)",
-    borderRadius: "clamp(12px, 3vw, 16px)",
-    border: "2px solid rgba(0, 240, 255, 0.3)",
-  },
-});
+const ItemName = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ fontSize: "2rem", fontWeight: 800, color: "#f8fafc", lineHeight: 1.2, letterSpacing: "-0.02em", maxWidth: "90%", ...style }} {...props}>{children}</div>
+);
 
-const ItemName = styled("div", {
-  fontSize: "2rem",
-  fontWeight: 800,
-  color: "#f8fafc",
-  lineHeight: 1.2,
-  letterSpacing: "-0.02em",
-  maxWidth: "90%",
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(1.25rem, 5vw, 1.75rem)",
-  },
-});
+const ItemMeta = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ fontSize: "1rem", color: "#94a3b8", fontWeight: 600, fontFamily: "'Inter', sans-serif", ...style }} {...props}>{children}</div>
+);
 
-const ItemMeta = styled("div", {
-  fontSize: "1rem",
-  color: "#94a3b8",
-  fontWeight: 600,
-  fontFamily: "'Inter', sans-serif",
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(0.75rem, 2.5vw, 0.9rem)",
-  },
-});
+const Top3CardContent = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", width: "100%", height: "100%", gap: "1.75rem", padding: "2rem 0", ...style }} {...props}>{children}</div>
+);
 
-const Top3CardContent = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  textAlign: "center",
-  width: "100%",
-  height: "100%",
-  gap: "1.75rem",
-  padding: "2rem 0",
-  
-  "@media (max-width: 768px)": {
-    gap: "clamp(0.75rem, 2vh, 1.25rem)",
-    padding: "clamp(0.5rem, 1.5vh, 1rem) 0",
-  },
-});
+const Top3Grid = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", width: "100%", ...style }} {...props}>{children}</div>
+);
 
-const Top3Grid = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  gap: "1.25rem",
-  width: "100%",
-});
+const Top3Item = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", alignItems: "center", gap: "1rem", width: "100%", padding: "0.75rem", background: "rgba(255, 255, 255, 0.05)", borderRadius: "16px", border: "1px solid rgba(255, 255, 255, 0.1)", ...style }} {...props}>{children}</div>
+);
 
-const Top3Item = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  gap: "1rem",
-  width: "100%",
-  padding: "0.75rem",
-  background: "rgba(255, 255, 255, 0.05)",
-  borderRadius: "16px",
-  border: "1px solid rgba(255, 255, 255, 0.1)",
-  
-  "@media (max-width: 768px)": {
-    padding: "clamp(0.5rem, 1.5vh, 0.75rem)",
-    gap: "clamp(0.5rem, 1.5vw, 0.75rem)",
-    borderRadius: "clamp(12px, 3vw, 14px)",
-  },
-});
+const Top3Rank = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ fontSize: "1.25rem", fontWeight: 900, color: "#00f0ff", fontFamily: "'Inter', sans-serif", minWidth: "35px", textAlign: "center", ...style }} {...props}>{children}</div>
+);
 
-const Top3Rank = styled("div", {
-  fontSize: "1.25rem",
-  fontWeight: 900,
-  color: "#00f0ff",
-  fontFamily: "'Inter', sans-serif",
-  minWidth: "35px",
-  textAlign: "center",
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(0.9rem, 3vw, 1.1rem)",
-    minWidth: "clamp(25px, 6vw, 30px)",
-  },
-});
+const Top3Image = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ width: "70px", height: "105px", borderRadius: "12px", overflow: "hidden", border: "2px solid rgba(0, 240, 255, 0.3)", flexShrink: 0, boxShadow: "0 4px 12px rgba(0, 240, 255, 0.2)", ...style }} {...props}>{children}</div>
+);
 
-const Top3Image = styled("div", {
-  width: "70px",
-  height: "105px",
-  borderRadius: "12px",
-  overflow: "hidden",
-  border: "2px solid rgba(0, 240, 255, 0.3)",
-  flexShrink: 0,
-  boxShadow: "0 4px 12px rgba(0, 240, 255, 0.2)",
-  
-  "@media (max-width: 768px)": {
-    width: "clamp(50px, 12vw, 60px)",
-    height: "clamp(75px, 18vw, 90px)",
-    borderRadius: "clamp(8px, 2vw, 10px)",
-  },
-});
+const Top3Name = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "#f8fafc", flex: 1, textAlign: "left", lineHeight: 1.3, letterSpacing: "-0.01em", ...style }} {...props}>{children}</div>
+);
 
-const Top3Name = styled("div", {
-  fontSize: "1.1rem",
-  fontWeight: 700,
-  color: "#f8fafc",
-  flex: 1,
-  textAlign: "left",
-  lineHeight: 1.3,
-  letterSpacing: "-0.01em",
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(0.85rem, 2.5vw, 1rem)",
-  },
-});
+const Top3Meta = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ fontSize: "0.9rem", color: "#94a3b8", fontFamily: "'Inter', sans-serif", fontWeight: 600, ...style }} {...props}>{children}</div>
+);
 
-const Top3Meta = styled("div", {
-  fontSize: "0.9rem",
-  color: "#94a3b8",
-  fontFamily: "'Inter', sans-serif",
-  fontWeight: 600,
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
-  },
-});
+const StatsCardContent = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", width: "100%", height: "100%", gap: "2rem", padding: "2rem 0", ...style }} {...props}>{children}</div>
+);
 
-const StatsCardContent = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  textAlign: "center",
-  width: "100%",
-  height: "100%",
-  gap: "2rem",
-  padding: "2rem 0",
-});
+const StatsGrid = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "1.5rem", width: "100%", ...style }} {...props}>{children}</div>
+);
 
-const StatsGrid = styled("div", {
-  display: "grid",
-  gridTemplateColumns: "repeat(2, 1fr)",
-  gap: "1.5rem",
-  width: "100%",
-  
-  "@media (max-width: 768px)": {
-    gap: "clamp(0.5rem, 1.5vh, 1rem)",
-  },
-});
+const StatItem = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "1.25rem", background: "rgba(255, 255, 255, 0.05)", borderRadius: "16px", border: "1px solid rgba(255, 255, 255, 0.1)", minHeight: "180px", justifyContent: "space-between", ...style }} {...props}>{children}</div>
+);
 
-const StatItem = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  padding: "1.25rem",
-  background: "rgba(255, 255, 255, 0.05)",
-  borderRadius: "16px",
-  border: "1px solid rgba(255, 255, 255, 0.1)",
-  minHeight: "180px", // Ensure consistent height for alignment
-  justifyContent: "space-between", // Distribute space evenly
-  
-  "@media (max-width: 768px)": {
-    padding: "clamp(0.75rem, 2vh, 1rem)",
-    minHeight: "clamp(120px, 25vh, 150px)",
-    borderRadius: "clamp(12px, 3vw, 14px)",
-  },
-});
+const StatIcon = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "56px", height: "56px", borderRadius: "14px", background: "linear-gradient(135deg, #00f0ff 0%, #a855f7 100%)", color: "#030304", boxShadow: "0 4px 16px rgba(0, 240, 255, 0.3)", flexShrink: 0, marginBottom: "0.75rem", ...style }} {...props}>{children}</div>
+);
 
-const StatIcon = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "56px",
-  height: "56px",
-  borderRadius: "14px",
-  background: "linear-gradient(135deg, #00f0ff 0%, #a855f7 100%)",
-  color: "#030304",
-  boxShadow: "0 4px 16px rgba(0, 240, 255, 0.3)",
-  flexShrink: 0, // Prevent icon from shrinking
-  marginBottom: "0.75rem", // Space after icon
-  
-  "@media (max-width: 768px)": {
-    width: "clamp(40px, 10vw, 48px)",
-    height: "clamp(40px, 10vw, 48px)",
-    borderRadius: "clamp(10px, 2.5vw, 12px)",
-    marginBottom: "clamp(0.5rem, 1.5vh, 0.75rem)",
-    
-    "& svg": {
-      width: "clamp(20px, 5vw, 28px)",
-      height: "clamp(20px, 5vw, 28px)",
-    },
-  },
-});
+const StatValue = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ fontSize: "1.75rem", fontWeight: 900, color: "#f8fafc", fontFamily: "'Inter', sans-serif", lineHeight: 1.2, letterSpacing: "-0.02em", minHeight: "3.5rem", maxHeight: "3.5rem", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", marginBottom: "0.75rem", flex: 1, ...style }} {...props}>{children}</div>
+);
 
-const StatValue = styled("div", {
-  fontSize: "1.75rem",
-  fontWeight: 900,
-  color: "#f8fafc",
-  fontFamily: "'Inter', sans-serif",
-  lineHeight: 1.2,
-  letterSpacing: "-0.02em",
-  minHeight: "3.5rem", // Fixed height to accommodate multi-line values
-  maxHeight: "3.5rem", // Fixed height to accommodate multi-line values
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  textAlign: "center",
-  marginBottom: "0.75rem", // Space before label
-  flex: 1, // Take available space
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(1rem, 4vw, 1.5rem)",
-    minHeight: "clamp(2rem, 5vh, 3rem)",
-    maxHeight: "clamp(2rem, 5vh, 3rem)",
-    marginBottom: "clamp(0.5rem, 1.5vh, 0.75rem)",
-  },
-});
+const StatValueSmall = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ fontSize: "1rem", fontWeight: 900, color: "#f8fafc", fontFamily: "'Inter', sans-serif", lineHeight: 1.3, letterSpacing: "-0.02em", minHeight: "3.5rem", maxHeight: "3.5rem", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", marginBottom: "0.75rem", flex: 1, ...style }} {...props}>{children}</div>
+);
 
-const StatValueSmall = styled("div", {
-  fontSize: "1rem", // Smaller font size for total watch time
-  fontWeight: 900,
-  color: "#f8fafc",
-  fontFamily: "'Inter', sans-serif",
-  lineHeight: 1.3,
-  letterSpacing: "-0.02em",
-  minHeight: "3.5rem", // Match StatValue height for alignment
-  maxHeight: "3.5rem", // Match StatValue height for alignment
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  textAlign: "center",
-  marginBottom: "0.75rem", // Space before label
-  flex: 1, // Take available space
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(0.75rem, 3vw, 0.9rem)",
-    minHeight: "clamp(2rem, 5vh, 2.5rem)",
-    maxHeight: "clamp(2rem, 5vh, 2.5rem)",
-    marginBottom: "clamp(0.5rem, 1.5vh, 0.75rem)",
-  },
-});
+const StatLabel = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ fontSize: "0.8rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.1em", textAlign: "center", fontWeight: 600, height: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, ...style }} {...props}>{children}</div>
+);
 
-const StatLabel = styled("div", {
-  fontSize: "0.8rem",
-  color: "#94a3b8",
-  textTransform: "uppercase",
-  letterSpacing: "0.1em",
-  textAlign: "center",
-  fontWeight: 600,
-  height: "1.2rem", // Fixed height for consistent alignment
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexShrink: 0, // Prevent label from shrinking
-  
-  "@media (max-width: 768px)": {
-    fontSize: "clamp(0.65rem, 2vw, 0.75rem)",
-    height: "clamp(1rem, 2.5vh, 1.1rem)",
-  },
-});
+const CarouselSection = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "relative", width: "100%", marginBottom: "3rem", paddingLeft: "80px", paddingRight: "80px", ...style }} {...props}>{children}</div>
+);
 
-const CarouselSection = styled("div", {
-  position: "relative",
-  width: "100%",
-  marginBottom: "3rem",
-  paddingLeft: "80px", // Space for left button (48px + 32px margin)
-  paddingRight: "80px", // Space for right button (48px + 32px margin)
-  
-  "@media (max-width: 768px)": {
-    paddingLeft: "0",
-    paddingRight: "0",
-    marginBottom: "2rem",
-    overflow: "hidden",
-  },
-});
+const CarouselContainer = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ children, style, ...props }, ref) => (
+    <div ref={ref} style={{ width: "100%", overflow: "hidden", position: "relative", paddingLeft: "0", paddingRight: "0", ...style }} {...props}>{children}</div>
+  )
+);
+CarouselContainer.displayName = "CarouselContainer";
 
-const CarouselContainer = styled("div", {
-  width: "100%",
-  overflow: "hidden",
-  position: "relative",
-  paddingLeft: "0",
-  paddingRight: "0",
-  
-  "@media (max-width: 768px)": {
-    overflowX: "auto",
-    overflowY: "hidden",
-    scrollSnapType: "x mandatory",
-    scrollBehavior: "smooth",
-    overscrollBehaviorX: "contain", // Prevent bounce/overscroll
-    WebkitOverflowScrolling: "touch",
-    scrollbarWidth: "none", // Firefox
-    msOverflowStyle: "none", // IE/Edge
-    scrollPaddingLeft: "5vw", // Padding to allow first card to center
-    scrollPaddingRight: "5vw", // Padding to allow last card to center
-    touchAction: "pan-x pan-y pinch-zoom", // Optimize for horizontal scrolling
-    transform: "translateZ(0)", // GPU acceleration
-    WebkitTransform: "translateZ(0)",
-    
-    "&::-webkit-scrollbar": {
-      display: "none", // Chrome/Safari
-    },
-  },
-});
+const CarouselWrapper = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ children, style, ...props }, ref) => (
+    <div ref={ref} style={{ width: "100%", overflow: "hidden", position: "relative", display: "flex", ...style }} {...props}>{children}</div>
+  )
+);
+CarouselWrapper.displayName = "CarouselWrapper";
 
-const CarouselWrapper = styled("div", {
-  width: "100%",
-  overflow: "hidden",
-  position: "relative",
-  display: "flex",
-  
-  "@media (max-width: 768px)": {
-    width: "100%",
-    overflow: "visible",
-    justifyContent: "flex-start",
-  },
-});
+const CardSlide = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ flexShrink: 0, width: "400px", display: "flex", justifyContent: "center", transform: "translateZ(0)", ...style }} {...props}>{children}</div>
+);
 
-const CarouselTrack = styled("div", {
-  display: "flex",
-  gap: "2rem",
-  cursor: "grab",
-  userSelect: "none",
-  transform: "translateZ(0)",
-  WebkitTransform: "translateZ(0)",
-  backfaceVisibility: "hidden",
-  WebkitBackfaceVisibility: "hidden",
-  willChange: "transform",
-  // Use CSS transitions for smooth animation
-  transition: "transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)",
-  
-  "&:active": {
-    cursor: "grabbing",
-    transition: "none", // Disable transition during drag
-  },
-  
-  "@media (max-width: 768px)": {
-    gap: "0",
-    cursor: "default",
-    userSelect: "auto",
-    width: "max-content",
-    justifyContent: "flex-start",
-    paddingLeft: "5vw", // Padding to allow first card to center (half of remaining 10vw)
-    paddingRight: "5vw", // Padding to allow last card to center (half of remaining 10vw)
-    display: "flex",
-    willChange: "auto", // Let browser handle scroll optimization
-    transition: "none", // Native scroll doesn't need transition
-  },
-});
+const NavButton = ({ children, style, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+  <button style={{ position: "absolute", top: "calc(350px + 1rem)", transform: "translateY(-50%) translateZ(0)", width: "48px", height: "48px", borderRadius: "50%", background: "rgba(0, 240, 255, 0.1)", border: "1px solid rgba(0, 240, 255, 0.2)", color: "#00f0ff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease", willChange: "transform", zIndex: 10, backfaceVisibility: "hidden", ...style }} {...props}>{children}</button>
+);
 
-const CardSlide = styled("div", {
-  flexShrink: 0,
-  width: "400px",
-  display: "flex",
-  justifyContent: "center",
-  transform: "translateZ(0)", // GPU acceleration
-  WebkitTransform: "translateZ(0)",
-  
-  "@media (max-width: 768px)": {
-    width: "90vw", // 90% of viewport width (10% smaller than full width)
-    minWidth: "90vw",
-    maxWidth: "90vw",
-    scrollSnapAlign: "center",
-    scrollSnapStop: "normal", // Allow faster swiping through cards
-    display: "flex",
-    justifyContent: "center",
-    boxSizing: "border-box",
-    flexShrink: 0,
-  },
-});
+const DotsContainer = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", marginTop: "2rem", ...style }} {...props}>{children}</div>
+);
 
-const NavButton = styled("button", {
-  position: "absolute",
-  top: "calc(350px + 1rem)", // Center on card (700px / 2) + some spacing
-  transform: "translateY(-50%) translateZ(0)",
-  WebkitTransform: "translateY(-50%) translateZ(0)",
-  width: "48px",
-  height: "48px",
-  borderRadius: "50%",
-  background: "rgba(0, 240, 255, 0.1)",
-  border: "1px solid rgba(0, 240, 255, 0.2)",
-  color: "#00f0ff",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  cursor: "pointer",
-  transition: "transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease",
-  willChange: "transform",
-  zIndex: 10,
-  backfaceVisibility: "hidden",
-  WebkitBackfaceVisibility: "hidden",
-  
-  "&:hover:not(:disabled)": {
-    background: "rgba(0, 240, 255, 0.2)",
-    transform: "translateY(-50%) scale(1.1) translateZ(0)",
-    WebkitTransform: "translateY(-50%) scale(1.1) translateZ(0)",
-  },
-  
-  "&:disabled": {
-    opacity: 0.3,
-    cursor: "not-allowed",
-  },
-  
-  "@media (max-width: 768px)": {
-    display: "none",
-  },
-});
-
-const DotsContainer = styled("div", {
-  display: "flex",
-  gap: "0.75rem",
-  justifyContent: "center",
-  marginTop: "2rem",
-  
-  "@media (max-width: 768px)": {
-    display: "none",
-  },
-});
-
-const Dot = styled("button", {
-  width: "12px",
-  height: "12px",
-  borderRadius: "50%",
-  border: "none",
-  background: "rgba(255, 255, 255, 0.2)",
-  cursor: "pointer",
-  transition: "width 0.3s ease, border-radius 0.3s ease, background-color 0.3s ease",
-  transform: "translateZ(0)",
-  WebkitTransform: "translateZ(0)",
-  willChange: "width, border-radius, background-color",
-  backfaceVisibility: "hidden",
-  WebkitBackfaceVisibility: "hidden",
-  
-  variants: {
-    active: {
-      true: {
-        background: "#00f0ff",
-        width: "32px",
-        borderRadius: "6px",
-      },
-    },
-  },
-});
+type DotActive = boolean;
+const Dot = ({ children, active, style, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { active?: DotActive }) => (
+  <button style={{ width: active ? "32px" : "12px", height: "12px", borderRadius: active ? "6px" : "50%", border: "none", background: active ? "#00f0ff" : "rgba(255, 255, 255, 0.2)", cursor: "pointer", transition: "width 0.3s ease, border-radius 0.3s ease, background-color 0.3s ease", transform: "translateZ(0)", willChange: "width, border-radius, background-color", backfaceVisibility: "hidden", ...style }} {...props}>{children}</button>
+);
 

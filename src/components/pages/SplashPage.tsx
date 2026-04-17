@@ -1,19 +1,13 @@
-import { motion } from "framer-motion";
+import React from "react";
+import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
-  ContentWrapper,
-  Disclaimer,
-  FeatureItem,
-  FeaturesList,
   StyledButton,
-  Subtitle,
-  Title,
 } from "../ui/styled";
 import TimeframeSelector from "../TimeframeSelector";
 import { TimeframeOption } from "../../lib/timeframe";
 import { Film, BarChart3, Play, Star, Tv } from "lucide-react";
-import { styled } from "@stitches/react";
 
 const NEXT_PAGE = "/configure";
 
@@ -40,7 +34,7 @@ const SplashPage = () => {
       opacity: 1,
       transition: {
         duration: 0.8,
-        ease: [0.25, 0.1, 0.25, 1],
+        ease: [0.25, 0.1, 0.25, 1] as const,
       },
     },
   };
@@ -64,7 +58,7 @@ const SplashPage = () => {
       opacity: 1,
       transition: {
         duration: 0.6,
-        ease: [0.25, 0.1, 0.25, 1],
+        ease: [0.25, 0.1, 0.25, 1] as const,
       },
     },
   };
@@ -84,122 +78,73 @@ const SplashPage = () => {
       {/* Floating geometric shapes */}
       <GeometricLayer>
         <GeometricShape
-          css={{
+          style={{
             top: "15%",
             left: "8%",
             width: "120px",
             height: "120px",
             animation: "spin 30s linear infinite, float-y 8s ease-in-out infinite",
-            "@media (max-width: 768px)": {
-              width: "60px",
-              height: "60px",
-              display: "none",
-            },
           }}
         />
-        <GeometricShape
-          variant="ring"
-          css={{
+        <GeometricShapeRing
+          style={{
             top: "25%",
             right: "10%",
             width: "160px",
             height: "160px",
             animation: "spin-reverse 25s linear infinite, scale-pulse 6s ease-in-out infinite",
-            "@media (max-width: 768px)": {
-              width: "80px",
-              height: "80px",
-              display: "none",
-            },
           }}
         />
-        <GeometricShape
-          variant="triangle"
-          css={{
+        <GeometricShapeTriangle
+          style={{
             bottom: "20%",
             left: "12%",
             width: "80px",
             height: "80px",
             animation: "spin 35s linear infinite, float-x 10s ease-in-out infinite",
-            "@media (max-width: 768px)": {
-              width: "40px",
-              height: "40px",
-              display: "none",
-            },
           }}
         />
-        <GeometricShape
-          variant="dots"
-          css={{
+        <GeometricShapeDots
+          style={{
             bottom: "30%",
             right: "15%",
             width: "100px",
             height: "100px",
             animation: "opacity-pulse 4s ease-in-out infinite",
-            "@media (max-width: 768px)": {
-              width: "50px",
-              height: "50px",
-              display: "none",
-            },
           }}
         />
       </GeometricLayer>
 
       {/* Animated orbs with electric colors */}
       <OrbContainer>
-        <Orb 
-          css={{ 
-            top: "0%", 
-            left: "0%", 
-            width: "600px", 
-            height: "600px", 
+        <Orb
+          style={{
+            top: "0%",
+            left: "0%",
+            width: "600px",
+            height: "600px",
             background: "radial-gradient(circle, rgba(0, 240, 255, 0.12) 0%, transparent 70%)",
             animation: "orb-float-1 14s ease-in-out infinite",
-            "@media (max-width: 768px)": {
-              width: "300px",
-              height: "300px",
-            },
-            "@media (max-width: 480px)": {
-              width: "200px",
-              height: "200px",
-            },
           }}
         />
-        <Orb 
-          css={{ 
-            top: "40%", 
-            right: "-10%", 
-            width: "700px", 
-            height: "700px", 
+        <Orb
+          style={{
+            top: "40%",
+            right: "-10%",
+            width: "700px",
+            height: "700px",
             background: "radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%)",
             animation: "orb-float-2 18s ease-in-out infinite",
-            "@media (max-width: 768px)": {
-              width: "350px",
-              height: "350px",
-              right: "-15%",
-            },
-            "@media (max-width: 480px)": {
-              width: "250px",
-              height: "250px",
-              right: "-20%",
-            },
           }}
         />
-        <Orb 
-          css={{ 
-            bottom: "-5%", 
-            left: "20%", 
-            width: "550px", 
-            height: "550px", 
+        <Orb
+          style={{
+            bottom: "-5%",
+            left: "20%",
+            width: "550px",
+            height: "550px",
             background: "radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, transparent 70%)",
             animation: "orb-float-3 20s ease-in-out infinite",
-            "@media (max-width: 768px)": {
-              width: "280px",
-              height: "280px",
-            },
-            "@media (max-width: 480px)": {
-              width: "200px",
-              height: "200px",
-            },
           }}
         />
       </OrbContainer>
@@ -231,43 +176,102 @@ const SplashPage = () => {
         })}
       </ParticleField>
 
-      <ContentWrapper
-        as={motion.div}
+      <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
+        style={{
+          maxWidth: "1000px",
+          textAlign: "center",
+          padding: "40px 48px 80px 48px",
+          position: "relative",
+          zIndex: 1,
+          width: "100%",
+          boxSizing: "border-box",
+        }}
       >
-        <Title as={motion.h1} variants={itemVariants}>
+        <motion.h1 variants={itemVariants} style={{
+          fontSize: "clamp(2.75rem, 8vw, 5.5rem)",
+          fontWeight: 800,
+          marginBottom: "1.75rem",
+          lineHeight: 0.95,
+          letterSpacing: "-0.05em",
+          background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 35%, #a855f7 55%, #f59e0b 80%, #f43f5e 100%)",
+          backgroundSize: "250% 250%",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+          animation: "gradient-flow 8s ease infinite",
+          filter: "drop-shadow(0 0 50px rgba(0, 240, 255, 0.25))",
+        }}>
           Jellyfin<br />Wrapped
-        </Title>
+        </motion.h1>
 
-        <Subtitle as={motion.p} variants={itemVariants}>
-          Discover your personalized entertainment recap. 
-          Uncover viewing trends, hidden favorites, and meaningful insights 
+        <motion.p variants={itemVariants} style={{
+          fontSize: "clamp(1.125rem, 2vw, 1.5rem)",
+          marginBottom: "3rem",
+          lineHeight: 1.7,
+          color: "#94a3b8",
+          maxWidth: "620px",
+          margin: "0 auto 3rem",
+          fontWeight: 400,
+        }}>
+          Discover your personalized entertainment recap.{" "}
+          Uncover viewing trends, hidden favorites, and meaningful insights{" "}
           from your Jellyfin library.
-        </Subtitle>
+        </motion.p>
 
         <motion.div variants={itemVariants}>
           <TimeframeSelector onTimeframeChange={handleTimeframeChange} />
         </motion.div>
 
-        <FeaturesList as={motion.ul} variants={listVariants}>
+        <motion.ul
+          variants={listVariants}
+          style={{
+            listStyle: "none",
+            padding: 0,
+            marginBottom: "3.5rem",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: "1rem",
+            maxWidth: "800px",
+            margin: "0 auto 3.5rem",
+          }}
+        >
           {features.map((feature, index) => (
-            <FeatureItem as={motion.li} key={index} variants={featureVariants}>
+            <motion.li
+              key={index}
+              variants={featureVariants}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                fontSize: "1rem",
+                padding: "1.125rem 1.5rem",
+                color: "#e2e8f0",
+                textAlign: "left",
+                background: "rgba(18, 21, 28, 0.75)",
+                backdropFilter: "blur(16px)",
+                borderRadius: "16px",
+                border: "1px solid rgba(255, 255, 255, 0.03)",
+                transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
               <FeatureIcon style={{ background: `${feature.color}12`, borderColor: `${feature.color}20` }}>
                 <feature.icon size={20} style={{ color: feature.color }} />
               </FeatureIcon>
               <FeatureText>{feature.text}</FeatureText>
               <FeatureArrow style={{ color: feature.color }}>→</FeatureArrow>
-            </FeatureItem>
+            </motion.li>
           ))}
-        </FeaturesList>
+        </motion.ul>
 
         <motion.div
           variants={itemVariants}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] as const }}
           style={{ willChange: "transform" }}
         >
           <StyledButton
@@ -282,172 +286,90 @@ const SplashPage = () => {
           </StyledButton>
         </motion.div>
 
-        <Disclaimer as={motion.p} variants={itemVariants}>
+        <motion.p
+          variants={itemVariants}
+          style={{
+            fontSize: "0.875rem",
+            color: "#475569",
+            marginTop: "3.5rem",
+            lineHeight: 1.7,
+            maxWidth: "500px",
+            margin: "3.5rem auto 0",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.75rem",
+          }}
+        >
           <LockBadge>
             <Star size={10} />
             <span>100% Private</span>
           </LockBadge>
           <span>Your data never leaves your browser. Completely client-side.</span>
-        </Disclaimer>
-      </ContentWrapper>
+        </motion.p>
+      </motion.div>
     </Container>
   );
 };
 
-const GeometricLayer = styled("div", {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  overflow: "hidden",
-  pointerEvents: "none",
-});
+const GeometricLayer = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, overflow: "hidden", pointerEvents: "none", ...style }} {...props}>{children}</div>
+);
 
-const GeometricShape = styled("div", {
-  position: "absolute",
-  border: "1px solid rgba(0, 240, 255, 0.1)",
-  borderRadius: "8px",
-  
-  variants: {
-    variant: {
-      ring: {
-        borderRadius: "50%",
-        borderWidth: "2px",
-        borderStyle: "dashed",
-        borderColor: "rgba(168, 85, 247, 0.12)",
-      },
-      triangle: {
-        borderRadius: "0",
-        clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
-        background: "rgba(16, 185, 129, 0.04)",
-        border: "none",
-      },
-      dots: {
-        border: "none",
-        backgroundImage: "radial-gradient(rgba(245, 158, 11, 0.2) 2px, transparent 2px)",
-        backgroundSize: "12px 12px",
-      },
-    },
-  },
-});
+const GeometricShape = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "absolute", border: "1px solid rgba(0, 240, 255, 0.1)", borderRadius: "8px", ...style }} {...props} />
+);
 
-const OrbContainer = styled("div", {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  overflow: "hidden",
-  pointerEvents: "none",
-});
+const GeometricShapeRing = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "absolute", borderRadius: "50%", borderWidth: "2px", borderStyle: "dashed", borderColor: "rgba(168, 85, 247, 0.12)", ...style }} {...props} />
+);
 
-const Orb = styled("div", {
-  position: "absolute",
-  borderRadius: "50%",
-  filter: "blur(100px)",
-});
+const GeometricShapeTriangle = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "absolute", borderRadius: "0", clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)", background: "rgba(16, 185, 129, 0.04)", ...style }} {...props} />
+);
 
-const GridOverlay = styled("div", {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundImage: `
-    linear-gradient(rgba(0, 240, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.02) 1px, transparent 1px)
-  `,
-  backgroundSize: "80px 80px",
-  pointerEvents: "none",
-  opacity: 0.5,
-});
+const GeometricShapeDots = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "absolute", backgroundImage: "radial-gradient(rgba(245, 158, 11, 0.2) 2px, transparent 2px)", backgroundSize: "12px 12px", ...style }} {...props} />
+);
 
-const ParticleField = styled("div", {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  pointerEvents: "none",
-  overflow: "hidden",
-});
+const OrbContainer = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, overflow: "hidden", pointerEvents: "none", ...style }} {...props}>{children}</div>
+);
 
-const Particle = styled("div", {
-  position: "absolute",
-  borderRadius: "50%",
-  boxShadow: "0 0 8px currentColor",
-});
+const Orb = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "absolute", borderRadius: "50%", filter: "blur(100px)", ...style }} {...props} />
+);
 
+const GridOverlay = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundImage: "linear-gradient(rgba(0, 240, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.02) 1px, transparent 1px)", backgroundSize: "80px 80px", pointerEvents: "none", opacity: 0.5, ...style }} {...props} />
+);
 
-const FeatureIcon = styled("span", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "44px",
-  height: "44px",
-  borderRadius: "12px",
-  border: "1px solid",
-  flexShrink: 0,
-  transition: "all 0.25s ease",
-  
-  "@media (max-width: 480px)": {
-    width: "38px",
-    height: "38px",
-  },
-  
-  "li:hover &": {
-    transform: "scale(1.1) rotate(5deg)",
-  },
-});
+const ParticleField = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", overflow: "hidden", ...style }} {...props}>{children}</div>
+);
 
-const FeatureText = styled("span", {
-  flex: 1,
-  marginLeft: "14px",
-  fontWeight: 500,
-  fontSize: "1rem",
-  letterSpacing: "-0.01em",
-  
-  "@media (max-width: 480px)": {
-    marginLeft: "10px",
-    fontSize: "0.9rem",
-  },
-});
+const Particle = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "absolute", borderRadius: "50%", boxShadow: "0 0 8px currentColor", ...style }} {...props} />
+);
 
-const FeatureArrow = styled("span", {
-  fontSize: "1.25rem",
-  opacity: 0,
-  transform: "translateX(-8px)",
-  transition: "all 0.25s ease",
-  
-  "li:hover &": {
-    opacity: 1,
-    transform: "translateX(0)",
-  },
-});
+const FeatureIcon = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "44px", height: "44px", borderRadius: "12px", border: "1px solid", flexShrink: 0, transition: "all 0.25s ease", ...style }} {...props}>{children}</span>
+);
 
-const ButtonContent = styled("span", {
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-  position: "relative",
-  zIndex: 1,
-});
+const FeatureText = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ flex: 1, marginLeft: "14px", fontWeight: 500, fontSize: "1rem", letterSpacing: "-0.01em", ...style }} {...props}>{children}</span>
+);
 
-const LockBadge = styled("span", {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "4px",
-  padding: "4px 10px",
-  background: "rgba(16, 185, 129, 0.1)",
-  border: "1px solid rgba(16, 185, 129, 0.2)",
-  borderRadius: "999px",
-  fontSize: "0.7rem",
-  fontWeight: 600,
-  color: "#10b981",
-  marginRight: "10px",
-  textTransform: "uppercase",
-  letterSpacing: "0.05em",
-});
+const FeatureArrow = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ fontSize: "1.25rem", opacity: 0, transform: "translateX(-8px)", transition: "all 0.25s ease", ...style }} {...props}>{children}</span>
+);
+
+const ButtonContent = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ display: "flex", alignItems: "center", gap: "12px", position: "relative", zIndex: 1, ...style }} {...props}>{children}</span>
+);
+
+const LockBadge = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "4px 10px", background: "rgba(16, 185, 129, 0.1)", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: "999px", fontSize: "0.7rem", fontWeight: 600, color: "#10b981", marginRight: "10px", textTransform: "uppercase", letterSpacing: "0.05em", ...style }} {...props}>{children}</span>
+);
 
 export default SplashPage;

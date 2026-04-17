@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Grid } from "@radix-ui/themes";
-import { motion } from "framer-motion";
-import { Title } from "../ui/styled";
+import { motion } from "motion/react";
 import { itemVariants } from "@/lib/styled-variants";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { generateGuid } from "@/lib/utils";
@@ -45,9 +44,22 @@ export default function HolidayReviewPage() {
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
-            <Title as={motion.h1} variants={itemVariants}>
+            <motion.h1 variants={itemVariants} style={{
+              fontSize: "clamp(2.75rem, 8vw, 5.5rem)",
+              fontWeight: 800,
+              marginBottom: "1.75rem",
+              lineHeight: 0.95,
+              letterSpacing: "-0.05em",
+              background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 35%, #a855f7 55%, #f59e0b 80%, #f43f5e 100%)",
+              backgroundSize: "250% 250%",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              animation: "gradient-flow 8s ease infinite",
+              filter: "drop-shadow(0 0 50px rgba(0, 240, 255, 0.25))",
+            }}>
               What You Watched on Holidays
-            </Title>
+            </motion.h1>
             <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
               Your viewing activity during special occasions
             </p>
@@ -55,9 +67,21 @@ export default function HolidayReviewPage() {
 
           {christmasItems.length > 0 && (
             <>
-              <Title as={motion.h2} variants={itemVariants}>
+              <motion.h2 variants={itemVariants} style={{
+                fontSize: "clamp(1.75rem, 5vw, 3rem)",
+                fontWeight: 700,
+                marginBottom: "1rem",
+                lineHeight: 1.1,
+                letterSpacing: "-0.03em",
+                background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 35%, #a855f7 55%, #f59e0b 80%, #f43f5e 100%)",
+                backgroundSize: "250% 250%",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                animation: "gradient-flow 8s ease infinite",
+              }}>
                 Christmas
-              </Title>
+              </motion.h2>
               <Grid
                 columns={{ initial: "2", sm: "3", md: "4", lg: "5" }}
                 gap="4"
@@ -71,9 +95,21 @@ export default function HolidayReviewPage() {
 
           {christmasEveItems.length > 0 && (
             <>
-              <Title as={motion.h2} variants={itemVariants}>
+              <motion.h2 variants={itemVariants} style={{
+                fontSize: "clamp(1.75rem, 5vw, 3rem)",
+                fontWeight: 700,
+                marginBottom: "1rem",
+                lineHeight: 1.1,
+                letterSpacing: "-0.03em",
+                background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 35%, #a855f7 55%, #f59e0b 80%, #f43f5e 100%)",
+                backgroundSize: "250% 250%",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                animation: "gradient-flow 8s ease infinite",
+              }}>
                 Christmas Eve
-              </Title>
+              </motion.h2>
               <Grid
                 columns={{ initial: "2", sm: "3", md: "4", lg: "5" }}
                 gap="4"
@@ -87,9 +123,21 @@ export default function HolidayReviewPage() {
 
           {halloweenItems.length > 0 && (
             <>
-              <Title as={motion.h2} variants={itemVariants}>
+              <motion.h2 variants={itemVariants} style={{
+                fontSize: "clamp(1.75rem, 5vw, 3rem)",
+                fontWeight: 700,
+                marginBottom: "1rem",
+                lineHeight: 1.1,
+                letterSpacing: "-0.03em",
+                background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 35%, #a855f7 55%, #f59e0b 80%, #f43f5e 100%)",
+                backgroundSize: "250% 250%",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                animation: "gradient-flow 8s ease infinite",
+              }}>
                 Halloween
-              </Title>
+              </motion.h2>
               <Grid
                 columns={{ initial: "2", sm: "3", md: "4", lg: "5" }}
                 gap="4"
@@ -103,9 +151,21 @@ export default function HolidayReviewPage() {
 
           {valentinesItems.length > 0 && (
             <>
-              <Title as={motion.h2} variants={itemVariants}>
+              <motion.h2 variants={itemVariants} style={{
+                fontSize: "clamp(1.75rem, 5vw, 3rem)",
+                fontWeight: 700,
+                marginBottom: "1rem",
+                lineHeight: 1.1,
+                letterSpacing: "-0.03em",
+                background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 35%, #a855f7 55%, #f59e0b 80%, #f43f5e 100%)",
+                backgroundSize: "250% 250%",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                animation: "gradient-flow 8s ease infinite",
+              }}>
                 Valentine's Day
-              </Title>
+              </motion.h2>
               <Grid
                 columns={{ initial: "2", sm: "3", md: "4", lg: "5" }}
                 gap="4"

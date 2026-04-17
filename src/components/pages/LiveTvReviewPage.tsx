@@ -5,11 +5,10 @@ import {
   Text,
   Flex,
 } from "@radix-ui/themes";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useData } from "@/contexts/DataContext";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { formatDuration } from "@/lib/utils";
-import { Title } from "../ui/styled";
 import PageContainer from "../PageContainer";
 
 function ChannelCard({
@@ -61,9 +60,22 @@ export default function LiveTvReviewPage() {
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
-            <Title as={motion.h1}>
+            <motion.h1 style={{
+              fontSize: "clamp(2.75rem, 8vw, 5.5rem)",
+              fontWeight: 800,
+              marginBottom: "1.75rem",
+              lineHeight: 0.95,
+              letterSpacing: "-0.05em",
+              background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 35%, #a855f7 55%, #f59e0b 80%, #f43f5e 100%)",
+              backgroundSize: "250% 250%",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              animation: "gradient-flow 8s ease infinite",
+              filter: "drop-shadow(0 0 50px rgba(0, 240, 255, 0.25))",
+            }}>
               You Watched {sortedChannels.length} Live TV Channels
-            </Title>
+            </motion.h1>
             <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
               Your live television viewing across different channels
             </p>

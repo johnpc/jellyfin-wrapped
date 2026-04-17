@@ -1,11 +1,10 @@
+import React from "react";
 import { Container, Grid } from "@radix-ui/themes";
-import { motion } from "framer-motion";
-import { Title } from "../ui/styled";
+import { motion } from "motion/react";
 import { itemVariants } from "@/lib/styled-variants";
 import { useData } from "@/contexts/DataContext";
 import { LoadingSpinner } from "../LoadingSpinner";
 import PageContainer from "../PageContainer";
-import { styled } from "@stitches/react";
 import { Monitor, Globe, Cpu, Smartphone, Tv, Laptop } from "lucide-react";
 
 // Get icon for device type
@@ -47,9 +46,22 @@ export default function DeviceStatsPage() {
       <Container size="4" p="4">
         <Grid gap="6">
           <HeaderSection>
-            <Title as={motion.h1} variants={itemVariants}>
+            <motion.h1 variants={itemVariants} style={{
+              fontSize: "clamp(2.75rem, 8vw, 5.5rem)",
+              fontWeight: 800,
+              marginBottom: "1.75rem",
+              lineHeight: 0.95,
+              letterSpacing: "-0.05em",
+              background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 35%, #a855f7 55%, #f59e0b 80%, #f43f5e 100%)",
+              backgroundSize: "250% 250%",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              animation: "gradient-flow 8s ease infinite",
+              filter: "drop-shadow(0 0 50px rgba(0, 240, 255, 0.25))",
+            }}>
               Your Viewing Devices
-            </Title>
+            </motion.h1>
             <Subtitle>
               Where you watch your content across different devices and apps
             </Subtitle>
@@ -58,8 +70,16 @@ export default function DeviceStatsPage() {
           <StatsGrid>
             {/* Devices Section */}
             {deviceUsage.length > 0 && (
-              <StatSection
-                as={motion.div}
+              <motion.div
+                style={{
+                  background: "rgba(18, 21, 28, 0.8)",
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                  borderRadius: "18px",
+                  padding: "24px",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+                }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
@@ -78,7 +98,7 @@ export default function DeviceStatsPage() {
                         <StatInfo>
                           <StatName>{device.name}</StatName>
                           <ProgressBar>
-                            <ProgressFill style={{ width: `${percentage}%` }} variant="cyan" />
+                            <ProgressFill style={{ width: `${percentage}%`, background: "linear-gradient(90deg, #00f0ff 0%, #22d3ee 100%)" }} />
                           </ProgressBar>
                         </StatInfo>
                         <StatValue>
@@ -89,13 +109,21 @@ export default function DeviceStatsPage() {
                     );
                   })}
                 </StatList>
-              </StatSection>
+              </motion.div>
             )}
 
             {/* Clients/Apps Section */}
             {browserUsage.length > 0 && (
-              <StatSection
-                as={motion.div}
+              <motion.div
+                style={{
+                  background: "rgba(18, 21, 28, 0.8)",
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                  borderRadius: "18px",
+                  padding: "24px",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+                }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -114,7 +142,7 @@ export default function DeviceStatsPage() {
                         <StatInfo>
                           <StatName>{browser.name}</StatName>
                           <ProgressBar>
-                            <ProgressFill style={{ width: `${percentage}%` }} variant="violet" />
+                            <ProgressFill style={{ width: `${percentage}%`, background: "linear-gradient(90deg, #a855f7 0%, #c084fc 100%)" }} />
                           </ProgressBar>
                         </StatInfo>
                         <StatValue>
@@ -125,13 +153,21 @@ export default function DeviceStatsPage() {
                     );
                   })}
                 </StatList>
-              </StatSection>
+              </motion.div>
             )}
 
             {/* OS Section */}
             {osUsage.length > 0 && (
-              <StatSection
-                as={motion.div}
+              <motion.div
+                style={{
+                  background: "rgba(18, 21, 28, 0.8)",
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                  borderRadius: "18px",
+                  padding: "24px",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+                }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
@@ -150,7 +186,7 @@ export default function DeviceStatsPage() {
                         <StatInfo>
                           <StatName>{os.name}</StatName>
                           <ProgressBar>
-                            <ProgressFill style={{ width: `${percentage}%` }} variant="gold" />
+                            <ProgressFill style={{ width: `${percentage}%`, background: "linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%)" }} />
                           </ProgressBar>
                         </StatInfo>
                         <StatValue>
@@ -161,7 +197,7 @@ export default function DeviceStatsPage() {
                     );
                   })}
                 </StatList>
-              </StatSection>
+              </motion.div>
             )}
           </StatsGrid>
         </Grid>
@@ -170,157 +206,243 @@ export default function DeviceStatsPage() {
   );
 }
 
-const HeaderSection = styled("div", {
-  textAlign: "center",
-  marginBottom: "1rem",
-});
+const HeaderSection = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      textAlign: "center",
+      marginBottom: "1rem",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const Subtitle = styled("p", {
-  fontSize: "1.125rem",
-  color: "#94a3b8",
-  marginTop: "0.5rem",
-});
+const Subtitle = ({ children, style, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  <p
+    style={{
+      fontSize: "1.125rem",
+      color: "#94a3b8",
+      marginTop: "0.5rem",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </p>
+);
 
-const StatsGrid = styled("div", {
-  display: "grid",
-  gap: "1.5rem",
-  gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
-  
-  "@media (max-width: 768px)": {
-    gridTemplateColumns: "1fr",
-  },
-});
+const StatsGrid = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "grid",
+      gap: "1.5rem",
+      gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const StatSection = styled("div", {
-  background: "rgba(18, 21, 28, 0.8)",
-  backdropFilter: "blur(12px)",
-  WebkitBackdropFilter: "blur(12px)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
-  borderRadius: "18px",
-  padding: "24px",
-  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
-  
-  "@media (max-width: 768px)": {
-    padding: "20px 16px",
-    borderRadius: "16px",
-  },
-});
+const SectionHeader = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      marginBottom: "20px",
+      color: "#00f0ff",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const SectionHeader = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-  marginBottom: "20px",
-  color: "#00f0ff",
-});
+const SectionTitle = ({ children, style, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h3
+    style={{
+      fontSize: "1.25rem",
+      fontWeight: 700,
+      color: "#f8fafc",
+      margin: 0,
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </h3>
+);
 
-const SectionTitle = styled("h3", {
-  fontSize: "1.25rem",
-  fontWeight: 700,
-  color: "#f8fafc",
-  margin: 0,
-});
+const StatList = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "12px",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const StatList = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  gap: "12px",
-});
+const StatItem = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      padding: "12px",
+      background: "rgba(255, 255, 255, 0.02)",
+      borderRadius: "12px",
+      transition: "all 0.2s ease",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const StatItem = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-  padding: "12px",
-  background: "rgba(255, 255, 255, 0.02)",
-  borderRadius: "12px",
-  transition: "all 0.2s ease",
-  
-  "&:hover": {
-    background: "rgba(255, 255, 255, 0.05)",
-  },
-});
+const StatRank = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span
+    style={{
+      width: "24px",
+      height: "24px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "rgba(0, 240, 255, 0.1)",
+      borderRadius: "6px",
+      fontSize: "0.75rem",
+      fontWeight: 700,
+      color: "#00f0ff",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </span>
+);
 
-const StatRank = styled("span", {
-  width: "24px",
-  height: "24px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: "rgba(0, 240, 255, 0.1)",
-  borderRadius: "6px",
-  fontSize: "0.75rem",
-  fontWeight: 700,
-  color: "#00f0ff",
-});
+const StatIcon = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      color: "#64748b",
+      display: "flex",
+      alignItems: "center",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const StatIcon = styled("div", {
-  color: "#64748b",
-  display: "flex",
-  alignItems: "center",
-});
+const StatInfo = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      flex: 1,
+      minWidth: 0,
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const StatInfo = styled("div", {
-  flex: 1,
-  minWidth: 0,
-});
+const StatName = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span
+    style={{
+      display: "block",
+      fontSize: "0.95rem",
+      fontWeight: 600,
+      color: "#f8fafc",
+      marginBottom: "6px",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </span>
+);
 
-const StatName = styled("span", {
-  display: "block",
-  fontSize: "0.95rem",
-  fontWeight: 600,
-  color: "#f8fafc",
-  marginBottom: "6px",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-});
+const ProgressBar = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      height: "4px",
+      background: "rgba(255, 255, 255, 0.1)",
+      borderRadius: "2px",
+      overflow: "hidden",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const ProgressBar = styled("div", {
-  height: "4px",
-  background: "rgba(255, 255, 255, 0.1)",
-  borderRadius: "2px",
-  overflow: "hidden",
-});
+const ProgressFill = ({ style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      height: "100%",
+      borderRadius: "2px",
+      transition: "width 0.5s ease",
+      background: "linear-gradient(90deg, #00f0ff 0%, #22d3ee 100%)",
+      ...style,
+    }}
+    {...props}
+  />
+);
 
-const ProgressFill = styled("div", {
-  height: "100%",
-  borderRadius: "2px",
-  transition: "width 0.5s ease",
-  
-  variants: {
-    variant: {
-      cyan: {
-        background: "linear-gradient(90deg, #00f0ff 0%, #22d3ee 100%)",
-      },
-      violet: {
-        background: "linear-gradient(90deg, #a855f7 0%, #c084fc 100%)",
-      },
-      gold: {
-        background: "linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%)",
-      },
-    },
-  },
-  
-  defaultVariants: {
-    variant: "cyan",
-  },
-});
+const StatValue = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      textAlign: "right",
+      minWidth: "70px",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const StatValue = styled("div", {
-  textAlign: "right",
-  minWidth: "70px",
-});
+const StatCount = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span
+    style={{
+      display: "block",
+      fontSize: "0.9rem",
+      fontWeight: 700,
+      color: "#f8fafc",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </span>
+);
 
-const StatCount = styled("span", {
-  display: "block",
-  fontSize: "0.9rem",
-  fontWeight: 700,
-  color: "#f8fafc",
-});
-
-const StatPercent = styled("span", {
-  display: "block",
-  fontSize: "0.75rem",
-  color: "#64748b",
-});
+const StatPercent = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span
+    style={{
+      display: "block",
+      fontSize: "0.75rem",
+      color: "#64748b",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </span>
+);

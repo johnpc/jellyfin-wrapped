@@ -1,6 +1,6 @@
+import React from "react";
 import { Avatar } from "@radix-ui/themes";
 import { SimpleItemDto, PersonDto } from "@/lib/queries";
-import { styled } from "@stitches/react";
 
 interface ActorCardProps {
   name: string;
@@ -56,66 +56,124 @@ export function ActorCard({
   );
 }
 
-const CardContainer = styled("div", {
-  background: "rgba(15, 18, 25, 0.8)",
-  borderRadius: "16px",
-  overflow: "hidden",
-  border: "1px solid rgba(255, 255, 255, 0.06)",
-  transition: "all 0.3s ease",
-  
-  "&:hover": {
-    transform: "translateY(-4px)",
-    borderColor: "rgba(0, 240, 255, 0.2)",
-    boxShadow: "0 12px 40px rgba(0, 0, 0, 0.4)",
-  },
-});
+const CardContainer = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      background: "rgba(15, 18, 25, 0.8)",
+      borderRadius: "16px",
+      overflow: "hidden",
+      border: "1px solid rgba(255, 255, 255, 0.06)",
+      transition: "all 0.3s ease",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const ImageContainer = styled("div", {
-  aspectRatio: "2/3",
-  position: "relative",
-  overflow: "hidden",
-  background: "linear-gradient(180deg, rgba(0, 240, 255, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)",
-});
+const ImageContainer = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      aspectRatio: "2/3",
+      position: "relative",
+      overflow: "hidden",
+      background: "linear-gradient(180deg, rgba(0, 240, 255, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const CardContent = styled("div", {
-  padding: "16px",
-});
+const CardContent = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      padding: "16px",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const ActorName = styled("h3", {
-  fontSize: "1.1rem",
-  fontWeight: 600,
-  color: "#f8fafc",
-  marginBottom: "6px",
-  fontFamily: "'Sora', sans-serif",
-  lineHeight: 1.3,
-});
+const ActorName = ({ children, style, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h3
+    style={{
+      fontSize: "1.1rem",
+      fontWeight: 600,
+      color: "#f8fafc",
+      marginBottom: "6px",
+      fontFamily: "'Sora', sans-serif",
+      lineHeight: 1.3,
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </h3>
+);
 
-const WatchCount = styled("p", {
-  fontSize: "0.875rem",
-  color: "#00f0ff",
-  fontWeight: 500,
-  marginBottom: "10px",
-});
+const WatchCount = ({ children, style, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  <p
+    style={{
+      fontSize: "0.875rem",
+      color: "#00f0ff",
+      fontWeight: 500,
+      marginBottom: "10px",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </p>
+);
 
-const TitleList = styled("ul", {
-  listStyle: "none",
-  padding: 0,
-  margin: 0,
-  display: "flex",
-  flexDirection: "column",
-  gap: "4px",
-});
+const TitleList = ({ children, style, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
+  <ul
+    style={{
+      listStyle: "none",
+      padding: 0,
+      margin: 0,
+      display: "flex",
+      flexDirection: "column",
+      gap: "4px",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </ul>
+);
 
-const TitleItem = styled("li", {
-  fontSize: "0.8rem",
-  color: "#94a3b8",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
-});
+const TitleItem = ({ children, style, ...props }: React.HTMLAttributes<HTMLLIElement>) => (
+  <li
+    style={{
+      fontSize: "0.8rem",
+      color: "#94a3b8",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </li>
+);
 
-const MoreCount = styled("span", {
-  fontSize: "0.75rem",
-  color: "#64748b",
-  fontStyle: "italic",
-});
+const MoreCount = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span
+    style={{
+      fontSize: "0.75rem",
+      color: "#64748b",
+      fontStyle: "italic",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </span>
+);

@@ -1,15 +1,15 @@
+import React from "react";
 import { Container, Grid } from "@radix-ui/themes";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useData } from "@/contexts/DataContext";
 import { LoadingSpinner } from "../LoadingSpinner";
-import { Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
 import { format } from "date-fns";
 import { SimpleItemDto } from "@/lib/queries";
 import { formatWatchTime } from "@/lib/time-helpers";
 import PageContainer from "../PageContainer";
-import { styled } from "@stitches/react";
 import { Calendar, Clock } from "lucide-react";
+import { getCurrentTimeframe } from "@/lib/timeframe";
 
 type MonthlyShowStats = {
   month: Date;
@@ -23,6 +23,7 @@ type MonthlyShowStats = {
 export default function ShowOfTheMonthPage() {
   const { monthlyShowStats, isLoading } = useData();
   const { data: stats } = monthlyShowStats;
+  const timeframe = getCurrentTimeframe();
 
   if (isLoading || !stats?.length) {
     return <LoadingSpinner />;
@@ -38,22 +39,34 @@ export default function ShowOfTheMonthPage() {
       <Container size="4" p="4">
         <Grid gap="6">
           <HeaderSection>
-            <Title as={motion.h1} variants={itemVariants}>
+            <motion.h1 variants={itemVariants} style={{
+              fontSize: "clamp(2.75rem, 8vw, 5.5rem)",
+              fontWeight: 800,
+              marginBottom: "1.75rem",
+              lineHeight: 0.95,
+              letterSpacing: "-0.05em",
+              background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 35%, #a855f7 55%, #f59e0b 80%, #f43f5e 100%)",
+              backgroundSize: "250% 250%",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              animation: "gradient-flow 8s ease infinite",
+              filter: "drop-shadow(0 0 50px rgba(0, 240, 255, 0.25))",
+            }}>
               Your Top Show Each Month
-            </Title>
+            </motion.h1>
             <Subtitle>
-              The show you watched the most in each month of the year
+              The show you watched the most each month in {timeframe.name}
             </Subtitle>
           </HeaderSection>
 
           <ContentGrid>
             {sortedStats.map((stat: MonthlyShowStats) => (
-              <ShowCard
+              <motion.div
                 key={stat.month.toISOString()}
-                as={motion.div}
+                style={{ background: "rgba(18, 21, 28, 0.8)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(255, 255, 255, 0.05)", borderRadius: "18px", overflow: "hidden", width: "100%", boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)", transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)", willChange: "transform" }}
                 whileHover={{ scale: 1.02, y: -4 }}
-                transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-                style={{ willChange: "transform" }}
+                transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] as const }}
               >
                 <ImageContainer>
                   {stat.topShow.item.imageUrl ? (
@@ -79,7 +92,7 @@ export default function ShowOfTheMonthPage() {
                     <span>{formatWatchTime(stat.topShow.watchTimeMinutes)}</span>
                   </WatchTime>
                 </CardContent>
-              </ShowCard>
+              </motion.div>
             ))}
           </ContentGrid>
         </Grid>
@@ -88,184 +101,46 @@ export default function ShowOfTheMonthPage() {
   );
 }
 
-const HeaderSection = styled("div", {
-  textAlign: "center",
-  marginBottom: "1rem",
-});
+const HeaderSection = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ textAlign: "center", marginBottom: "1rem", ...style }} {...props}>{children}</div>
+);
 
-const Subtitle = styled("p", {
-  fontSize: "1.125rem",
-  color: "#94a3b8",
-  marginTop: "0.5rem",
-});
+const Subtitle = ({ children, style, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+  <p style={{ fontSize: "1.125rem", color: "#94a3b8", marginTop: "0.5rem", ...style }} {...props}>{children}</p>
+);
 
-const ContentGrid = styled("div", {
-  display: "grid",
-  gridTemplateColumns: "repeat(2, 1fr)",
-  gap: "12px",
-  alignItems: "stretch",
-  justifyContent: "center",
-  
-  "& > *": {
-    maxWidth: "100%",
-    minWidth: 0,
-  },
-  
-  "@media (min-width: 640px)": {
-    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 200px))",
-    gap: "20px",
-    justifyContent: "center",
-    "& > *": {
-      maxWidth: "200px",
-    },
-  },
-  
-  "@media (min-width: 768px)": {
-    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 200px))",
-    gap: "20px",
-    justifyContent: "center",
-    "& > *": {
-      maxWidth: "200px",
-    },
-  },
-});
+const ContentGrid = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", alignItems: "stretch", justifyContent: "center", ...style }} {...props}>{children}</div>
+);
 
-const ShowCard = styled("div", {
-  background: "rgba(18, 21, 28, 0.8)",
-  backdropFilter: "blur(12px)",
-  WebkitBackdropFilter: "blur(12px)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
-  borderRadius: "18px",
-  overflow: "hidden",
-  width: "100%",
-  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
-  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+const ImageContainer = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "relative", width: "100%", aspectRatio: "2/3", overflow: "hidden", ...style }} {...props}>{children}</div>
+);
 
-  "&:hover": {
-    borderColor: "rgba(0, 240, 255, 0.15)",
-    boxShadow: "0 8px 32px rgba(0, 240, 255, 0.1)",
-  },
-  
-  "@media (max-width: 640px)": {
-    borderRadius: "14px",
-  },
-});
+const PosterImage = ({ style, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => (
+  <img style={{ width: "100%", height: "100%", objectFit: "cover", ...style }} {...props} />
+);
 
-const ImageContainer = styled("div", {
-  position: "relative",
-  width: "100%",
-  aspectRatio: "2/3",
-  overflow: "hidden",
-});
+const PlaceholderImage = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)", color: "#64748b", ...style }} {...props}>{children}</div>
+);
 
-const PosterImage = styled("img", {
-  width: "100%",
-  height: "100%",
-  objectFit: "cover",
-});
+const MonthBadge = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ position: "absolute", top: "12px", right: "12px", display: "flex", alignItems: "center", gap: "6px", padding: "8px 12px", background: "rgba(0, 240, 255, 0.15)", backdropFilter: "blur(8px)", borderRadius: "10px", color: "#00f0ff", fontSize: "0.85rem", fontWeight: 600, border: "1px solid rgba(0, 240, 255, 0.2)", ...style }} {...props}>{children}</div>
+);
 
-const PlaceholderImage = styled("div", {
-  width: "100%",
-  height: "100%",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: "linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%)",
-  color: "#64748b",
-  
-  "@media (max-width: 640px)": {
-    "& svg": {
-      width: "24px",
-      height: "24px",
-    },
-  },
-});
+const CardContent = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ padding: "16px 18px 20px", display: "flex", flexDirection: "column", gap: "6px", ...style }} {...props}>{children}</div>
+);
 
-const MonthBadge = styled("div", {
-  position: "absolute",
-  top: "12px",
-  right: "12px",
-  display: "flex",
-  alignItems: "center",
-  gap: "6px",
-  padding: "8px 12px",
-  background: "rgba(0, 240, 255, 0.15)",
-  backdropFilter: "blur(8px)",
-  borderRadius: "10px",
-  color: "#00f0ff",
-  fontSize: "0.85rem",
-  fontWeight: 600,
-  border: "1px solid rgba(0, 240, 255, 0.2)",
-  
-  "@media (max-width: 640px)": {
-    top: "8px",
-    right: "8px",
-    padding: "6px 10px",
-    fontSize: "0.75rem",
-    gap: "4px",
-  },
-});
+const MonthLabel = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span style={{ fontSize: "0.8rem", color: "#00f0ff", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", ...style }} {...props}>{children}</span>
+);
 
-const CardContent = styled("div", {
-  padding: "16px 18px 20px",
-  display: "flex",
-  flexDirection: "column",
-  gap: "6px",
-  
-  "@media (max-width: 640px)": {
-    padding: "12px 14px 16px",
-    gap: "4px",
-  },
-});
+const ShowTitle = ({ children, style, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+  <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#f8fafc", margin: 0, lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", ...style }} {...props}>{children}</h3>
+);
 
-const MonthLabel = styled("span", {
-  fontSize: "0.8rem",
-  color: "#00f0ff",
-  fontWeight: 600,
-  textTransform: "uppercase",
-  letterSpacing: "0.05em",
-  
-  "@media (max-width: 640px)": {
-    fontSize: "0.7rem",
-  },
-});
-
-const ShowTitle = styled("h3", {
-  fontSize: "1.1rem",
-  fontWeight: 700,
-  color: "#f8fafc",
-  margin: 0,
-  lineHeight: 1.3,
-  display: "-webkit-box",
-  WebkitLineClamp: 2,
-  WebkitBoxOrient: "vertical",
-  overflow: "hidden",
-  
-  "@media (max-width: 640px)": {
-    fontSize: "0.95rem",
-    WebkitLineClamp: 2,
-  },
-});
-
-const WatchTime = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  gap: "6px",
-  fontSize: "0.9rem",
-  color: "#94a3b8",
-  marginTop: "4px",
-  
-  "@media (max-width: 640px)": {
-    fontSize: "0.8rem",
-    gap: "4px",
-  },
-  
-  "& svg": {
-    color: "#64748b",
-    
-    "@media (max-width: 640px)": {
-      width: "12px",
-      height: "12px",
-    },
-  },
-});
+const WatchTime = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.9rem", color: "#94a3b8", marginTop: "4px", ...style }} {...props}>{children}</div>
+);

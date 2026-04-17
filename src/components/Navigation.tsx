@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { styled } from "@stitches/react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import TimeframeSelector from "./TimeframeSelector";
 import { TimeframeOption } from "../lib/timeframe";
 import { getAvailablePages } from "../lib/navigation";
@@ -115,14 +114,33 @@ const Navigation = () => {
 
   return (
     <>
-      <NavToggle 
+      <motion.button
         onClick={toggleNav}
-        as={motion.button}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
-        style={{ willChange: "transform" }}
-        isOpen={isOpen}
+        transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] as const }}
+        style={{
+          position: "fixed",
+          top: "24px",
+          left: "24px",
+          zIndex: 1003,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "50px",
+          height: "50px",
+          background: isOpen ? "rgba(0, 240, 255, 0.1)" : "rgba(8, 9, 12, 0.95)",
+          backdropFilter: "blur(16px)",
+          border: isOpen
+            ? "1px solid rgba(0, 240, 255, 0.25)"
+            : "1px solid rgba(255, 255, 255, 0.05)",
+          borderRadius: "16px",
+          color: "#f8fafc",
+          cursor: "pointer",
+          boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+          transition: "all 0.25s ease",
+          willChange: "transform",
+        }}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -147,55 +165,142 @@ const Navigation = () => {
             </motion.div>
           )}
         </AnimatePresence>
-      </NavToggle>
+      </motion.button>
 
       <AnimatePresence>
         {isOpen && (
           <>
-            <Overlay
-              as={motion.div}
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               onClick={toggleNav}
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: "rgba(0, 0, 0, 0.75)",
+                backdropFilter: "blur(12px)",
+                zIndex: 1001,
+              }}
             />
-            <SideNav
-              as={motion.nav}
+            <motion.nav
               initial={{ x: "-100%", opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "-100%", opacity: 0 }}
-              transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+              transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] as const }}
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                height: "100vh",
+                width: "320px",
+                background: "rgba(8, 9, 12, 0.97)",
+                backdropFilter: "blur(40px) saturate(180%)",
+                WebkitBackdropFilter: "blur(40px) saturate(180%)",
+                borderRight: "1px solid rgba(255, 255, 255, 0.04)",
+                boxShadow: "4px 0 60px rgba(0, 0, 0, 0.6)",
+                zIndex: 1002,
+                overflowY: "auto",
+                overflowX: "hidden",
+                display: "flex",
+                flexDirection: "column",
+              }}
             >
               {/* Top gradient accent */}
-              <TopAccent />
-              
-              <NavHeader>
-                <NavTitle>
-                  <NavLogo>
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "2px",
+                  background: "linear-gradient(90deg, #00f0ff 0%, #a855f7 50%, #f59e0b 100%)",
+                  opacity: 0.8,
+                }}
+              />
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "28px 24px",
+                  borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
+                }}
+              >
+                <h2
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    color: "#f8fafc",
+                    margin: 0,
+                    fontSize: "1.15rem",
+                    fontWeight: 700,
+                    fontFamily: "'Sora', sans-serif",
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "40px",
+                      height: "40px",
+                      background: "linear-gradient(135deg, #00f0ff 0%, #22d3ee 50%, #10b981 100%)",
+                      borderRadius: "12px",
+                      marginRight: "14px",
+                      color: "#030304",
+                      boxShadow: "0 4px 20px rgba(0, 240, 255, 0.3)",
+                    }}
+                  >
                     <Zap size={18} />
-                  </NavLogo>
-                  <TitleText>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
                     <span>Jellyfin</span>
-                    <SubText>Wrapped</SubText>
-                  </TitleText>
-                </NavTitle>
-              </NavHeader>
+                    <span
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 500,
+                        color: "#00f0ff",
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      Wrapped
+                    </span>
+                  </div>
+                </h2>
+              </div>
 
-              <TimeframeContainer>
+              <div
+                style={{
+                  padding: "20px 24px 24px",
+                  borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
+                }}
+              >
                 <TimeframeSelector onTimeframeChange={handleTimeframeChange} />
-              </TimeframeContainer>
+              </div>
 
-              <NavList>
+              <ul
+                style={{
+                  listStyle: "none",
+                  padding: "16px 12px",
+                  margin: 0,
+                  flexGrow: 1,
+                }}
+              >
                 {navigationItems.map((item, index) => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.path;
-                  
+
                   return (
-                    <NavItem
-                      as={motion.li}
+                    <motion.li
                       key={item.path}
-                      isActive={isActive}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.02 }}
@@ -203,285 +308,100 @@ const Navigation = () => {
                         void navigate(item.path);
                         setIsOpen(false);
                       }}
+                      style={{
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        padding: "13px 16px",
+                        margin: "3px 0",
+                        color: isActive ? "#f8fafc" : "#94a3b8",
+                        cursor: "pointer",
+                        borderRadius: "14px",
+                        transition: "all 0.2s ease",
+                        fontFamily: "'Sora', sans-serif",
+                        fontSize: "0.9rem",
+                        fontWeight: 500,
+                        background: isActive ? "rgba(0, 240, 255, 0.08)" : undefined,
+                      }}
                     >
-                      <NavItemIcon isActive={isActive}>
+                      <span
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "38px",
+                          height: "38px",
+                          marginRight: "14px",
+                          borderRadius: "11px",
+                          background: isActive
+                            ? "linear-gradient(135deg, #00f0ff 0%, #22d3ee 100%)"
+                            : "rgba(255, 255, 255, 0.02)",
+                          color: isActive ? "#030304" : "#475569",
+                          transition: "all 0.25s ease",
+                          boxShadow: isActive ? "0 4px 16px rgba(0, 240, 255, 0.3)" : undefined,
+                        }}
+                      >
                         <Icon size={17} />
-                      </NavItemIcon>
-                      <NavItemText>{item.name}</NavItemText>
+                      </span>
+                      <span style={{ flex: 1, letterSpacing: "-0.01em" }}>{item.name}</span>
                       {isActive && (
-                        <ActiveIndicator
-                          as={motion.div}
+                        <motion.div
                           layoutId="activeIndicator"
-                          transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+                          transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] as const }}
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            width: "3px",
+                            height: "28px",
+                            background: "linear-gradient(180deg, #00f0ff 0%, #22d3ee 100%)",
+                            borderRadius: "0 4px 4px 0",
+                            boxShadow: "0 0 16px rgba(0, 240, 255, 0.5)",
+                          }}
                         />
                       )}
-                    </NavItem>
+                    </motion.li>
                   );
                 })}
-              </NavList>
+              </ul>
 
-              <NavFooter>
-                <FooterBadge>
+              <div
+                style={{
+                  padding: "20px 24px",
+                  borderTop: "1px solid rgba(255, 255, 255, 0.04)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    padding: "10px 16px",
+                    background: "rgba(16, 185, 129, 0.06)",
+                    border: "1px solid rgba(16, 185, 129, 0.1)",
+                    borderRadius: "12px",
+                  }}
+                >
                   <span>🔐</span>
-                  <FooterText>Data stays local</FooterText>
-                </FooterBadge>
-              </NavFooter>
-            </SideNav>
+                  <span
+                    style={{
+                      fontSize: "0.8rem",
+                      color: "#10b981",
+                      fontWeight: 500,
+                    }}
+                  >
+                    Data stays local
+                  </span>
+                </div>
+              </div>
+            </motion.nav>
           </>
         )}
       </AnimatePresence>
     </>
   );
 };
-
-const SideNav = styled("nav", {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  height: "100vh",
-  width: "320px",
-  background: "rgba(8, 9, 12, 0.97)",
-  backdropFilter: "blur(40px) saturate(180%)",
-  WebkitBackdropFilter: "blur(40px) saturate(180%)",
-  borderRight: "1px solid rgba(255, 255, 255, 0.04)",
-  boxShadow: "4px 0 60px rgba(0, 0, 0, 0.6)",
-  zIndex: 1002,
-  overflowY: "auto",
-  overflowX: "hidden",
-  display: "flex",
-  flexDirection: "column",
-  
-  "@media (max-width: 768px)": {
-    width: "100%",
-    maxWidth: "100vw",
-  },
-});
-
-const TopAccent = styled("div", {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  height: "2px",
-  background: "linear-gradient(90deg, #00f0ff 0%, #a855f7 50%, #f59e0b 100%)",
-  opacity: 0.8,
-});
-
-const NavHeader = styled("div", {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "28px 24px",
-  borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
-  
-  "@media (max-width: 768px)": {
-    padding: "20px 16px",
-  },
-});
-
-const NavLogo = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "40px",
-  height: "40px",
-  background: "linear-gradient(135deg, #00f0ff 0%, #22d3ee 50%, #10b981 100%)",
-  borderRadius: "12px",
-  marginRight: "14px",
-  color: "#030304",
-  boxShadow: "0 4px 20px rgba(0, 240, 255, 0.3)",
-});
-
-const TitleText = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-});
-
-const SubText = styled("span", {
-  fontSize: "0.75rem",
-  fontWeight: 500,
-  color: "#00f0ff",
-  letterSpacing: "0.1em",
-  textTransform: "uppercase",
-});
-
-const TimeframeContainer = styled("div", {
-  padding: "20px 24px 24px",
-  borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
-  
-  "@media (max-width: 768px)": {
-    padding: "16px",
-  },
-});
-
-const NavTitle = styled("h2", {
-  display: "flex",
-  alignItems: "center",
-  color: "#f8fafc",
-  margin: 0,
-  fontSize: "1.15rem",
-  fontWeight: 700,
-  fontFamily: "'Sora', sans-serif",
-  letterSpacing: "-0.02em",
-});
-
-const NavList = styled("ul", {
-  listStyle: "none",
-  padding: "16px 12px",
-  margin: 0,
-  flexGrow: 1,
-  
-  "@media (max-width: 768px)": {
-    padding: "12px 8px",
-  },
-});
-
-const NavItem = styled("li", {
-  position: "relative",
-  display: "flex",
-  alignItems: "center",
-  padding: "13px 16px",
-  margin: "3px 0",
-  color: "#94a3b8",
-  cursor: "pointer",
-  borderRadius: "14px",
-  transition: "all 0.2s ease",
-  fontFamily: "'Sora', sans-serif",
-  fontSize: "0.9rem",
-  fontWeight: 500,
-
-  "&:hover": {
-    background: "rgba(0, 240, 255, 0.04)",
-    color: "#e2e8f0",
-  },
-
-  variants: {
-    isActive: {
-      true: {
-        background: "rgba(0, 240, 255, 0.08)",
-        color: "#f8fafc",
-      },
-    },
-  },
-});
-
-const NavItemIcon = styled("span", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "38px",
-  height: "38px",
-  marginRight: "14px",
-  borderRadius: "11px",
-  background: "rgba(255, 255, 255, 0.02)",
-  color: "#475569",
-  transition: "all 0.25s ease",
-  
-  variants: {
-    isActive: {
-      true: {
-        background: "linear-gradient(135deg, #00f0ff 0%, #22d3ee 100%)",
-        color: "#030304",
-        boxShadow: "0 4px 16px rgba(0, 240, 255, 0.3)",
-      },
-    },
-  },
-});
-
-const NavItemText = styled("span", {
-  flex: 1,
-  letterSpacing: "-0.01em",
-});
-
-const ActiveIndicator = styled("div", {
-  position: "absolute",
-  left: 0,
-  top: "50%",
-  transform: "translateY(-50%)",
-  width: "3px",
-  height: "28px",
-  background: "linear-gradient(180deg, #00f0ff 0%, #22d3ee 100%)",
-  borderRadius: "0 4px 4px 0",
-  boxShadow: "0 0 16px rgba(0, 240, 255, 0.5)",
-});
-
-const NavToggle = styled("button", {
-  position: "fixed",
-  top: "24px",
-  left: "24px",
-  zIndex: 1003,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "50px",
-  height: "50px",
-  background: "rgba(8, 9, 12, 0.95)",
-  backdropFilter: "blur(16px)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
-  borderRadius: "16px",
-  color: "#f8fafc",
-  cursor: "pointer",
-  boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
-  transition: "all 0.25s ease",
-
-  "&:hover": {
-    background: "rgba(0, 240, 255, 0.08)",
-    borderColor: "rgba(0, 240, 255, 0.2)",
-    boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 240, 255, 0.1)",
-  },
-
-  "@media (max-width: 768px)": {
-    top: "16px",
-    left: "16px",
-    width: "44px",
-    height: "44px",
-  },
-
-  variants: {
-    isOpen: {
-      true: {
-        background: "rgba(0, 240, 255, 0.1)",
-        borderColor: "rgba(0, 240, 255, 0.25)",
-      },
-    },
-  },
-});
-
-const Overlay = styled("div", {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  background: "rgba(0, 0, 0, 0.75)",
-  backdropFilter: "blur(12px)",
-  zIndex: 1001,
-});
-
-const NavFooter = styled("div", {
-  padding: "20px 24px",
-  borderTop: "1px solid rgba(255, 255, 255, 0.04)",
-  
-  "@media (max-width: 768px)": {
-    padding: "16px",
-  },
-});
-
-const FooterBadge = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "8px",
-  padding: "10px 16px",
-  background: "rgba(16, 185, 129, 0.06)",
-  border: "1px solid rgba(16, 185, 129, 0.1)",
-  borderRadius: "12px",
-});
-
-const FooterText = styled("span", {
-  fontSize: "0.8rem",
-  color: "#10b981",
-  fontWeight: 500,
-});
 
 export default Navigation;

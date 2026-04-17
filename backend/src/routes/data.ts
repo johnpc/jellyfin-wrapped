@@ -106,6 +106,22 @@ export async function dataRoutes(fastify: FastifyInstance) {
   // Add authentication hook to all routes
   fastify.addHook('preHandler', authenticate);
 
+  // Helper to log query timing
+  async function timed<T>(label: string, fn: () => Promise<T>): Promise<T> {
+    const start = performance.now();
+    fastify.log.info(`[TIMING] ${label} - started`);
+    try {
+      const result = await fn();
+      const ms = (performance.now() - start).toFixed(1);
+      fastify.log.info(`[TIMING] ${label} - completed in ${ms}ms`);
+      return result;
+    } catch (error) {
+      const ms = (performance.now() - start).toFixed(1);
+      fastify.log.error(`[TIMING] ${label} - failed after ${ms}ms`);
+      throw error;
+    }
+  }
+
   // Get current user info
   fastify.get('/user', async (request, reply) => {
     const session = (request as any).session;
@@ -122,7 +138,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const movies = await queries.listMovies(config, timeframe);
+        const movies = await timed('movies', () => queries.listMovies(config, timeframe));
         return movies;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -141,7 +157,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const shows = await queries.listShows(config, timeframe);
+        const shows = await timed('shows', () => queries.listShows(config, timeframe));
         return shows;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -160,7 +176,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const audio = await queries.listAudio(config, timeframe);
+        const audio = await timed('audio', () => queries.listAudio(config, timeframe));
         return audio;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -179,7 +195,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const videos = await queries.listMusicVideos(config, timeframe);
+        const videos = await timed('music-videos', () => queries.listMusicVideos(config, timeframe));
         return videos;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -198,7 +214,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const channels = await queries.listLiveTvChannels(config, timeframe);
+        const channels = await timed('live-tv', () => queries.listLiveTvChannels(config, timeframe));
         return channels;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -217,7 +233,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const stats = await queries.getDeviceStats(config, timeframe);
+        const stats = await timed('device-stats', () => queries.getDeviceStats(config, timeframe));
         return stats;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -236,7 +252,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const data = await queries.getPunchCardData(config, timeframe);
+        const data = await timed('punch-card', () => queries.getPunchCardData(config, timeframe));
         return data;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -252,7 +268,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
   fastify.get('/calendar', async (request, reply) => {
     try {
       const config = getConfig(request, fastify);
-      const data = await queries.getCalendarData(config);
+      const data = await timed('calendar', () => queries.getCalendarData(config));
       return data;
     } catch (error) {
       fastify.log.error(error, 'Error fetching calendar');
@@ -267,7 +283,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const stats = await queries.getMonthlyShowStats(config, timeframe);
+        const stats = await timed('monthly-shows', () => queries.getMonthlyShowStats(config, timeframe));
         return stats;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -286,7 +302,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const shows = await queries.getUnfinishedShows(config, timeframe);
+        const shows = await timed('unfinished-shows', () => queries.getUnfinishedShows(config, timeframe));
         return shows;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -305,7 +321,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const actors = await queries.listFavoriteActors(config, timeframe);
+        const actors = await timed('actors', () => queries.listFavoriteActors(config, timeframe));
         return actors;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -334,7 +350,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
 
       try {
         const config = getConfig(request, fastify);
-        const items = await queries.getWatchedOnDate(config, validatedDate);
+        const items = await timed(`watched-on-date(${validatedDate})`, () => queries.getWatchedOnDate(config, validatedDate));
         return items;
       } catch (error) {
         fastify.log.error(error, 'Error fetching watched on date');
@@ -350,7 +366,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const stats = await queries.getStreakStats(config, timeframe);
+        const stats = await timed('streaks', () => queries.getStreakStats(config, timeframe));
         return stats;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -369,7 +385,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const personality = await queries.getTimePersonality(config, timeframe);
+        const personality = await timed('time-personality', () => queries.getTimePersonality(config, timeframe));
         return personality;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -388,7 +404,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const breakdown = await queries.getDecadeBreakdown(config, timeframe);
+        const breakdown = await timed('decades', () => queries.getDecadeBreakdown(config, timeframe));
         return breakdown;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -407,7 +423,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const evolution = await queries.getWatchEvolution(config, timeframe);
+        const evolution = await timed('watch-evolution', () => queries.getWatchEvolution(config, timeframe));
         return evolution;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -426,7 +442,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const personality = await queries.getPersonality(config, timeframe);
+        const personality = await timed('personality', () => queries.getPersonality(config, timeframe));
         return personality;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {
@@ -445,7 +461,7 @@ export async function dataRoutes(fastify: FastifyInstance) {
       try {
         const config = getConfig(request, fastify);
         const timeframe = getTimeframe(request.query);
-        const comparisons = await queries.getFunComparisons(config, timeframe);
+        const comparisons = await timed('comparisons', () => queries.getFunComparisons(config, timeframe));
         return comparisons;
       } catch (error) {
         if (error instanceof Error && error.message.includes('Invalid')) {

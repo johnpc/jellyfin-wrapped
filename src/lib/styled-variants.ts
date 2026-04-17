@@ -16,7 +16,7 @@ export const itemVariants = {
     opacity: 1,
     transition: {
       duration: 0.3,
-      ease: [0.25, 0.46, 0.45, 0.94], // Optimized easing for mobile
+      ease: [0.25, 0.46, 0.45, 0.94] as const, // Optimized easing for mobile
     },
   },
 };

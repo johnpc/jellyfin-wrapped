@@ -1,8 +1,8 @@
+import React from "react";
 import { useStreaks } from "@/hooks/queries/useStreaks";
 import { LoadingSpinner } from "../LoadingSpinner";
 import PageContainer from "../PageContainer";
-import { motion } from "framer-motion";
-import { styled } from "@stitches/react";
+import { motion } from "motion/react";
 import { Flame, Calendar, Clock, Sparkles } from "lucide-react";
 
 export default function StreaksPage() {
@@ -18,14 +18,39 @@ export default function StreaksPage() {
 
   return (
     <PageContainer>
-      <ContentWrapper
-        as={motion.div}
+      <motion.div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "calc(100vh - 8rem)",
+          textAlign: "center",
+          padding: "0.75rem 1rem 0.25rem 1rem",
+          width: "100%",
+          maxWidth: "100%",
+          margin: "0 auto",
+          boxSizing: "border-box",
+        }}
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const }}
       >
-        <Badge
-          as={motion.div}
+        <motion.div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "10px",
+            padding: "10px 20px",
+            background: "rgba(0, 240, 255, 0.06)",
+            border: "1px solid rgba(0, 240, 255, 0.12)",
+            borderRadius: "999px",
+            fontSize: "0.85rem",
+            fontWeight: 600,
+            color: "#00f0ff",
+            marginBottom: "1rem",
+            backdropFilter: "blur(12px)",
+          }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.4 }}
@@ -34,20 +59,44 @@ export default function StreaksPage() {
             <Sparkles size={14} />
           </BadgeIcon>
           <span>Your Binge Streaks</span>
-        </Badge>
+        </motion.div>
 
-        <Title
-          as={motion.h1}
+        <motion.h1
+          style={{
+            fontSize: "clamp(2rem, 6vw, 3.5rem)",
+            fontWeight: 700,
+            marginBottom: "1.5rem",
+            letterSpacing: "-0.04em",
+            background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 50%, #a855f7 100%)",
+            backgroundSize: "200% 200%",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            animation: "gradient-flow 8s ease infinite",
+            textAlign: "center",
+            width: "100%",
+          }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.4 }}
         >
           Your Viewing Streaks
-        </Title>
+        </motion.h1>
 
         <StatsGrid>
-          <StatCard
-            as={motion.div}
+          <motion.div
+            style={{
+              background: "rgba(18, 21, 28, 0.65)",
+              backdropFilter: "blur(24px) saturate(180%)",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
+              borderRadius: "24px",
+              padding: "2rem",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "1rem",
+              transition: "all 0.3s ease",
+            }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.4 }}
@@ -58,10 +107,21 @@ export default function StreaksPage() {
             <StatValue>{data.longestStreak}</StatValue>
             <StatLabel>Longest Streak</StatLabel>
             <StatSubtext>consecutive days</StatSubtext>
-          </StatCard>
+          </motion.div>
 
-          <StatCard
-            as={motion.div}
+          <motion.div
+            style={{
+              background: "rgba(18, 21, 28, 0.65)",
+              backdropFilter: "blur(24px) saturate(180%)",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
+              borderRadius: "24px",
+              padding: "2rem",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "1rem",
+              transition: "all 0.3s ease",
+            }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.4 }}
@@ -76,10 +136,21 @@ export default function StreaksPage() {
                 ? `since ${new Date(data.streakStartDate).toLocaleDateString()}`
                 : "days in a row"}
             </StatSubtext>
-          </StatCard>
+          </motion.div>
 
-          <StatCard
-            as={motion.div}
+          <motion.div
+            style={{
+              background: "rgba(18, 21, 28, 0.65)",
+              backdropFilter: "blur(24px) saturate(180%)",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
+              borderRadius: "24px",
+              padding: "2rem",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "1rem",
+              transition: "all 0.3s ease",
+            }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.4 }}
@@ -90,11 +161,22 @@ export default function StreaksPage() {
             <StatValue>{data.longestBreak}</StatValue>
             <StatLabel>Longest Break</StatLabel>
             <StatSubtext>days without watching</StatSubtext>
-          </StatCard>
+          </motion.div>
         </StatsGrid>
 
-        <Message
-          as={motion.p}
+        <motion.p
+          style={{
+            fontSize: "clamp(1.25rem, 3vw, 1.75rem)",
+            fontWeight: 500,
+            color: "#f8fafc",
+            maxWidth: "600px",
+            lineHeight: 1.6,
+            marginTop: "0.5rem",
+            marginBottom: "0.5rem",
+            marginLeft: "auto",
+            marginRight: "auto",
+            textAlign: "center",
+          }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.4 }}
@@ -104,161 +186,109 @@ export default function StreaksPage() {
             : data.longestStreak > 0
             ? `Your longest binge streak was ${data.longestStreak} days. Impressive!`
             : "Start your first streak today!"}
-        </Message>
-      </ContentWrapper>
+        </motion.p>
+      </motion.div>
     </PageContainer>
   );
 }
 
-const ContentWrapper = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  minHeight: "calc(100vh - 8rem)",
-  textAlign: "center",
-  padding: "0.75rem 1rem 0.25rem 1rem",
-  width: "100%",
-  maxWidth: "100%",
-  margin: "0 auto",
-  boxSizing: "border-box",
-  
-  "@media (max-width: 768px)": {
-    padding: "0.5rem 0.75rem 0.25rem 0.75rem",
-    minHeight: "calc(100vh - 6rem)",
-  },
-});
+const BadgeIcon = ({ children, style, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+  <span
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "24px",
+      height: "24px",
+      borderRadius: "7px",
+      background: "rgba(0, 240, 255, 0.15)",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </span>
+);
 
-const Badge = styled("div", {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "10px",
-  padding: "10px 20px",
-  background: "rgba(0, 240, 255, 0.06)",
-  border: "1px solid rgba(0, 240, 255, 0.12)",
-  borderRadius: "999px",
-  fontSize: "0.85rem",
-  fontWeight: 600,
-  color: "#00f0ff",
-  marginBottom: "1rem",
-  backdropFilter: "blur(12px)",
-});
+const StatsGrid = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+      gap: "1.5rem",
+      width: "100%",
+      maxWidth: "900px",
+      marginBottom: "1rem",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const BadgeIcon = styled("span", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "24px",
-  height: "24px",
-  borderRadius: "7px",
-  background: "rgba(0, 240, 255, 0.15)",
-});
+const StatIcon = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "64px",
+      height: "64px",
+      borderRadius: "16px",
+      background: "linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%)",
+      border: "1px solid rgba(0, 240, 255, 0.2)",
+      color: "#00f0ff",
+      backdropFilter: "blur(12px)",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const Title = styled("h1", {
-  fontSize: "clamp(2rem, 6vw, 3.5rem)",
-  fontWeight: 700,
-  marginBottom: "1.5rem",
-  letterSpacing: "-0.04em",
-  background: "linear-gradient(135deg, #f8fafc 0%, #00f0ff 50%, #a855f7 100%)",
-  backgroundSize: "200% 200%",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent",
-  backgroundClip: "text",
-  animation: "gradient-flow 8s ease infinite",
-  textAlign: "center",
-  width: "100%",
-});
+const StatValue = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      fontSize: "3rem",
+      fontWeight: 800,
+      fontFamily: "'JetBrains Mono', monospace",
+      color: "#00f0ff",
+      textShadow: "0 0 40px rgba(0, 240, 255, 0.5)",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const StatsGrid = styled("div", {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-  gap: "1.5rem",
-  width: "100%",
-  maxWidth: "900px",
-  marginBottom: "1rem",
-  
-  "@media (max-width: 640px)": {
-    gridTemplateColumns: "1fr",
-    gap: "1rem",
-  },
-});
+const StatLabel = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      fontSize: "1.1rem",
+      fontWeight: 600,
+      color: "#f8fafc",
+      marginTop: "0.5rem",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
 
-const StatCard = styled("div", {
-  background: "rgba(18, 21, 28, 0.65)",
-  backdropFilter: "blur(24px) saturate(180%)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
-  borderRadius: "24px",
-  padding: "2rem",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  gap: "1rem",
-  transition: "all 0.3s ease",
-  
-  "&:hover": {
-    transform: "translateY(-8px)",
-    borderColor: "rgba(0, 240, 255, 0.2)",
-    boxShadow: "0 12px 40px rgba(0, 240, 255, 0.15)",
-  },
-  
-  "@media (max-width: 768px)": {
-    padding: "1.5rem",
-    borderRadius: "20px",
-  },
-});
-
-const StatIcon = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "64px",
-  height: "64px",
-  borderRadius: "16px",
-  background: "linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%)",
-  border: "1px solid rgba(0, 240, 255, 0.2)",
-  color: "#00f0ff",
-  backdropFilter: "blur(12px)",
-});
-
-const StatValue = styled("div", {
-  fontSize: "3rem",
-  fontWeight: 800,
-  fontFamily: "'JetBrains Mono', monospace",
-  color: "#00f0ff",
-  textShadow: "0 0 40px rgba(0, 240, 255, 0.5)",
-  
-  "@media (max-width: 768px)": {
-    fontSize: "2.5rem",
-  },
-  
-  "@media (max-width: 480px)": {
-    fontSize: "2rem",
-  },
-});
-
-const StatLabel = styled("div", {
-  fontSize: "1.1rem",
-  fontWeight: 600,
-  color: "#f8fafc",
-  marginTop: "0.5rem",
-});
-
-const StatSubtext = styled("div", {
-  fontSize: "0.85rem",
-  color: "#64748b",
-  textAlign: "center",
-});
-
-const Message = styled("p", {
-  fontSize: "clamp(1.25rem, 3vw, 1.75rem)",
-  fontWeight: 500,
-  color: "#f8fafc",
-  maxWidth: "600px",
-  lineHeight: 1.6,
-  marginTop: "0.5rem",
-  marginBottom: "0.5rem",
-  marginLeft: "auto",
-  marginRight: "auto",
-  textAlign: "center",
-});
-
+const StatSubtext = ({ children, style, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    style={{
+      fontSize: "0.85rem",
+      color: "#64748b",
+      textAlign: "center",
+      ...style,
+    }}
+    {...props}
+  >
+    {children}
+  </div>
+);
