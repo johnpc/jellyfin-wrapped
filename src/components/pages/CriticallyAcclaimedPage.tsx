@@ -9,7 +9,6 @@ import {
 import { motion } from "framer-motion";
 import { Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
-import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { useMovies } from "@/hooks/queries/useMovies";
 import { useShows } from "@/hooks/queries/useShows";
@@ -22,7 +21,6 @@ const NEXT_PAGE = "/oldest-movie";
 
 export default function CriticallyAcclaimedPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const {
     data: movies,
     isLoading: moviesLoading,

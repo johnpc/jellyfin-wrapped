@@ -3,7 +3,6 @@ import { useRef } from "react";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useErrorBoundary } from "react-error-boundary";
-import { useNavigate } from "react-router-dom";
 import * as d3 from "d3";
 import { Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
@@ -22,7 +21,6 @@ const CHART_COLORS = {
 
 export default function DeviceStatsPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const { data: deviceStats, isLoading, error } = useDeviceStats();
   const containerRef = useRef<HTMLDivElement>(null);
 

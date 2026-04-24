@@ -2,7 +2,6 @@ import EmptyState from "../EmptyState";
 import { useEffect, useState } from "react";
 import { Container, Grid, Card, Text } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { useUnfinishedShows } from "@/hooks/queries/useUnfinishedShows";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -18,7 +17,6 @@ type ShowWithPoster = UnfinishedShowDto & { posterUrl?: string };
 
 export default function UnfinishedShowsPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const { data: shows, isLoading, error } = useUnfinishedShows();
   const [showsWithPosters, setShowsWithPosters] = useState<ShowWithPoster[]>(
     []

@@ -2,7 +2,7 @@ import EmptyState from "../EmptyState";
 import { useEffect, useState } from "react";
 import { Container, Grid, Card, Text } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+
 import { useErrorBoundary } from "react-error-boundary";
 import { useMonthlyShowStats } from "@/hooks/queries/useMonthlyShowStats";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -27,7 +27,6 @@ type MonthlyShowStats = {
 
 export default function ShowOfTheMonthPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const { data: stats, isLoading, error } = useMonthlyShowStats();
   const [statsWithPosters, setStatsWithPosters] = useState<MonthlyShowStats[]>(
     []

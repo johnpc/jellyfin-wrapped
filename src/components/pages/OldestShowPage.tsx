@@ -1,7 +1,6 @@
 import EmptyState from "../EmptyState";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { useShows } from "@/hooks/queries/useShows";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -15,7 +14,6 @@ const NEXT_PAGE = "/holidays";
 
 export default function OldestShowPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const { data: shows, isLoading, error } = useShows();
 
   if (error) {

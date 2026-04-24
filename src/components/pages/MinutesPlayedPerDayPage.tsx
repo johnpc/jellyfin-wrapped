@@ -3,7 +3,6 @@ import { useRef } from "react";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useErrorBoundary } from "react-error-boundary";
-import { useNavigate } from "react-router-dom";
 import { Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
 import { useMinutesPlayedPerDay } from "@/hooks/queries/useMinutesPlayedPerDay";
@@ -24,7 +23,6 @@ const CHART_COLORS = {
 
 export default function MinutesPlayedPerDayPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const {

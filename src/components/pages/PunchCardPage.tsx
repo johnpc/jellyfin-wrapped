@@ -1,4 +1,3 @@
-import EmptyState from "../EmptyState";
 import { ResponsiveScatterPlot } from "@nivo/scatterplot";
 import { Card } from "@/components/ui/card";
 import { Button, Box } from "@radix-ui/themes";

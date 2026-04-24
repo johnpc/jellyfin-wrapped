@@ -7,7 +7,6 @@ import {
   Flex,
 } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { useLiveTvChannels } from "@/hooks/queries/useLiveTvChannels";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -46,7 +45,6 @@ function ChannelCard({
 
 export default function LiveTvReviewPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const { data: channels, isLoading, error } = useLiveTvChannels();
 
   if (error) {

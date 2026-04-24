@@ -2,7 +2,6 @@ import EmptyState from "../EmptyState";
 import { useState } from "react";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { useMovies } from "@/hooks/queries/useMovies";
 import { useShows } from "@/hooks/queries/useShows";
@@ -19,7 +18,6 @@ const NEXT_PAGE = "/tv";
 
 export default function GenreReviewPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const {
     data: movies,
     isLoading: moviesLoading,

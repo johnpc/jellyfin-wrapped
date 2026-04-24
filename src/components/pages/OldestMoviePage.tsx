@@ -1,7 +1,6 @@
 import EmptyState from "../EmptyState";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { useMovies } from "@/hooks/queries/useMovies";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -14,7 +13,6 @@ const NEXT_PAGE = "/oldest-show";
 
 export default function OldestMoviePage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const { data: movies, isLoading, error } = useMovies();
 
   if (error) {

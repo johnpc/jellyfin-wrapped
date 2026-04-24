@@ -1,7 +1,6 @@
 import EmptyState from "../EmptyState";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { useAudio } from "@/hooks/queries/useAudio";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
@@ -15,7 +14,6 @@ const MAX_DISPLAY_ITEMS = 20;
 
 export default function AudioReviewPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const { data: audios, isLoading, error } = useAudio();
 
   if (error) {

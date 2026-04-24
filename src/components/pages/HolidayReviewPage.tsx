@@ -4,7 +4,6 @@ import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
-import { useNavigate } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { useWatchedOnDate } from "@/hooks/queries/useWatchedOnDate";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -19,7 +18,6 @@ const NEXT_PAGE = "/minutes-per-day";
 
 export default function HolidayReviewPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const [hiddenIds, setHiddenIds] = useState<string[]>(getCachedHiddenIds());
 
   const dates = useMemo(() => {

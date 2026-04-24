@@ -1,7 +1,7 @@
 import EmptyState from "../EmptyState";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import {  } from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { useFavoriteActors } from "@/hooks/queries/useFavoriteActors";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -12,13 +12,12 @@ import PageContainer from "../PageContainer";
 import { generateGuid } from "@/lib/utils";
 import { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client";
 import { SimpleItemDto } from "@/lib/queries";
-import { useEffect } from "react";
+
 
 const NEXT_PAGE = "/genres";
 
 export default function FavoriteActorsPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const { data: favoriteActors, isLoading, error } = useFavoriteActors();
 
   if (!isLoading && !error && favoriteActors && !favoriteActors.length) {

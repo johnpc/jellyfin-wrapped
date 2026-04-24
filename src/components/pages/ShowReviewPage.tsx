@@ -1,8 +1,8 @@
 import EmptyState from "../EmptyState";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+
 import { useErrorBoundary } from "react-error-boundary";
 import { useShows } from "@/hooks/queries/useShows";
 import { MovieCard } from "./MoviesReviewPage/MovieCard";
@@ -16,7 +16,6 @@ const NEXT_PAGE = "/audio";
 
 export default function ShowReviewPage() {
   const { showBoundary } = useErrorBoundary();
-  const navigate = useNavigate();
   const { data: shows, isLoading, error } = useShows();
   const [hiddenIds, setHiddenIds] = useState<string[]>(getCachedHiddenIds());
 
