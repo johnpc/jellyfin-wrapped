@@ -88,7 +88,7 @@ const ServerConfigurationPage = () => {
 
       void navigate(NEXT_PAGE);
     } catch (e) {
-      showBoundary(e);
+      showBoundary(e as Error);
     } finally {
       setIsLoading(false);
     }
@@ -170,7 +170,7 @@ const ServerConfigurationPage = () => {
                       </HelpText>
                     </div>
                     {!protocol.includes("https") ? null : (
-                      <Disclaimer as={motion.div} variants={itemVariants}>
+                      <Disclaimer as={motion.div as any} variants={itemVariants}>
                         You are accessing Jellyfin Wrapped via https. You must
                         either use an https server url or follow these steps:
                         <ol>
@@ -280,7 +280,7 @@ const ServerConfigurationPage = () => {
           </form>
 
           {useAuthToken && (
-            <Disclaimer as={motion.div} variants={itemVariants}>
+            <Disclaimer as={motion.div as any} variants={itemVariants}>
               Auth token can be found by following these steps:
               <ol>
                 <li>Log into your Jellyfin web interface</li>
@@ -298,7 +298,7 @@ const ServerConfigurationPage = () => {
             </Disclaimer>
           )}
 
-          <Disclaimer as={motion.div} variants={itemVariants}>
+          <Disclaimer as={motion.div as any} variants={itemVariants}>
             Jellyfin Wrapped is an entirely client-side application. Your data
             stays private and is never sent to any external service.
           </Disclaimer>

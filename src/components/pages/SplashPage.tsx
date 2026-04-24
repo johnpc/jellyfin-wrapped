@@ -38,7 +38,7 @@ const SplashPage = () => {
       opacity: 1,
       transition: {
         duration: 0.5,
-        ease: "easeOut",
+        ease: "easeOut" as const,
       },
     },
   };
@@ -62,7 +62,7 @@ const SplashPage = () => {
       opacity: 1,
       transition: {
         duration: 0.5,
-        ease: "easeOut",
+        ease: "easeOut" as const,
       },
     },
   };
@@ -74,17 +74,17 @@ const SplashPage = () => {
   return (
     <Container>
       <ContentWrapper
-        as={motion.div}
+        as={motion.div as any}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <Title as={motion.h1} variants={itemVariants}>
+        <Title as={motion.h1 as any} variants={itemVariants}>
           Jellyfin Wrapped
         </Title>
         <BlinkingStars />
 
-        <Subtitle as={motion.p} variants={itemVariants}>
+        <Subtitle as={motion.p as any} variants={itemVariants}>
           Discover your entertainment with a personalized recap of your Jellyfin
           watching habits
         </Subtitle>
@@ -93,14 +93,14 @@ const SplashPage = () => {
           <TimeframeSelector onTimeframeChange={handleTimeframeChange} />
         </motion.div>
 
-        <FeaturesList as={motion.ul} variants={listVariants}>
+        <FeaturesList as={motion.ul as any} variants={listVariants}>
           {[
             "📺 See your most-watched shows",
             "⭐ Review your favorite movies",
             "📊 Get insights into your viewing patterns",
             "🗓️ Choose custom timeframes for your stats",
           ].map((feature, index) => (
-            <FeatureItem as={motion.li} key={index} variants={featureVariants}>
+            <FeatureItem as={motion.li as any} key={index} variants={featureVariants}>
               {feature}
             </FeatureItem>
           ))}
@@ -120,7 +120,7 @@ const SplashPage = () => {
           </StyledButton>
         </motion.div>
 
-        <Disclaimer as={motion.p} variants={itemVariants}>
+        <Disclaimer as={motion.p as any} variants={itemVariants}>
           Jellyfin Wrapped is an entirely client-side application. Your data
           stays private and is never sent to any external service.
         </Disclaimer>
