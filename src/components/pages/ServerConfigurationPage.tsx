@@ -93,12 +93,6 @@ const ServerConfigurationPage = () => {
       setIsLoading(false);
     }
   };
-  const Disclaimer = styled("p", {
-    fontSize: "0.875rem",
-    color: "#2D00F7",
-    marginTop: "2rem",
-    opacity: 0.9,
-  });
 
   const HelpText = styled("p", {
     fontSize: "0.75rem",
@@ -107,7 +101,7 @@ const ServerConfigurationPage = () => {
     marginBottom: "0.5rem",
   });
 
-  const itemVariants = {
+  const itemVariants: import("framer-motion").Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
@@ -170,7 +164,7 @@ const ServerConfigurationPage = () => {
                       </HelpText>
                     </div>
                     {!protocol.includes("https") ? null : (
-                      <Disclaimer as={motion.div as any} variants={itemVariants}>
+                      <motion.div style={{ fontSize: "0.875rem", color: "#2D00F7", marginTop: "2rem", opacity: 0.9 }} variants={itemVariants}>
                         You are accessing Jellyfin Wrapped via https. You must
                         either use an https server url or follow these steps:
                         <ol>
@@ -184,7 +178,7 @@ const ServerConfigurationPage = () => {
                             {currentUrl}
                           </li>
                         </ol>
-                      </Disclaimer>
+                      </motion.div>
                     )}
                   </>
                 )}
@@ -280,7 +274,7 @@ const ServerConfigurationPage = () => {
           </form>
 
           {useAuthToken && (
-            <Disclaimer as={motion.div as any} variants={itemVariants}>
+            <motion.div style={{ fontSize: "0.875rem", color: "#2D00F7", marginTop: "2rem", opacity: 0.9 }} variants={itemVariants}>
               Auth token can be found by following these steps:
               <ol>
                 <li>Log into your Jellyfin web interface</li>
@@ -295,13 +289,13 @@ const ServerConfigurationPage = () => {
                   "Authorization"
                 </li>
               </ol>
-            </Disclaimer>
+            </motion.div>
           )}
 
-          <Disclaimer as={motion.div as any} variants={itemVariants}>
+          <motion.div style={{ fontSize: "0.875rem", color: "#2D00F7", marginTop: "2rem", opacity: 0.9 }} variants={itemVariants}>
             Jellyfin Wrapped is an entirely client-side application. Your data
             stays private and is never sent to any external service.
-          </Disclaimer>
+          </motion.div>
         </motion.div>
       </StyledCard>
     </Container>
