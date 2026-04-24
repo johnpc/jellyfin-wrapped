@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -25,8 +26,14 @@ export default function MusicVideoPage() {
   }
 
   if (!musicVideos?.length) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Music Videos Watched"
+        backgroundColor="var(--red-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/audio"
+      />
+    );
   }
 
   return (

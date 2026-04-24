@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { useState, useEffect } from "react";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
@@ -25,11 +26,16 @@ export default function ShowReviewPage() {
         !hiddenIds.includes(show.item.id ?? "")
     ) ?? [];
 
-  useEffect(() => {
-    if (!isLoading && !error && shows && !visibleShows.length) {
-      void navigate(NEXT_PAGE);
-    }
-  }, [isLoading, error, shows, visibleShows.length, navigate]);
+  if (!isLoading && !error && shows && !visibleShows.length) {
+    return (
+      <EmptyState
+        title="No Shows Watched"
+        backgroundColor="var(--yellow-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/movies"
+      />
+    );
+  }
 
   if (error) {
     showBoundary(error);

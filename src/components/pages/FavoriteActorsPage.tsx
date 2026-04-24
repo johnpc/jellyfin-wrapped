@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -20,11 +21,16 @@ export default function FavoriteActorsPage() {
   const navigate = useNavigate();
   const { data: favoriteActors, isLoading, error } = useFavoriteActors();
 
-  useEffect(() => {
-    if (!isLoading && !error && favoriteActors && !favoriteActors.length) {
-      void navigate(NEXT_PAGE);
-    }
-  }, [isLoading, error, favoriteActors, navigate]);
+  if (!isLoading && !error && favoriteActors && !favoriteActors.length) {
+    return (
+      <EmptyState
+        title="No Favorite Actors Yet"
+        backgroundColor="var(--orange-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/music-videos"
+      />
+    );
+  }
 
   if (error) {
     showBoundary(error);

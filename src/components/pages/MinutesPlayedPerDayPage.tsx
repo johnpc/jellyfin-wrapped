@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { useRef } from "react";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
@@ -47,8 +48,14 @@ export default function MinutesPlayedPerDayPage() {
   }
 
   if (!playbackData || !viewingPatterns) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Daily Viewing Data"
+        backgroundColor="var(--amber-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/holidays"
+      />
+    );
   }
 
   const containerWidth = containerRef.current?.clientWidth || 600;

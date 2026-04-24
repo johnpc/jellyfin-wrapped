@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { useEffect, useState } from "react";
 import { Container, Grid, Card, Text } from "@radix-ui/themes";
 import { motion } from "framer-motion";
@@ -50,8 +51,14 @@ export default function UnfinishedShowsPage() {
   }
 
   if (!showsWithPosters.length) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Unfinished Shows"
+        backgroundColor="var(--plum-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/show-of-the-month"
+      />
+    );
   }
 
   return (

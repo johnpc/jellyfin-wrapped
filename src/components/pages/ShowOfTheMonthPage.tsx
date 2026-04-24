@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { useEffect, useState } from "react";
 import { Container, Grid, Card, Text } from "@radix-ui/themes";
 import { motion } from "framer-motion";
@@ -59,8 +60,14 @@ export default function ShowOfTheMonthPage() {
   }
 
   if (!statsWithPosters.length) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Show of the Month Data"
+        backgroundColor="var(--bronze-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/minutes-per-day"
+      />
+    );
   }
 
   return (

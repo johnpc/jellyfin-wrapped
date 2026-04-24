@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { useState } from "react";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
@@ -34,8 +35,14 @@ export default function MoviesReviewPage() {
     ) ?? [];
 
   if (!visibleMovies.length) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Movies Watched"
+        backgroundColor="var(--purple-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/TopTen"
+      />
+    );
   }
 
   return (

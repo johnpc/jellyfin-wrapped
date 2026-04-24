@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -35,8 +36,14 @@ export default function OldestMoviePage() {
   const movie = sortedMovies[0];
 
   if (!movie) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Movie History"
+        backgroundColor="var(--teal-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/critically-acclaimed"
+      />
+    );
   }
 
   return (

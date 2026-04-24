@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -26,8 +27,14 @@ export default function AudioReviewPage() {
   }
 
   if (!audios?.length) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Audio Listening History"
+        backgroundColor="var(--red-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/shows"
+      />
+    );
   }
 
   return (
