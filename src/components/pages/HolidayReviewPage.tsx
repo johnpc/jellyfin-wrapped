@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { useState, useMemo } from "react";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
@@ -78,8 +79,14 @@ export default function HolidayReviewPage() {
     !halloweenItems.length &&
     !valentinesItems.length
   ) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Holiday Viewing Data"
+        backgroundColor="var(--grass-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/oldest-show"
+      />
+    );
   }
 
   return (

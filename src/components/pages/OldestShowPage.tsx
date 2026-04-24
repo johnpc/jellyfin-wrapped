@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -36,8 +37,14 @@ export default function OldestShowPage() {
   const show = sortedShows[0];
 
   if (!show) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Show History"
+        backgroundColor="var(--lime-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/oldest-movie"
+      />
+    );
   }
 
   return (

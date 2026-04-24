@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { useRef } from "react";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
@@ -34,8 +35,14 @@ export default function DeviceStatsPage() {
   }
 
   if (!deviceStats) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Device Stats"
+        backgroundColor="var(--violet-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/unfinished-shows"
+      />
+    );
   }
 
   const containerWidth = containerRef.current?.clientWidth || 600;

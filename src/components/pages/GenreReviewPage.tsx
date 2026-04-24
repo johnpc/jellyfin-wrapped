@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import { useState } from "react";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
@@ -52,8 +53,14 @@ export default function GenreReviewPage() {
   const topGenreData = getTopGenre(visibleMovies, visibleShows);
 
   if (!topGenreData) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Genre Data"
+        backgroundColor="var(--pink-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/actors"
+      />
+    );
   }
 
   return (

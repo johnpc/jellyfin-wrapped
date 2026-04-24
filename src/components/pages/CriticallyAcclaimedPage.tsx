@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import {
   Container,
   Grid,
@@ -43,8 +44,14 @@ export default function CriticallyAcclaimedPage() {
   const topContent = getTopRatedContent(movies ?? [], shows ?? []);
 
   if (!topContent.length) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Critically Acclaimed Titles"
+        backgroundColor="var(--cyan-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/tv"
+      />
+    );
   }
 
   return (

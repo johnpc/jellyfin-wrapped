@@ -1,3 +1,4 @@
+import EmptyState from "../EmptyState";
 import {
   Container,
   Grid,
@@ -62,8 +63,14 @@ export default function LiveTvReviewPage() {
   );
 
   if (!sortedChannels.length) {
-    void navigate(NEXT_PAGE);
-    return null;
+    return (
+      <EmptyState
+        title="No Live TV Activity"
+        backgroundColor="var(--blue-8)"
+        nextPage={NEXT_PAGE}
+        previousPage="/genres"
+      />
+    );
   }
 
   return (
