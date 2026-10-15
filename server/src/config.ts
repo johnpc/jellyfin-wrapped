@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 export interface Config {
   /** Address the server uses to reach Jellyfin (can differ from the address browsers use). */
   jellyfinUrl: string;
@@ -46,11 +48,40 @@ function intFromEnv(
   return value;
 }
 
-export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
+/**
+ * The admin key comes from JELLYFIN_API_KEY, or from the file named by JELLYFIN_API_KEY_FILE.
+ * A file keeps the key out of the process environment, `docker inspect` and crash reports.
+ */
+function readApiKey(
+  env: NodeJS.ProcessEnv,
+  readFile: (path: string) => string
+): string | undefined {
+  const file = env.JELLYFIN_API_KEY_FILE;
+  if (!file) return env.JELLYFIN_API_KEY || undefined;
+  if (env.JELLYFIN_API_KEY) {
+    throw new Error(
+      "Set either JELLYFIN_API_KEY or JELLYFIN_API_KEY_FILE, not both"
+    );
+  }
+  let contents: string;
+  try {
+    contents = readFile(file);
+  } catch {
+    throw new Error(`Cannot read JELLYFIN_API_KEY_FILE (${file})`);
+  }
+  return contents.trim() || undefined;
+}
+
+export function loadConfig(
+  env: NodeJS.ProcessEnv = process.env,
+  readFile: (path: string) => string = (path) => readFileSync(path, "utf8")
+): Config {
   const jellyfinUrl = env.JELLYFIN_SERVER_URL?.replace(/\/+$/, "");
-  const apiKey = env.JELLYFIN_API_KEY;
+  const apiKey = readApiKey(env, readFile);
   if (!jellyfinUrl || !apiKey) {
-    throw new Error("JELLYFIN_SERVER_URL and JELLYFIN_API_KEY must be set");
+    throw new Error(
+      "JELLYFIN_SERVER_URL and JELLYFIN_API_KEY (or JELLYFIN_API_KEY_FILE) must be set"
+    );
   }
 
   return {

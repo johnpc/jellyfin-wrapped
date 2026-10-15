@@ -44,6 +44,7 @@ users' browsers.
 | ---------------------------- | -------- | --------------------------------------------------- |
 | `JELLYFIN_SERVER_URL`        | required | Address the server uses to reach Jellyfin.          |
 | `JELLYFIN_API_KEY`           | required | Admin API key.                                      |
+| `JELLYFIN_API_KEY_FILE`      | -        | Read the admin key from this file instead. Keeps it out of the environment. |
 | `PORT`                       | `3000`   | Listen port.                                        |
 | `CACHE_TTL_SECONDS`          | `300`    | How long a user's data copy is reused.              |
 | `MAX_CACHED_USERS`           | `50`     | Users held in memory at once.                       |
