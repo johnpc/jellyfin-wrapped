@@ -7,23 +7,24 @@ COPY . .
 RUN npm run build
 
 FROM httpd:2.4-alpine
-RUN sed -i \
-    -e '/LoadModule substitute_module/s/^#//g' \
-    -e '/LoadModule filter_module/s/^#//g' \
-    -e '/LoadModule env_module/s/^#//g' \
-    -e '/LoadModule proxy_module/s/^#//g' \
-    -e '/LoadModule proxy_http_module/s/^#//g' \
-    -e '/LoadModule headers_module/s/^#//g' \
-    /usr/local/apache2/conf/httpd.conf
+# Load only the Apache modules the site uses. Everything else (directory listings,
+# WebDAV, CGI, status pages, user directories and the rest) is switched off.
+RUN set -eux; \
+    conf=/usr/local/apache2/conf/httpd.conf; \
+    sed -i -E -e 's/^(LoadModule )/#\1/' -e '/ScriptAlias/d' "$conf"; \
+    for m in mpm_event unixd log_config mime dir alias headers filter substitute \
+             authz_core reqtimeout proxy proxy_http; do \
+      sed -i -E "s/^#(LoadModule ${m}_module )/\1/" "$conf"; \
+    done; \
+    mkdir -p /usr/local/apache2/generated
 COPY --from=build /app/dist /usr/local/apache2/htdocs/
 # Public files keep the permissions they had in the checkout; make sure Apache can read them.
 RUN chmod -R a+rX /usr/local/apache2/htdocs
-COPY ./apache-config.conf /usr/local/apache2/conf/extra/apache-config.conf
-RUN echo "Include conf/extra/apache-config.conf" >> /usr/local/apache2/conf/httpd.conf && \
-    echo "PassEnv JELLYFIN_SERVER_URL" >> /usr/local/apache2/conf/httpd.conf && \
-    echo "PassEnv JELLYFIN_API_KEY" >> /usr/local/apache2/conf/httpd.conf
+COPY ./apache-config.conf /usr/local/apache2/conf/wrapped.conf
+RUN echo "Include conf/wrapped.conf" >> /usr/local/apache2/conf/httpd.conf && \
+    httpd -t
 
-# Writes the /api proxy config at start (server mode), then runs Apache.
+# Writes env.js, the security policy and the /api proxy config at start, then runs Apache.
 COPY ./docker-entrypoint.sh /usr/local/bin/wrapped-entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/wrapped-entrypoint.sh"]
 CMD ["httpd-foreground"]
