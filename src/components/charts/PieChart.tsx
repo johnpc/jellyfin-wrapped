@@ -21,8 +21,9 @@ export function PieChart({
 
     const smallChart = containerWidth < 600;
     const width = smallChart ? containerWidth - 40 : (containerWidth - 80) / 2;
-    const height = Math.min(400, width);
-    const radius = Math.min(width, height) / 2;
+    const pieSize = Math.min(400, width);
+    const radius = pieSize / 2;
+    const height = pieSize + data.length * 20 + 16;
 
     d3.select(ref.current).selectAll("*").remove();
 
@@ -31,7 +32,7 @@ export function PieChart({
       .attr("width", width)
       .attr("height", height)
       .append("g")
-      .attr("transform", `translate(${width / 2},${height / 2})`);
+      .attr("transform", `translate(${width / 2},${pieSize / 2})`);
 
     const pie = d3
       .pie<PieChartData>()
@@ -66,29 +67,30 @@ export function PieChart({
       .attr(
         "transform",
         (_d: PieChartData, i: number) =>
-          `translate(0,${i * 20 - (data.length * 20) / 2})`
+          `translate(${-radius * 0.8},${radius + 16 + i * 20})`
       );
 
     legend
       .append("rect")
-      .attr("x", radius + 10)
+      .attr("x", 0)
       .attr("width", 18)
       .attr("height", 18)
       .style("fill", (_d: PieChartData, i: number) => color(String(i)));
 
     legend
       .append("text")
-      .attr("x", radius + 35)
+      .attr("x", 25)
       .attr("y", 9)
       .attr("dy", ".35em")
       .style("text-anchor", "start")
       .style("font-size", "12px")
+      .style("fill", "white")
       .text((d: PieChartData) => `${d.name} (${Math.round(d.minutes / 60)}h)`);
   }, [data, colors, containerWidth]);
 
   return (
     <div>
-      <h3 style={{ textAlign: "center", marginBottom: "10px" }}>{title}</h3>
+      <h3 style={{ textAlign: "center", marginBottom: "10px", color: "white" }}>{title}</h3>
       <svg ref={ref} />
     </div>
   );
