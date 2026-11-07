@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { styled } from "@stitches/react";
 import { motion } from "framer-motion";
 import TimeframeSelector from "./TimeframeSelector";
-import { TimeframeOption } from "../lib/timeframe";
 
 // Define navigation items with their paths and display names
 const navigationItems = [
@@ -28,6 +28,7 @@ const navigationItems = [
 
 const Navigation = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -40,10 +41,10 @@ const Navigation = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleTimeframeChange = (timeframe: TimeframeOption) => {
-    // Refresh the current page to apply the new timeframe
-    console.log({timeframe});
-    void navigate(0);
+  const handleTimeframeChange = () => {
+    // Every query reads the selected timeframe when it runs. Resetting them re-runs the
+    // ones on screen now and the others the next time their page opens, with no reload.
+    void queryClient.resetQueries();
   };
 
   return (

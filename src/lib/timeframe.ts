@@ -95,8 +95,23 @@ export const generateTimeframeOptions = (): TimeframeOption[] => {
 // Default timeframe (last 12 months)
 export const defaultTimeframe: TimeframeOption = generateTimeframeOptions()[0];
 
+// The selection survives a page reload (the timeframe selector reloads the page to
+// re-run every query), so it is kept in sessionStorage by id. Storage can be
+// unavailable or blocked, so every access falls back to the default.
+const TIMEFRAME_STORAGE_KEY = "jellyfin-wrapped-timeframe";
+
+const loadStoredTimeframe = (): TimeframeOption => {
+  try {
+    const id = sessionStorage.getItem(TIMEFRAME_STORAGE_KEY);
+    const stored = generateTimeframeOptions().find((option) => option.id === id);
+    return stored ?? defaultTimeframe;
+  } catch {
+    return defaultTimeframe;
+  }
+};
+
 // Store the currently selected timeframe
-let currentTimeframe: TimeframeOption = defaultTimeframe;
+let currentTimeframe: TimeframeOption = loadStoredTimeframe();
 
 // Get the current timeframe
 export const getCurrentTimeframe = (): TimeframeOption => {
@@ -106,6 +121,11 @@ export const getCurrentTimeframe = (): TimeframeOption => {
 // Set the current timeframe
 export const setCurrentTimeframe = (timeframe: TimeframeOption): void => {
   currentTimeframe = timeframe;
+  try {
+    sessionStorage.setItem(TIMEFRAME_STORAGE_KEY, timeframe.id);
+  } catch {
+    // Not persisted; the selection still applies until the page is reloaded.
+  }
 };
 
 // Format a timeframe for display
