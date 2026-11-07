@@ -74,7 +74,7 @@ export default function DeviceStatsPage() {
             <Title as={motion.h1} variants={itemVariants}>
               Your Viewing Devices
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+            <p style={{ fontSize: "1.125rem", color: "white", marginTop: "0.5rem" }}>
               Where you watch your content across different devices and apps
             </p>
           </div>
