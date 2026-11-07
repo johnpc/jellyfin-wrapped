@@ -18,7 +18,7 @@ export const TopTen = () => {
   if (!data) return null;
 
   return (
-    <PageContainer backgroundColor="var(--purple-8)" nextPage="/movies" previousPage="/loading">
+    <PageContainer backgroundColor="var(--purple-8)" nextPage="/first-watched" previousPage="/loading">
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>

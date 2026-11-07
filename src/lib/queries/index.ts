@@ -39,3 +39,6 @@ export * from "./date-based";
 
 // Advanced
 export * from "./advanced";
+
+// First watched
+export * from "./first-watched";

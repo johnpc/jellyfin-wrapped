@@ -38,13 +38,13 @@ export default function MoviesReviewPage() {
         title="No Movies Watched"
         backgroundColor="var(--purple-8)"
         nextPage={NEXT_PAGE}
-        previousPage="/TopTen"
+        previousPage="/first-watched"
       />
     );
   }
 
   return (
-    <PageContainer backgroundColor="var(--purple-8)" nextPage={NEXT_PAGE} previousPage="/TopTen">
+    <PageContainer backgroundColor="var(--purple-8)" nextPage={NEXT_PAGE} previousPage="/first-watched">
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>

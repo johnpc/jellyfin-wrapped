@@ -26,6 +26,7 @@ import ShowOfTheMonthPage from "./components/pages/ShowOfTheMonthPage";
 import UnfinishedShowsPage from "./components/pages/UnfinishedShowsPage";
 import CriticallyAcclaimedPage from "./components/pages/CriticallyAcclaimedPage";
 import TopTenPage from "./components/pages/TopTenPage";
+import FirstWatchedPage from "./components/pages/FirstWatchedPage";
 import { useEffect } from "react";
 import ActivityCalendarPage from "./components/pages/ActivityCalendarPage";
 import Navigation from "./components/Navigation";
@@ -87,6 +88,10 @@ const router = createBrowserRouter([
       {
         path: "/loading",
         element: <LoadingPage />,
+      },
+      {
+        path: "/first-watched",
+        element: <FirstWatchedPage />,
       },
       {
         path: "/movies",

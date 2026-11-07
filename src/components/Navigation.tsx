@@ -8,6 +8,7 @@ import TimeframeSelector from "./TimeframeSelector";
 // Define navigation items with their paths and display names
 const navigationItems = [
   { path: "/TopTen", name: "Top 10" },
+  { path: "/first-watched", name: "First Watched" },
   { path: "/movies", name: "Movies" },
   { path: "/shows", name: "TV Shows" },
   { path: "/audio", name: "Music" },
