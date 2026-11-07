@@ -45,6 +45,9 @@ export const playbackReportingSqlRequest = async (
     {
       method: "POST",
       headers: {
+        // Jellyfin 12 only accepts the Authorization header; older servers also
+        // accept it, so send it alongside the legacy header.
+        Authorization: `MediaBrowser Client="Jellyfin Wrapped", Device="Web", DeviceId="jellyfin-wrapped", Version="1.0.0", Token="${getEnvVar("JELLYFIN_API_KEY")}"`,
         "X-Emby-Token": `${getEnvVar("JELLYFIN_API_KEY")}`,
         "Content-Type": "application/json",
       },
