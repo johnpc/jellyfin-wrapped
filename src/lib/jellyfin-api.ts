@@ -6,6 +6,8 @@ import {
   JELLYFIN_PASSWORD_CACHE_KEY,
   JELLYFIN_SERVER_URL_CACHE_KEY,
   JELLYFIN_USERNAME_CACHE_KEY,
+  removeCacheValue,
+  setCacheValue,
 } from "./cache";
 
 let api: Api | null = null;
@@ -124,6 +126,12 @@ export const authenticateByUserName = async (
   try {
     // Authentication state is persisted on the api object
     await api.authenticateUserByName(username, password);
+    // Keep the session token, not the password, so later page loads do not need
+    // the password and it is never left in localStorage.
+    if (api.accessToken) {
+      setCacheValue(JELLYFIN_AUTH_TOKEN_CACHE_KEY, api.accessToken);
+    }
+    removeCacheValue(JELLYFIN_PASSWORD_CACHE_KEY);
   } catch (error) {
     console.error("Connection failed:", error);
     alert(error);

@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import {
   getCacheValue,
   JELLYFIN_AUTH_TOKEN_CACHE_KEY,
-  JELLYFIN_PASSWORD_CACHE_KEY,
   JELLYFIN_SERVER_URL_CACHE_KEY,
   JELLYFIN_USERNAME_CACHE_KEY,
   setCacheValue,
@@ -38,9 +37,8 @@ const ServerConfigurationPage = () => {
   const [username, setUsername] = useState<string>(
     () => getCacheValue(JELLYFIN_USERNAME_CACHE_KEY) || ""
   );
-  const [password, setPassword] = useState<string>(
-    () => getCacheValue(JELLYFIN_PASSWORD_CACHE_KEY) || ""
-  );
+  // Held in memory only. Never written to localStorage.
+  const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [useAuthToken, setUseAuthToken] = useState<boolean>(false);
 
@@ -65,7 +63,6 @@ const ServerConfigurationPage = () => {
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
-    setCacheValue(JELLYFIN_PASSWORD_CACHE_KEY, value);
   };
 
   const handleConnect = async (e: React.FormEvent<HTMLFormElement>) => {

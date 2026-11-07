@@ -20,6 +20,15 @@ export const setCacheValue = (key: string, value: string) => {
   }
 };
 
+export const removeCacheValue = (key: string) => {
+  delete localCache[key];
+  try {
+    localStorage.removeItem(key);
+  } catch (error) {
+    console.warn(`Error removing cache value for key ${key}:`, error);
+  }
+};
+
 export const getCacheValue = (key: string): string | null => {
   // Check if the value is in the local cache
   if (localCache[key]) {
