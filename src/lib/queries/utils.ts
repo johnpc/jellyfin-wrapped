@@ -1,6 +1,10 @@
 import { format } from "date-fns";
 import { getCurrentTimeframe } from "../timeframe";
-import { getAdminJellyfinApi, getEnvVar } from "../jellyfin-api";
+import {
+  getAdminJellyfinApi,
+  getAuthenticatedJellyfinApi,
+  getEnvVar,
+} from "../jellyfin-api";
 
 export const getStartDate = (): Date => {
   return getCurrentTimeframe().startDate;
@@ -16,7 +20,6 @@ export const formatDateForSql = (date: Date): string => {
 
 export const getCurrentUserId = async (): Promise<string> => {
   const { getUserApi } = await import("@jellyfin/sdk/lib/utils/api");
-  const { getAuthenticatedJellyfinApi } = await import("../jellyfin-api");
   const { getCacheValue, setCacheValue, JELLYFIN_CURRENT_USER_CACHE_KEY } =
     await import("../cache");
 
@@ -33,14 +36,10 @@ export const getCurrentUserId = async (): Promise<string> => {
   return userId;
 };
 
-export const playbackReportingSqlRequest = async (
-  queryString: string
-): Promise<{
-  colums: string[];
-  results: string[][];
-}> => {
+// Direct mode: the admin API key is in the browser and the plugin is called as-is.
+const fetchWithAdminKey = (queryString: string): Promise<Response> => {
   const adminApi = getAdminJellyfinApi();
-  const res = await fetch(
+  return fetch(
     `${adminApi.basePath}/user_usage_stats/submit_custom_query?stamp=${Date.now()}`,
     {
       method: "POST",
@@ -57,6 +56,38 @@ export const playbackReportingSqlRequest = async (
       }),
     }
   );
+};
+
+// Server mode: no admin key in the browser. The backend checks the user's own
+// Jellyfin token and only runs the query against that user's playback data.
+const fetchThroughServer = async (queryString: string): Promise<Response> => {
+  const api = await getAuthenticatedJellyfinApi();
+  const res = await fetch("/api/playback-report", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${api.accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query: queryString }),
+  });
+  if (!res.ok) {
+    const detail = await res.text();
+    throw new Error(
+      `Playback report request failed (${res.status}): ${detail.substring(0, 200)}`
+    );
+  }
+  return res;
+};
+
+export const playbackReportingSqlRequest = async (
+  queryString: string
+): Promise<{
+  colums: string[];
+  results: string[][];
+}> => {
+  const res = getEnvVar("JELLYFIN_API_KEY")
+    ? await fetchWithAdminKey(queryString)
+    : await fetchThroughServer(queryString);
 
   const text = await res.text();
 

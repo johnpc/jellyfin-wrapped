@@ -7,6 +7,7 @@ A web application that generates personalized year-in-review statistics for your
 **DO NOT host this application publicly on the internet when using API keys as environment variables.** The API key is embedded in the frontend JavaScript bundle and will be visible to anyone who visits your site. This could expose your Jellyfin server to unauthorized access.
 
 **Recommended deployment options:**
+
 - Host locally on your home network only
 - Use behind a VPN or authentication proxy
 - Deploy on a private network/intranet
@@ -35,10 +36,12 @@ A web application that generates personalized year-in-review statistics for your
 The application requires the following environment variables to be set:
 
 **For Development (Vite):**
+
 - `VITE_JELLYFIN_SERVER_URL`: The URL of your Jellyfin server (e.g., `http://192.168.1.100:8096`)
 - `VITE_JELLYFIN_API_KEY`: An admin API key for accessing playback reporting data
 
 **For Production (Docker/Runtime):**
+
 - `JELLYFIN_SERVER_URL`: The URL of your Jellyfin server (e.g., `http://192.168.1.100:8096`)
 - `JELLYFIN_API_KEY`: An admin API key for accessing playback reporting data
 
@@ -137,6 +140,32 @@ docker compose pull
 ```
 
 Now the Jellyfin Wrapped ui is available at `http://localhost` on port 80.
+
+### Server mode (no admin key in the browser)
+
+By default the admin API key is injected into the page, so anyone who can open the
+site can read every user's playback data. Server mode keeps the key on a backend
+instead:
+
+- The browser signs in with the user's own Jellyfin account.
+- It sends that user's token to `/api/playback-report` on the backend.
+- The backend asks Jellyfin who the token belongs to, copies only that user's
+  rows into a throwaway in-memory database, and runs the page's SQL against it.
+  A query cannot read other users' rows, and anything other than a single
+  `SELECT`/`WITH` is rejected.
+
+```bash
+cp .env.server.example .env.server   # set JELLYFIN_API_KEY here
+# set JELLYFIN_SERVER_URL in docker-compose.server.yaml
+docker compose -f docker-compose.server.yaml up -d --build
+```
+
+Server mode is on whenever the frontend runs without `JELLYFIN_API_KEY`. Setting it
+brings back the original behavior. The backend's design, security model and every setting are documented in
+[`server/README.md`](server/README.md). Run its tests with `npm run server:test`.
+
+The Playback Reporting plugin keeps about three months of history by default.
+Raise its retention if you want previous years.
 
 ### Updating Published Docker Image
 

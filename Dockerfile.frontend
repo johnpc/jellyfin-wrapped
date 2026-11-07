@@ -1,0 +1,29 @@
+# Builds the frontend from source, so docker compose needs no separate `npm run build`.
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM httpd:2.4-alpine
+RUN sed -i \
+    -e '/LoadModule substitute_module/s/^#//g' \
+    -e '/LoadModule filter_module/s/^#//g' \
+    -e '/LoadModule env_module/s/^#//g' \
+    -e '/LoadModule proxy_module/s/^#//g' \
+    -e '/LoadModule proxy_http_module/s/^#//g' \
+    -e '/LoadModule headers_module/s/^#//g' \
+    /usr/local/apache2/conf/httpd.conf
+COPY --from=build /app/dist /usr/local/apache2/htdocs/
+# Public files keep the permissions they had in the checkout; make sure Apache can read them.
+RUN chmod -R a+rX /usr/local/apache2/htdocs
+COPY ./apache-config.conf /usr/local/apache2/conf/extra/apache-config.conf
+RUN echo "Include conf/extra/apache-config.conf" >> /usr/local/apache2/conf/httpd.conf && \
+    echo "PassEnv JELLYFIN_SERVER_URL" >> /usr/local/apache2/conf/httpd.conf && \
+    echo "PassEnv JELLYFIN_API_KEY" >> /usr/local/apache2/conf/httpd.conf
+
+# Writes the /api proxy config at start (server mode), then runs Apache.
+COPY ./docker-entrypoint.sh /usr/local/bin/wrapped-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/wrapped-entrypoint.sh"]
+CMD ["httpd-foreground"]

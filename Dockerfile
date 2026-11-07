@@ -5,6 +5,9 @@ RUN sed -i \
     -e '/LoadModule substitute_module/s/^#//g' \
     -e '/LoadModule filter_module/s/^#//g' \
     -e '/LoadModule env_module/s/^#//g' \
+    -e '/LoadModule proxy_module/s/^#//g' \
+    -e '/LoadModule proxy_http_module/s/^#//g' \
+    -e '/LoadModule headers_module/s/^#//g' \
     /usr/local/apache2/conf/httpd.conf
 
 # Copy your static files
@@ -22,3 +25,8 @@ RUN echo "PassEnv JELLYFIN_SERVER_URL" \
     >> /usr/local/apache2/conf/httpd.conf && \
     echo "PassEnv JELLYFIN_API_KEY" \
     >> /usr/local/apache2/conf/httpd.conf
+
+# Writes the /api proxy config at start (server mode), then runs Apache.
+COPY ./docker-entrypoint.sh /usr/local/bin/wrapped-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/wrapped-entrypoint.sh"]
+CMD ["httpd-foreground"]

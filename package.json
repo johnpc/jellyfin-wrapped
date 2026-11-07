@@ -11,7 +11,10 @@
     "preview": "vite preview",
     "validate": "tsx src/scripts/validate-data.ts",
     "prepare-husky": "husky",
-    "prepare": "husky"
+    "prepare": "husky",
+    "server:install": "npm --prefix server ci",
+    "server:test": "npm --prefix server test",
+    "server:dev": "npm --prefix server run dev"
   },
   "dependencies": {
     "@jellyfin/sdk": "^0.13.0",
