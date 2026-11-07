@@ -21,7 +21,7 @@ export const getMinutesPlayedPerDay = async (): Promise<
     date(DateCreated) as PlayDate,
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
-  WHERE UserId = "${userId}"
+  WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
   AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY date(DateCreated)
@@ -64,7 +64,7 @@ export const getPunchCardData = async (): Promise<
       strftime('%H', DateCreated) as hour,
       COUNT(*) as count
     FROM PlaybackActivity
-    WHERE UserId = "${userId}"
+    WHERE UserId = '${userId}'
     AND DateCreated > '${formatDateForSql(startDate)}'
     AND DateCreated <= '${formatDateForSql(endDate)}'
     GROUP BY day_of_week, hour
@@ -97,7 +97,7 @@ export const getCalendarData = async (): Promise<
       date(DateCreated) as day,
       COUNT(*) as count
     FROM PlaybackActivity
-    WHERE UserId = "${userId}"
+    WHERE UserId = '${userId}'
     AND DateCreated > date('now', '-1 year')
     GROUP BY date(DateCreated)
     ORDER BY day

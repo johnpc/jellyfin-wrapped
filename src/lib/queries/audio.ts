@@ -16,8 +16,8 @@ export const listAudio = async (): Promise<SimpleItemDto[]> => {
   const queryString = `
   SELECT ROWID, *
   FROM PlaybackActivity
-  WHERE UserId = "${userId}"
-  AND ItemType = "Audio"
+  WHERE UserId = '${userId}'
+  AND ItemType = 'Audio'
   AND DateCreated > '${formatDateForSql(startDate)}'
   AND DateCreated <= '${formatDateForSql(endDate)}'
   ORDER BY rowid DESC
@@ -42,8 +42,8 @@ export const listMusicVideos = async (): Promise<SimpleItemDto[]> => {
   const queryString = `
   SELECT ROWID, *
   FROM PlaybackActivity
-  WHERE UserId = "${userId}"
-  AND ItemType = "MusicVideo"
+  WHERE UserId = '${userId}'
+  AND ItemType = 'MusicVideo'
   AND DateCreated > '${formatDateForSql(startDate)}'
   AND DateCreated <= '${formatDateForSql(endDate)}'
   ORDER BY rowid DESC

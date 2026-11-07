@@ -24,8 +24,8 @@ export const listShows = async (): Promise<
   const queryString = `
   SELECT ROWID, *
   FROM PlaybackActivity
-  WHERE UserId = "${userId}"
-  AND ItemType = "Episode"
+  WHERE UserId = '${userId}'
+  AND ItemType = 'Episode'
   AND DateCreated > '${formatDateForSql(startDate)}'
   AND DateCreated <= '${formatDateForSql(endDate)}'
   ORDER BY rowid DESC

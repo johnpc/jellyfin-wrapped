@@ -16,8 +16,8 @@ export const listMovies = async (): Promise<SimpleItemDto[]> => {
   const queryString = `
 SELECT ROWID, *
 FROM PlaybackActivity
-WHERE UserId = "${userId}"
-AND ItemType = "Movie"
+WHERE UserId = '${userId}'
+AND ItemType = 'Movie'
 AND DateCreated > '${formatDateForSql(startDate)}'
 AND DateCreated <= '${formatDateForSql(endDate)}'
 ORDER BY rowid DESC

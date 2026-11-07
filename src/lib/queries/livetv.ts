@@ -19,8 +19,8 @@ export const listLiveTvChannels = async (): Promise<
   const queryString = `
   SELECT ROWID, *
   FROM PlaybackActivity
-  WHERE UserId = "${userId}"
-  AND ItemType = "TvChannel"
+  WHERE UserId = '${userId}'
+  AND ItemType = 'TvChannel'
   AND DateCreated > '${formatDateForSql(startDate)}'
   AND DateCreated <= '${formatDateForSql(endDate)}'
   ORDER BY rowid DESC

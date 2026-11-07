@@ -20,7 +20,7 @@ export const getViewingPatterns = async (): Promise<{
     strftime('%H', DateCreated) as Hour,
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
-  WHERE UserId = "${userId}"
+  WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
   AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY Hour
@@ -32,7 +32,7 @@ export const getViewingPatterns = async (): Promise<{
     strftime('%w', DateCreated) as DayOfWeek,
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
-  WHERE UserId = "${userId}"
+  WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
   AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY DayOfWeek
@@ -47,7 +47,7 @@ export const getViewingPatterns = async (): Promise<{
     END as IsPrimeTime,
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
-  WHERE UserId = "${userId}"
+  WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
   AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY IsPrimeTime
@@ -134,7 +134,7 @@ export const getDeviceStats = async (): Promise<{
     DeviceName,
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
-  WHERE UserId = "${userId}"
+  WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
   AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY DeviceName
@@ -154,7 +154,7 @@ export const getDeviceStats = async (): Promise<{
     END as BrowserName,
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
-  WHERE UserId = "${userId}"
+  WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
   AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY BrowserName
@@ -173,7 +173,7 @@ export const getDeviceStats = async (): Promise<{
     END as OSName,
     SUM(PlayDuration) as TotalPlayDuration
   FROM PlaybackActivity
-  WHERE UserId = "${userId}"
+  WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
   AND DateCreated <= '${formatDateForSql(endDate)}'
   GROUP BY OSName

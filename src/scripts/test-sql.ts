@@ -36,8 +36,8 @@ async function testSQL() {
   // Test Episodes
   const episodeQuery = `
     SELECT COUNT(*) as count FROM PlaybackActivity 
-    WHERE UserId = "${userId}" 
-    AND ItemType = "Episode"
+    WHERE UserId = '${userId}' 
+    AND ItemType = 'Episode'
     AND DateCreated > '${formatDateForSql(startDate)}'
     AND DateCreated <= '${formatDateForSql(endDate)}'
   `;
@@ -47,8 +47,8 @@ async function testSQL() {
   // Test Seasons
   const seasonQuery = `
     SELECT COUNT(*) as count FROM PlaybackActivity 
-    WHERE UserId = "${userId}" 
-    AND ItemType = "Season"
+    WHERE UserId = '${userId}' 
+    AND ItemType = 'Season'
     AND DateCreated > '${formatDateForSql(startDate)}'
     AND DateCreated <= '${formatDateForSql(endDate)}'
   `;
@@ -58,8 +58,8 @@ async function testSQL() {
   // Test Series
   const seriesQuery = `
     SELECT COUNT(*) as count FROM PlaybackActivity 
-    WHERE UserId = "${userId}" 
-    AND ItemType = "Series"
+    WHERE UserId = '${userId}' 
+    AND ItemType = 'Series'
     AND DateCreated > '${formatDateForSql(startDate)}'
     AND DateCreated <= '${formatDateForSql(endDate)}'
   `;

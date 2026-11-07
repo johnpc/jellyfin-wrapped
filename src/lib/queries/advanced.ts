@@ -30,8 +30,8 @@ export const getMonthlyShowStats = async (): Promise<
       ItemId,
       SUM(PlayDuration) as TotalPlayDuration
     FROM PlaybackActivity
-    WHERE UserId = "${userId}"
-    AND ItemType = "Episode"
+    WHERE UserId = '${userId}'
+    AND ItemType = 'Episode'
     AND DateCreated > '${formatDateForSql(startDate)}'
     AND DateCreated <= '${formatDateForSql(endDate)}'
     GROUP BY Month, ItemId
@@ -166,8 +166,8 @@ export async function getUnfinishedShows(): Promise<UnfinishedShowDto[]> {
       ItemName,
       MAX(DateCreated) as LastWatched
     FROM PlaybackActivity
-    WHERE UserId = "${userId}"
-    AND ItemType = "Episode"
+    WHERE UserId = '${userId}'
+    AND ItemType = 'Episode'
     AND DateCreated > '${formatDateForSql(startDate)}'
     AND DateCreated <= '${formatDateForSql(endDate)}'
     GROUP BY ItemId

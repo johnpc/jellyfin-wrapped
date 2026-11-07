@@ -14,8 +14,8 @@ export const listWatchedOnDate = async (
   const queryString = `
 SELECT ROWID, *
 FROM PlaybackActivity
-WHERE UserId = "${userId}"
-AND ItemType = "Movie"
+WHERE UserId = '${userId}'
+AND ItemType = 'Movie'
 AND DateCreated > '${format(startOfDate, "yyyy-MM-dd")}'
 AND DateCreated < '${format(endOfDate, "yyyy-MM-dd")}'
 ORDER BY rowid DESC
@@ -25,8 +25,8 @@ ORDER BY rowid DESC
   const queryString2 = `
   SELECT ROWID, *
   FROM PlaybackActivity
-  WHERE UserId = "${userId}"
-  AND ItemType = "Episode"
+  WHERE UserId = '${userId}'
+  AND ItemType = 'Episode'
   AND DateCreated > '${format(startOfDate, "yyyy-MM-dd")}'
   AND DateCreated < '${format(endOfDate, "yyyy-MM-dd")}'
   ORDER BY rowid DESC
