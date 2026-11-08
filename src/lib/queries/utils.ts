@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { addDays, format, isSameDay } from "date-fns";
 import { getCurrentTimeframe } from "../timeframe";
 import {
   getAdminJellyfinApi,
@@ -21,8 +21,12 @@ export const formatDateForSql = (date: Date): string => {
 // Upper bound for a `DateCreated <= ...` filter. The plugin stores timestamps as
 // "yyyy-MM-dd HH:mm:ss.fffffff", which compare as strings, so a bare date would
 // exclude every play on the end date itself (and all of Dec 31 for a calendar year).
+// Timeframes that end "now" also reach through tomorrow: the plugin stamps rows in
+// the server's clock (often UTC), which can already be a day ahead of the browser.
+// Nothing can be played in the future, so the extra day never adds wrong rows.
 export const formatEndDateForSql = (date: Date): string => {
-  return format(date, "yyyy-MM-dd") + " 23:59:59.9999999";
+  const end = isSameDay(date, new Date()) ? addDays(date, 1) : date;
+  return format(end, "yyyy-MM-dd") + " 23:59:59.9999999";
 };
 
 export const getCurrentUserId = async (): Promise<string> => {
