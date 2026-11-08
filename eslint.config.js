@@ -45,5 +45,5 @@ export default tseslint.config(
       "@typescript-eslint/no-base-to-string": "error",
       "@typescript-eslint/unbound-method": "error",
     },
-  },
+  }
 );

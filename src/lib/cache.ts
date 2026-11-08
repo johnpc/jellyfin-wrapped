@@ -9,10 +9,12 @@ export const setCacheValue = (key: string, value: string) => {
   try {
     localCache[key] = value;
     localStorage.setItem(key, value);
-    if (key === JELLYFIN_SERVER_URL_CACHE_KEY || 
-        key === JELLYFIN_AUTH_TOKEN_CACHE_KEY || 
-        key === JELLYFIN_USERNAME_CACHE_KEY || 
-        key === JELLYFIN_PASSWORD_CACHE_KEY) {
+    if (
+      key === JELLYFIN_SERVER_URL_CACHE_KEY ||
+      key === JELLYFIN_AUTH_TOKEN_CACHE_KEY ||
+      key === JELLYFIN_USERNAME_CACHE_KEY ||
+      key === JELLYFIN_PASSWORD_CACHE_KEY
+    ) {
       localStorage.removeItem(JELLYFIN_CURRENT_USER_CACHE_KEY);
     }
   } catch (error) {

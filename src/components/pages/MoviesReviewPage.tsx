@@ -44,14 +44,24 @@ export default function MoviesReviewPage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--purple-8)" nextPage={NEXT_PAGE} previousPage="/first-watched">
+    <PageContainer
+      backgroundColor="var(--purple-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/first-watched"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               You Watched {visibleMovies.length} Movies
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "var(--gray-11)",
+                marginTop: "0.5rem",
+              }}
+            >
               Your complete movie viewing history
             </p>
           </div>

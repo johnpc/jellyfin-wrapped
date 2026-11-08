@@ -35,14 +35,24 @@ export default function MusicVideoPage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--red-8)" nextPage={NEXT_PAGE} previousPage="/audio">
+    <PageContainer
+      backgroundColor="var(--red-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/audio"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               You Listened to {musicVideos.length} Music Videos
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "var(--gray-11)",
+                marginTop: "0.5rem",
+              }}
+            >
               Your music video viewing collection
             </p>
           </div>

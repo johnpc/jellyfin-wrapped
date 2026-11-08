@@ -60,7 +60,11 @@ export default function UnfinishedShowsPage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--plum-8)" nextPage={NEXT_PAGE} previousPage="/show-of-the-month">
+    <PageContainer
+      backgroundColor="var(--plum-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/show-of-the-month"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
@@ -79,10 +83,20 @@ export default function UnfinishedShowsPage() {
                   <img
                     src={show.posterUrl}
                     alt={show.item.name ?? ""}
-                    style={{ width: "100%", borderRadius: "8px", marginBottom: "12px" }}
+                    style={{
+                      width: "100%",
+                      borderRadius: "8px",
+                      marginBottom: "12px",
+                    }}
                   />
                 )}
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
+                  }}
+                >
                   <Text size="4" weight="bold">
                     {show.item.name}
                   </Text>

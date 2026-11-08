@@ -40,9 +40,17 @@ export const getItemDtosByIds = async (
     const fetchedItems: SimpleItemDto[] = [];
 
     // Process batches with controlled concurrency
-    for (let i = 0; i < uncachedIds.length; i += BATCH_SIZE * CONCURRENT_BATCHES) {
+    for (
+      let i = 0;
+      i < uncachedIds.length;
+      i += BATCH_SIZE * CONCURRENT_BATCHES
+    ) {
       const batchPromises = [];
-      for (let j = 0; j < CONCURRENT_BATCHES && i + j * BATCH_SIZE < uncachedIds.length; j++) {
+      for (
+        let j = 0;
+        j < CONCURRENT_BATCHES && i + j * BATCH_SIZE < uncachedIds.length;
+        j++
+      ) {
         const start = i + j * BATCH_SIZE;
         const batch = uncachedIds.slice(start, start + BATCH_SIZE);
         batchPromises.push(
@@ -55,30 +63,31 @@ export const getItemDtosByIds = async (
       }
 
       const responses = await Promise.all(batchPromises);
-      
+
       for (const response of responses) {
-        const batchItems: SimpleItemDto[] = (((response as { data: { Items?: BaseItemDto[] } }).data.Items ?? []) as BaseItemDto[]).map(
-          (item: BaseItemDto) => {
-            const ticks = item.RunTimeTicks ?? 0;
-            const durationSeconds = Math.floor(ticks / 10000000);
+        const batchItems: SimpleItemDto[] = (
+          ((response as { data: { Items?: BaseItemDto[] } }).data.Items ??
+            []) as BaseItemDto[]
+        ).map((item: BaseItemDto) => {
+          const ticks = item.RunTimeTicks ?? 0;
+          const durationSeconds = Math.floor(ticks / 10000000);
 
-            const simpleItem: SimpleItemDto = {
-              id: item.Id,
-              parentId: item.ParentId,
-              name: item.Name,
-              productionYear: item.ProductionYear,
-              communityRating: item.CommunityRating,
-              people: item.People,
-              date: item.PremiereDate,
-              genres: item.Genres,
-              genreItems: item.GenreItems,
-              durationSeconds,
-            };
+          const simpleItem: SimpleItemDto = {
+            id: item.Id,
+            parentId: item.ParentId,
+            name: item.Name,
+            productionYear: item.ProductionYear,
+            communityRating: item.CommunityRating,
+            people: item.People,
+            date: item.PremiereDate,
+            genres: item.Genres,
+            genreItems: item.GenreItems,
+            durationSeconds,
+          };
 
-            setCacheValue(`item_${item.Id}`, JSON.stringify(simpleItem));
-            return simpleItem;
-          }
-        );
+          setCacheValue(`item_${item.Id}`, JSON.stringify(simpleItem));
+          return simpleItem;
+        });
 
         fetchedItems.push(...(batchItems as SimpleItemDto[]));
       }

@@ -3,7 +3,12 @@ import { SimpleItemDto } from "./queries/types";
 export function getTopGenre(
   movies: SimpleItemDto[],
   shows: SimpleItemDto[]
-): { genre: string; items: SimpleItemDto[]; count: number; honorableMentions: { genre: string; count: number }[] } | null {
+): {
+  genre: string;
+  items: SimpleItemDto[];
+  count: number;
+  honorableMentions: { genre: string; count: number }[];
+} | null {
   const genreCounts = new Map<string, SimpleItemDto[]>();
 
   [...movies, ...shows].forEach((item: SimpleItemDto) => {
@@ -14,8 +19,9 @@ export function getTopGenre(
   });
 
   // Sort genres by count
-  const sortedGenres = Array.from(genreCounts.entries())
-    .sort((a, b) => b[1].length - a[1].length);
+  const sortedGenres = Array.from(genreCounts.entries()).sort(
+    (a, b) => b[1].length - a[1].length
+  );
 
   if (sortedGenres.length === 0) return null;
 

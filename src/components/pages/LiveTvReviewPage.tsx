@@ -1,11 +1,5 @@
 import EmptyState from "../EmptyState";
-import {
-  Container,
-  Grid,
-  Card,
-  Text,
-  Flex,
-} from "@radix-ui/themes";
+import { Container, Grid, Card, Text, Flex } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useErrorBoundary } from "react-error-boundary";
 import { useLiveTvChannels } from "@/hooks/queries/useLiveTvChannels";
@@ -72,14 +66,24 @@ export default function LiveTvReviewPage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--blue-8)" nextPage={NEXT_PAGE} previousPage="/genres">
+    <PageContainer
+      backgroundColor="var(--blue-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/genres"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1}>
               You Watched {sortedChannels.length} Live TV Channels
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "var(--gray-11)",
+                marginTop: "0.5rem",
+              }}
+            >
               Your live television viewing across different channels
             </p>
           </div>

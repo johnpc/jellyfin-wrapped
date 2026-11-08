@@ -1,7 +1,7 @@
 import EmptyState from "../EmptyState";
 import { Container, Grid } from "@radix-ui/themes";
 import { motion } from "framer-motion";
-import {  } from "react-router-dom";
+import {} from "react-router-dom";
 import { useErrorBoundary } from "react-error-boundary";
 import { useFavoriteActors } from "@/hooks/queries/useFavoriteActors";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -12,7 +12,6 @@ import PageContainer from "../PageContainer";
 import { generateGuid } from "@/lib/utils";
 import { BaseItemPerson } from "@jellyfin/sdk/lib/generated-client";
 import { SimpleItemDto } from "@/lib/queries";
-
 
 const NEXT_PAGE = "/genres";
 
@@ -44,14 +43,24 @@ export default function FavoriteActorsPage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--orange-8)" nextPage={NEXT_PAGE} previousPage="/music-videos">
+    <PageContainer
+      backgroundColor="var(--orange-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/music-videos"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Your Favorite Actors
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "var(--gray-11)",
+                marginTop: "0.5rem",
+              }}
+            >
               The performers who appeared most in what you watched
             </p>
           </div>

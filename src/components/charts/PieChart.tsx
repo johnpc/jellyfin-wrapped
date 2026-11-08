@@ -90,7 +90,9 @@ export function PieChart({
 
   return (
     <div>
-      <h3 style={{ textAlign: "center", marginBottom: "10px", color: "white" }}>{title}</h3>
+      <h3 style={{ textAlign: "center", marginBottom: "10px", color: "white" }}>
+        {title}
+      </h3>
       <svg ref={ref} />
     </div>
   );

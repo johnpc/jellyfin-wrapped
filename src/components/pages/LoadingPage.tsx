@@ -34,10 +34,16 @@ export function LoadingPage() {
     { message: "Checking live TV...", query: useLiveTvChannels() },
     { message: "Finding unfinished shows...", query: useUnfinishedShows() },
     { message: "Rolling the music videos...", query: useMusicVideos() },
-    { message: "Reading your viewing patterns...", query: useViewingPatterns() },
+    {
+      message: "Reading your viewing patterns...",
+      query: useViewingPatterns(),
+    },
     { message: "Punching your punch card...", query: usePunchCard() },
     { message: "Tallying up the episodes...", query: useMonthlyShowStats() },
-    { message: "Adding up your watch time...", query: useMinutesPlayedPerDay() },
+    {
+      message: "Adding up your watch time...",
+      query: useMinutesPlayedPerDay(),
+    },
     { message: "Checking your devices...", query: useDeviceStats() },
     { message: "Filling in the calendar...", query: useCalendar() },
   ];
@@ -58,7 +64,10 @@ export function LoadingPage() {
 
   return (
     <PageContainer backgroundColor="var(--purple-8)">
-      <Container size="4" style={{ minHeight: "100vh", paddingTop: "20vh", textAlign: "center" }}>
+      <Container
+        size="4"
+        style={{ minHeight: "100vh", paddingTop: "20vh", textAlign: "center" }}
+      >
         <div>
           <Title as={motion.h1} style={{ marginBottom: "2rem" }}>
             {current?.message ?? "All done!"}
@@ -87,7 +96,9 @@ export function LoadingPage() {
                 }}
               />
             </div>
-            <p style={{ color: "white", marginTop: "1rem", fontSize: "1.2rem" }}>
+            <p
+              style={{ color: "white", marginTop: "1rem", fontSize: "1.2rem" }}
+            >
               {progress}%
             </p>
           </div>

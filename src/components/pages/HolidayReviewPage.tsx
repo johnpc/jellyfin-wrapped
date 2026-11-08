@@ -88,14 +88,24 @@ export default function HolidayReviewPage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--grass-8)" nextPage={NEXT_PAGE} previousPage="/oldest-show">
+    <PageContainer
+      backgroundColor="var(--grass-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/oldest-show"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               What You Watched on Holidays
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "var(--gray-11)",
+                marginTop: "0.5rem",
+              }}
+            >
               Your viewing activity during special occasions
             </p>
           </div>

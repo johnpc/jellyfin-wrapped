@@ -7,14 +7,20 @@ config();
   ENV: {
     JELLYFIN_SERVER_URL: process.env.VITE_JELLYFIN_SERVER_URL,
     JELLYFIN_API_KEY: process.env.VITE_JELLYFIN_API_KEY,
-  }
+  },
 };
 
 const localStorageMock = {
   store: {} as Record<string, string>,
-  getItem(key: string) { return this.store[key] || null; },
-  setItem(key: string, value: string) { this.store[key] = value; },
-  removeItem(key: string) { delete this.store[key]; },
+  getItem(key: string) {
+    return this.store[key] || null;
+  },
+  setItem(key: string, value: string) {
+    this.store[key] = value;
+  },
+  removeItem(key: string) {
+    delete this.store[key];
+  },
 };
 
 (global as any).localStorage = localStorageMock;
@@ -22,11 +28,22 @@ localStorageMock.setItem("jellyfinUsername", "john");
 localStorageMock.setItem("jellyfinPassword", "getthejelly");
 
 import { authenticateByUserName } from "../lib/jellyfin-api.js";
-import { playbackReportingSqlRequest, getCurrentUserId, getStartDate, getEndDate, formatDateForSql, formatEndDateForSql } from "../lib/queries/utils.js";
+import {
+  playbackReportingSqlRequest,
+  getCurrentUserId,
+  getStartDate,
+  getEndDate,
+  formatDateForSql,
+  formatEndDateForSql,
+} from "../lib/queries/utils.js";
 
 async function testSQL() {
-  await authenticateByUserName(process.env.VITE_JELLYFIN_SERVER_URL || "", "john", "getthejelly");
-  
+  await authenticateByUserName(
+    process.env.VITE_JELLYFIN_SERVER_URL || "",
+    "john",
+    "getthejelly"
+  );
+
   const userId = await getCurrentUserId();
   const startDate = getStartDate();
   const endDate = getEndDate();

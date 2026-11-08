@@ -3,7 +3,12 @@ import { Container, Box, Progress, Text } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Title } from "../ui/styled";
-import { listMovies, listShows, listAudio, listLiveTvChannels } from "@/lib/queries";
+import {
+  listMovies,
+  listShows,
+  listAudio,
+  listLiveTvChannels,
+} from "@/lib/queries";
 
 const MESSAGES = [
   "Crunching the numbers...",
@@ -44,7 +49,7 @@ export default function LoadingDataPage() {
         };
 
         // Execute tasks and update progress as each completes
-        await Promise.all(tasks.map(task => task.then(updateProgress)));
+        await Promise.all(tasks.map((task) => task.then(updateProgress)));
 
         if (mounted) {
           setIsComplete(true);
@@ -80,7 +85,10 @@ export default function LoadingDataPage() {
               {isComplete ? "Ready!" : message}
             </Title>
             <Progress value={progress} size="3" />
-            <Text size="2" style={{ color: "white", marginTop: "1rem", display: "block" }}>
+            <Text
+              size="2"
+              style={{ color: "white", marginTop: "1rem", display: "block" }}
+            >
               {Math.round(progress)}%
             </Text>
           </Box>

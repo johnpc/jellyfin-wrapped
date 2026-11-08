@@ -18,7 +18,7 @@ const TimeframeSelector: React.FC<TimeframeSelectorProps> = ({
 }) => {
   const [timeframes] = useState<TimeframeOption[]>(generateTimeframeOptions());
   const [selectedTimeframe, setSelectedTimeframe] = useState<TimeframeOption>(
-    getCurrentTimeframe(),
+    getCurrentTimeframe()
   );
   const [isOpen, setIsOpen] = useState(false);
 

@@ -49,14 +49,24 @@ export default function ShowReviewPage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--yellow-8)" nextPage={NEXT_PAGE} previousPage="/movies">
+    <PageContainer
+      backgroundColor="var(--yellow-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/movies"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               You Watched {visibleShows.length} Shows
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "var(--gray-11)",
+                marginTop: "0.5rem",
+              }}
+            >
               All the TV series you enjoyed this year
             </p>
           </div>

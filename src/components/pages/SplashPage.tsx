@@ -1,10 +1,7 @@
 import { motion } from "framer-motion";
 import BlinkingStars from "../BlinkingStars";
 import { useNavigate } from "react-router-dom";
-import {
-  Container,
-  StyledButton,
-} from "../ui/styled";
+import { Container, StyledButton } from "../ui/styled";
 import TimeframeSelector from "../TimeframeSelector";
 import { TimeframeOption } from "../../lib/timeframe";
 import type { Variants } from "framer-motion";
@@ -23,17 +20,28 @@ const SplashPage = () => {
 
   const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: "easeOut" } },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.5, ease: "easeOut" },
+    },
   };
 
   const listVariants: Variants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.2, delayChildren: 0.6 } },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.2, delayChildren: 0.6 },
+    },
   };
 
   const featureVariants: Variants = {
     hidden: { x: -20, opacity: 0 },
-    visible: { x: 0, opacity: 1, transition: { duration: 0.5, ease: "easeOut" } },
+    visible: {
+      x: 0,
+      opacity: 1,
+      transition: { duration: 0.5, ease: "easeOut" },
+    },
   };
 
   const handleTimeframeChange = (timeframe: TimeframeOption) => {
@@ -65,7 +73,12 @@ const SplashPage = () => {
         <BlinkingStars />
 
         <motion.p
-          style={{ fontSize: "1.5rem", marginBottom: "2rem", lineHeight: 1.5, color: "#8BE8FF" }}
+          style={{
+            fontSize: "1.5rem",
+            marginBottom: "2rem",
+            lineHeight: 1.5,
+            color: "#8BE8FF",
+          }}
           variants={itemVariants}
         >
           Discover your entertainment with a personalized recap of your Jellyfin
@@ -88,7 +101,12 @@ const SplashPage = () => {
           ].map((feature, index) => (
             <motion.li
               key={index}
-              style={{ fontSize: "1.25rem", margin: "1rem 0", color: "#FFE566", textShadow: "0 0 20px rgba(255, 229, 102, 0.3)" }}
+              style={{
+                fontSize: "1.25rem",
+                margin: "1rem 0",
+                color: "#FFE566",
+                textShadow: "0 0 20px rgba(255, 229, 102, 0.3)",
+              }}
               variants={featureVariants}
             >
               {feature}
@@ -101,13 +119,22 @@ const SplashPage = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <StyledButton onClick={() => { void navigate(NEXT_PAGE); }}>
+          <StyledButton
+            onClick={() => {
+              void navigate(NEXT_PAGE);
+            }}
+          >
             Connect Your Jellyfin Server
           </StyledButton>
         </motion.div>
 
         <motion.p
-          style={{ fontSize: "0.875rem", color: "#E0AAFF", marginTop: "2rem", opacity: 0.9 }}
+          style={{
+            fontSize: "0.875rem",
+            color: "#E0AAFF",
+            marginTop: "2rem",
+            opacity: 0.9,
+          }}
           variants={itemVariants}
         >
           Jellyfin Wrapped is an entirely client-side application. Your data

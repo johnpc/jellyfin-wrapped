@@ -12,7 +12,7 @@ config();
   ENV: {
     JELLYFIN_SERVER_URL: process.env.VITE_JELLYFIN_SERVER_URL,
     JELLYFIN_API_KEY: process.env.VITE_JELLYFIN_API_KEY,
-  }
+  },
 };
 
 // Mock localStorage for Node.js environment
@@ -51,7 +51,11 @@ async function validateData() {
   try {
     console.log("🔐 Authenticating...");
     const authStart = performance.now();
-    await authenticateByUserName(process.env.VITE_JELLYFIN_SERVER_URL || "", "john", "getthejelly");
+    await authenticateByUserName(
+      process.env.VITE_JELLYFIN_SERVER_URL || "",
+      "john",
+      "getthejelly"
+    );
     const authTime = ((performance.now() - authStart) / 1000).toFixed(2);
     console.log(`✅ Authenticated (${authTime}s)\n`);
 
@@ -87,29 +91,57 @@ async function validateData() {
 
     console.log("🎬 Fetching top genre...");
     const genreStart = performance.now();
-    console.log(`   Debug: Movies with genres: ${movies.filter(m => m.genres?.length).length}`);
-    console.log(`   Debug: Shows with genres: ${shows.filter(s => s.item?.genres?.length).length}`);
+    console.log(
+      `   Debug: Movies with genres: ${movies.filter((m) => m.genres?.length).length}`
+    );
+    console.log(
+      `   Debug: Shows with genres: ${shows.filter((s) => s.item?.genres?.length).length}`
+    );
     console.log(`   Debug: Sample movie genres:`, movies[0]?.genres);
     console.log(`   Debug: Sample show genres:`, shows[0]?.item?.genres);
-    const topGenre = getTopGenre(movies, shows.map(s => s.item));
+    const topGenre = getTopGenre(
+      movies,
+      shows.map((s) => s.item)
+    );
     const genreTime = ((performance.now() - genreStart) / 1000).toFixed(2);
-    console.log(`✅ Top Genre: ${topGenre?.genre || 'None'} with ${topGenre?.items.length || 0} items (${genreTime}s)\n`);
+    console.log(
+      `✅ Top Genre: ${topGenre?.genre || "None"} with ${topGenre?.items.length || 0} items (${genreTime}s)\n`
+    );
 
     console.log("📺 Fetching unfinished shows...");
     const unfinishedStart = performance.now();
     const unfinishedShows = await getUnfinishedShows();
-    const unfinishedTime = ((performance.now() - unfinishedStart) / 1000).toFixed(2);
-    console.log(`✅ Unfinished Shows: ${unfinishedShows.length} items (${unfinishedTime}s)\n`);
+    const unfinishedTime = (
+      (performance.now() - unfinishedStart) /
+      1000
+    ).toFixed(2);
+    console.log(
+      `✅ Unfinished Shows: ${unfinishedShows.length} items (${unfinishedTime}s)\n`
+    );
 
     console.log("✨ All data validation passed!");
     console.log("\n📊 Performance Summary:");
-    console.log(`   Movies: ${moviesTime}s ${parseFloat(moviesTime) > 10 ? '⚠️  SLOW' : '✓'}`);
-    console.log(`   Shows: ${showsTime}s ${parseFloat(showsTime) > 10 ? '⚠️  SLOW' : '✓'}`);
-    console.log(`   Actors: ${actorsTime}s ${parseFloat(actorsTime) > 10 ? '⚠️  SLOW' : '✓'}`);
-    console.log(`   Audio: ${audioTime}s ${parseFloat(audioTime) > 10 ? '⚠️  SLOW' : '✓'}`);
-    console.log(`   Live TV: ${liveTvTime}s ${parseFloat(liveTvTime) > 10 ? '⚠️  SLOW' : '✓'}`);
-    console.log(`   Genre: ${genreTime}s ${parseFloat(genreTime) > 10 ? '⚠️  SLOW' : '✓'}`);
-    console.log(`   Unfinished Shows: ${unfinishedTime}s ${parseFloat(unfinishedTime) > 10 ? '⚠️  SLOW' : '✓'}`);
+    console.log(
+      `   Movies: ${moviesTime}s ${parseFloat(moviesTime) > 10 ? "⚠️  SLOW" : "✓"}`
+    );
+    console.log(
+      `   Shows: ${showsTime}s ${parseFloat(showsTime) > 10 ? "⚠️  SLOW" : "✓"}`
+    );
+    console.log(
+      `   Actors: ${actorsTime}s ${parseFloat(actorsTime) > 10 ? "⚠️  SLOW" : "✓"}`
+    );
+    console.log(
+      `   Audio: ${audioTime}s ${parseFloat(audioTime) > 10 ? "⚠️  SLOW" : "✓"}`
+    );
+    console.log(
+      `   Live TV: ${liveTvTime}s ${parseFloat(liveTvTime) > 10 ? "⚠️  SLOW" : "✓"}`
+    );
+    console.log(
+      `   Genre: ${genreTime}s ${parseFloat(genreTime) > 10 ? "⚠️  SLOW" : "✓"}`
+    );
+    console.log(
+      `   Unfinished Shows: ${unfinishedTime}s ${parseFloat(unfinishedTime) > 10 ? "⚠️  SLOW" : "✓"}`
+    );
   } catch (error) {
     console.error("❌ Validation failed:", error);
     throw error;

@@ -36,14 +36,24 @@ export default function AudioReviewPage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--red-8)" nextPage={NEXT_PAGE} previousPage="/shows">
+    <PageContainer
+      backgroundColor="var(--red-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/shows"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               You Listened to {audios.length} Songs
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "var(--gray-11)",
+                marginTop: "0.5rem",
+              }}
+            >
               Your music listening history
             </p>
             {audios.length > MAX_DISPLAY_ITEMS && (

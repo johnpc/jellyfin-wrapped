@@ -19,10 +19,15 @@ const PageContainer = ({
   const navigate = useNavigate();
 
   return (
-    <Box style={{ backgroundColor, minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <div style={{ flex: 1, paddingBottom: "5rem" }}>
-        {children}
-      </div>
+    <Box
+      style={{
+        backgroundColor,
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <div style={{ flex: 1, paddingBottom: "5rem" }}>{children}</div>
 
       {(nextPage || previousPage) && (
         <NavButtonContainer>

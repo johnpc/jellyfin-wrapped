@@ -29,13 +29,23 @@ export default function ActivityCalendarPage() {
   const toDate = format(new Date(), "yyyy-MM-dd");
 
   return (
-    <PageContainer backgroundColor="var(--indigo-8)" nextPage={NEXT_PAGE} previousPage="/device-stats">
+    <PageContainer
+      backgroundColor="var(--indigo-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/device-stats"
+    >
       <Container size="4" p="4">
         <Card className="p-6">
           <Title as={motion.h2} className="text-2xl font-bold mb-4">
             Your Viewing Activity
           </Title>
-          <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginBottom: "1rem" }}>
+          <p
+            style={{
+              fontSize: "1.125rem",
+              color: "var(--gray-11)",
+              marginBottom: "1rem",
+            }}
+          >
             A calendar view of your daily viewing patterns
           </p>
           <div style={{ height: isMobile ? "300px" : "500px" }}>

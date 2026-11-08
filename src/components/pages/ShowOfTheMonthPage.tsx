@@ -70,7 +70,11 @@ export default function ShowOfTheMonthPage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--bronze-8)" nextPage={NEXT_PAGE} previousPage="/minutes-per-day">
+    <PageContainer
+      backgroundColor="var(--bronze-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/minutes-per-day"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
@@ -89,10 +93,20 @@ export default function ShowOfTheMonthPage() {
                   <img
                     src={stat.posterUrl}
                     alt={stat.topShow.item.name ?? ""}
-                    style={{ width: "100%", borderRadius: "8px", marginBottom: "12px" }}
+                    style={{
+                      width: "100%",
+                      borderRadius: "8px",
+                      marginBottom: "12px",
+                    }}
                   />
                 )}
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
+                  }}
+                >
                   <Text size="3" weight="bold">
                     {format(stat.month, "MMMM yyyy")}
                   </Text>

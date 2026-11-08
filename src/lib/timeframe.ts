@@ -103,7 +103,9 @@ const TIMEFRAME_STORAGE_KEY = "jellyfin-wrapped-timeframe";
 const loadStoredTimeframe = (): TimeframeOption => {
   try {
     const id = sessionStorage.getItem(TIMEFRAME_STORAGE_KEY);
-    const stored = generateTimeframeOptions().find((option) => option.id === id);
+    const stored = generateTimeframeOptions().find(
+      (option) => option.id === id
+    );
     return stored ?? defaultTimeframe;
   } catch {
     return defaultTimeframe;
@@ -130,7 +132,7 @@ export const setCurrentTimeframe = (timeframe: TimeframeOption): void => {
 
 // Format a timeframe for display
 export const formatTimeframeDescription = (
-  timeframe: TimeframeOption,
+  timeframe: TimeframeOption
 ): string => {
   return timeframe.description;
 };

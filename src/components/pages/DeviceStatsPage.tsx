@@ -67,14 +67,24 @@ export default function DeviceStatsPage() {
   );
 
   return (
-    <PageContainer backgroundColor="var(--violet-8)" nextPage={NEXT_PAGE} previousPage="/unfinished-shows">
+    <PageContainer
+      backgroundColor="var(--violet-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/unfinished-shows"
+    >
       <Container size="4" p="4" ref={containerRef}>
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Your Viewing Devices
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "white", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "white",
+                marginTop: "0.5rem",
+              }}
+            >
               Where you watch your content across different devices and apps
             </p>
           </div>

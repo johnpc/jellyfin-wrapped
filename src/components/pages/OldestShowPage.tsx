@@ -46,14 +46,24 @@ export default function OldestShowPage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--lime-8)" nextPage={NEXT_PAGE} previousPage="/oldest-movie">
+    <PageContainer
+      backgroundColor="var(--lime-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/oldest-movie"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Oldest Show You Watched
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "var(--gray-11)",
+                marginTop: "0.5rem",
+              }}
+            >
               The most classic series you enjoyed
             </p>
             <Subtitle as={motion.p} variants={itemVariants}>

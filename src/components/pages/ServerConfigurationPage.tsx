@@ -161,7 +161,15 @@ const ServerConfigurationPage = () => {
                       </HelpText>
                     </div>
                     {!protocol.includes("https") ? null : (
-                      <motion.div style={{ fontSize: "0.875rem", color: "#2D00F7", marginTop: "2rem", opacity: 0.9 }} variants={itemVariants}>
+                      <motion.div
+                        style={{
+                          fontSize: "0.875rem",
+                          color: "#2D00F7",
+                          marginTop: "2rem",
+                          opacity: 0.9,
+                        }}
+                        variants={itemVariants}
+                      >
                         You are accessing Jellyfin Wrapped via https. You must
                         either use an https server url or follow these steps:
                         <ol>
@@ -271,7 +279,15 @@ const ServerConfigurationPage = () => {
           </form>
 
           {useAuthToken && (
-            <motion.div style={{ fontSize: "0.875rem", color: "#2D00F7", marginTop: "2rem", opacity: 0.9 }} variants={itemVariants}>
+            <motion.div
+              style={{
+                fontSize: "0.875rem",
+                color: "#2D00F7",
+                marginTop: "2rem",
+                opacity: 0.9,
+              }}
+              variants={itemVariants}
+            >
               Auth token can be found by following these steps:
               <ol>
                 <li>Log into your Jellyfin web interface</li>
@@ -289,7 +305,15 @@ const ServerConfigurationPage = () => {
             </motion.div>
           )}
 
-          <motion.div style={{ fontSize: "0.875rem", color: "#2D00F7", marginTop: "2rem", opacity: 0.9 }} variants={itemVariants}>
+          <motion.div
+            style={{
+              fontSize: "0.875rem",
+              color: "#2D00F7",
+              marginTop: "2rem",
+              opacity: 0.9,
+            }}
+            variants={itemVariants}
+          >
             Jellyfin Wrapped is an entirely client-side application. Your data
             stays private and is never sent to any external service.
           </motion.div>

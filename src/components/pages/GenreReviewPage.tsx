@@ -62,17 +62,33 @@ export default function GenreReviewPage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--pink-8)" nextPage={NEXT_PAGE} previousPage="/actors">
+    <PageContainer
+      backgroundColor="var(--pink-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/actors"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Your Top Genre: {topGenreData.genre}
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "var(--gray-11)",
+                marginTop: "0.5rem",
+              }}
+            >
               The genre you watched most this year
             </p>
-            <p style={{ fontSize: "1.5rem", color: "white", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.5rem",
+                color: "white",
+                marginTop: "0.5rem",
+              }}
+            >
               {topGenreData.count} items watched
             </p>
           </div>
@@ -92,14 +108,32 @@ export default function GenreReviewPage() {
 
           {topGenreData.honorableMentions.length > 0 && (
             <div style={{ textAlign: "center", marginTop: "2rem" }}>
-              <h2 style={{ fontSize: "1.5rem", fontWeight: "bold", color: "white", marginBottom: "1rem" }}>
+              <h2
+                style={{
+                  fontSize: "1.5rem",
+                  fontWeight: "bold",
+                  color: "white",
+                  marginBottom: "1rem",
+                }}
+              >
                 Honorable Mentions
               </h2>
-              <div style={{ display: "flex", justifyContent: "center", gap: "2rem", flexWrap: "wrap" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "2rem",
+                  flexWrap: "wrap",
+                }}
+              >
                 {topGenreData.honorableMentions.map((mention) => (
                   <div key={mention.genre} style={{ color: "white" }}>
-                    <div style={{ fontSize: "1.25rem", fontWeight: "600" }}>{mention.genre}</div>
-                    <div style={{ fontSize: "1rem", opacity: 0.8 }}>{mention.count} items</div>
+                    <div style={{ fontSize: "1.25rem", fontWeight: "600" }}>
+                      {mention.genre}
+                    </div>
+                    <div style={{ fontSize: "1rem", opacity: 0.8 }}>
+                      {mention.count} items
+                    </div>
                   </div>
                 ))}
               </div>

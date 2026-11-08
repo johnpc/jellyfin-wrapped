@@ -45,14 +45,24 @@ export default function OldestMoviePage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--teal-8)" nextPage={NEXT_PAGE} previousPage="/critically-acclaimed">
+    <PageContainer
+      backgroundColor="var(--teal-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/critically-acclaimed"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Oldest Movie You Watched
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "var(--gray-11)",
+                marginTop: "0.5rem",
+              }}
+            >
               The most vintage film in your viewing history
             </p>
             <Subtitle as={motion.p} variants={itemVariants}>

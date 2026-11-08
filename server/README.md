@@ -40,24 +40,24 @@ users' browsers.
 
 ## Configuration
 
-| Variable                     | Default  | Meaning                                             |
-| ---------------------------- | -------- | --------------------------------------------------- |
-| `JELLYFIN_SERVER_URL`        | required | Address the server uses to reach Jellyfin.          |
-| `JELLYFIN_API_KEY`           | required | Admin API key.                                      |
+| Variable                     | Default  | Meaning                                                                     |
+| ---------------------------- | -------- | --------------------------------------------------------------------------- |
+| `JELLYFIN_SERVER_URL`        | required | Address the server uses to reach Jellyfin.                                  |
+| `JELLYFIN_API_KEY`           | required | Admin API key.                                                              |
 | `JELLYFIN_API_KEY_FILE`      | -        | Read the admin key from this file instead. Keeps it out of the environment. |
-| `PORT`                       | `3000`   | Listen port.                                        |
-| `CACHE_TTL_SECONDS`          | `300`    | How long a user's data copy is reused.              |
-| `MAX_CACHED_USERS`           | `50`     | Users held in memory at once.                       |
-| `QUERY_TIMEOUT_MS`           | `5000`   | Per-query time limit.                               |
-| `MAX_RESULT_ROWS`            | `200000` | Rows one query may return.                          |
-| `MAX_RESULT_MB`              | `16`     | Size of one query's result.                         |
-| `QUERY_MEMORY_LIMIT_MB`      | `128`    | SQLite memory per user database.                    |
-| `RATE_LIMIT_PER_MINUTE`      | `300`    | Requests per user per minute.                       |
-| `MAX_INFLIGHT_PER_USER`      | `4`      | Queries one user may run at once.                   |
-| `MAX_QUEUED_PER_USER`        | `64`     | Queries one user may have waiting; more get a 429.  |
-| `MAX_CONCURRENT_LOADS`       | `3`      | Users loading data from Jellyfin at once.           |
-| `AUTH_FAIL_LIMIT_PER_MINUTE` | `20`     | Failed sign-ins per client address per minute.      |
-| `TRUST_PROXY_HOPS`           | `0`      | Reverse proxies in front of this server. See below. |
+| `PORT`                       | `3000`   | Listen port.                                                                |
+| `CACHE_TTL_SECONDS`          | `300`    | How long a user's data copy is reused.                                      |
+| `MAX_CACHED_USERS`           | `50`     | Users held in memory at once.                                               |
+| `QUERY_TIMEOUT_MS`           | `5000`   | Per-query time limit.                                                       |
+| `MAX_RESULT_ROWS`            | `200000` | Rows one query may return.                                                  |
+| `MAX_RESULT_MB`              | `16`     | Size of one query's result.                                                 |
+| `QUERY_MEMORY_LIMIT_MB`      | `128`    | SQLite memory per user database.                                            |
+| `RATE_LIMIT_PER_MINUTE`      | `300`    | Requests per user per minute.                                               |
+| `MAX_INFLIGHT_PER_USER`      | `4`      | Queries one user may run at once.                                           |
+| `MAX_QUEUED_PER_USER`        | `64`     | Queries one user may have waiting; more get a 429.                          |
+| `MAX_CONCURRENT_LOADS`       | `3`      | Users loading data from Jellyfin at once.                                   |
+| `AUTH_FAIL_LIMIT_PER_MINUTE` | `20`     | Failed sign-ins per client address per minute.                              |
+| `TRUST_PROXY_HOPS`           | `0`      | Reverse proxies in front of this server. See below.                         |
 
 ### Putting it behind reverse proxies
 

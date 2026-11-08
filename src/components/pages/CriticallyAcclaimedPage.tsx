@@ -1,11 +1,5 @@
 import EmptyState from "../EmptyState";
-import {
-  Container,
-  Grid,
-  Text,
-  Card,
-  Flex,
-} from "@radix-ui/themes";
+import { Container, Grid, Text, Card, Flex } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
@@ -53,14 +47,24 @@ export default function CriticallyAcclaimedPage() {
   }
 
   return (
-    <PageContainer backgroundColor="var(--cyan-8)" nextPage={NEXT_PAGE} previousPage="/tv">
+    <PageContainer
+      backgroundColor="var(--cyan-8)"
+      nextPage={NEXT_PAGE}
+      previousPage="/tv"
+    >
       <Container size="4" p="4">
         <Grid gap="6">
           <div style={{ textAlign: "center" }}>
             <Title as={motion.h1} variants={itemVariants}>
               Critically Acclaimed Content You Watched
             </Title>
-            <p style={{ fontSize: "1.125rem", color: "var(--gray-11)", marginTop: "0.5rem" }}>
+            <p
+              style={{
+                fontSize: "1.125rem",
+                color: "var(--gray-11)",
+                marginTop: "0.5rem",
+              }}
+            >
               Highly-rated movies and shows from your viewing history
             </p>
           </div>
