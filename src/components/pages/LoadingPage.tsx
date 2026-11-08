@@ -13,6 +13,7 @@ import { useMonthlyShowStats } from "../../hooks/queries/useMonthlyShowStats";
 import { useMinutesPlayedPerDay } from "../../hooks/queries/useMinutesPlayedPerDay";
 import { useDeviceStats } from "../../hooks/queries/useDeviceStats";
 import { useCalendar } from "../../hooks/queries/useCalendar";
+import { useNewThisYear } from "../../hooks/queries/useNewThisYear";
 import { Container } from "@radix-ui/themes";
 import { motion } from "framer-motion";
 import { Title } from "../ui/styled";
@@ -46,6 +47,10 @@ export function LoadingPage() {
     },
     { message: "Checking your devices...", query: useDeviceStats() },
     { message: "Filling in the calendar...", query: useCalendar() },
+    {
+      message: "Checking what's new in the library...",
+      query: useNewThisYear(),
+    },
   ];
 
   // A query that failed is finished too; its own page shows the error.

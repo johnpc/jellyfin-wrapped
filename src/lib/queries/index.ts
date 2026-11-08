@@ -42,3 +42,6 @@ export * from "./advanced";
 
 // First watched
 export * from "./first-watched";
+
+// New this year
+export * from "./new-this-year";
