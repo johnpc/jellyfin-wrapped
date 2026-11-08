@@ -7,6 +7,7 @@ import { MovieCard } from "./MoviesReviewPage/MovieCard";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { Title } from "../ui/styled";
 import { itemVariants } from "@/lib/styled-variants";
+import { AudioPlayDto } from "@/lib/queries";
 import PageContainer from "../PageContainer";
 
 const NEXT_PAGE = "/music-videos";
@@ -23,6 +24,9 @@ export default function AudioReviewPage() {
   if (isLoading) {
     return <LoadingSpinner />;
   }
+
+  const totalPlays =
+    audios?.reduce((sum, audio) => sum + audio.playCount, 0) ?? 0;
 
   if (!audios?.length) {
     return (
@@ -54,21 +58,23 @@ export default function AudioReviewPage() {
                 marginTop: "0.5rem",
               }}
             >
-              Your music listening history
+              {totalPlays} plays across your music listening history
             </p>
             {audios.length > MAX_DISPLAY_ITEMS && (
               <p style={{ color: "var(--gray-12)" }}>
-                Showing top {MAX_DISPLAY_ITEMS} songs
+                Showing your {MAX_DISPLAY_ITEMS} most played songs
               </p>
             )}
           </div>
 
           <Grid columns={{ initial: "2", sm: "3", md: "4", lg: "5" }} gap="4">
-            {audios
-              .slice(0, MAX_DISPLAY_ITEMS)
-              .map((audio: { id?: string }) => (
-                <MovieCard key={audio.id} item={audio} />
-              ))}
+            {audios.slice(0, MAX_DISPLAY_ITEMS).map((audio: AudioPlayDto) => (
+              <MovieCard
+                key={audio.item.id}
+                item={audio.item}
+                playCount={audio.playCount}
+              />
+            ))}
           </Grid>
         </Grid>
       </Container>
