@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "22"
           cache: "npm"
@@ -28,7 +28,10 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Docker meta
+      # Frontend image (direct mode, or server mode when WRAPPED_SERVER_URL is set).
+      # Tags: 1.2.3, 1.2, 1, v1.2.3 and latest (latest is added automatically for
+      # non-prerelease semver tags).
+      - name: Docker meta (frontend)
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -37,7 +40,19 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            type=raw,value=latest,enable=${{ github.ref == format('refs/tags/{0}', github.event.repository.default_branch) }}
+            type=raw,value=${{ github.ref_name }}
+
+      # Backend image for server mode: holds the admin API key so the browser never sees it.
+      - name: Docker meta (server)
+        id: meta_server
+        uses: docker/metadata-action@v5
+        with:
+          images: mrorbitman/jellyfin-wrapped-server
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=${{ github.ref_name }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -51,44 +66,83 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
-        uses: docker/build-push-action@v5
+      - name: Build and push (frontend)
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
+
+      - name: Build and push (server)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./server
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta_server.outputs.tags }}
+          labels: ${{ steps.meta_server.outputs.labels }}
+          cache-from: type=gha,scope=server
+          cache-to: type=gha,mode=max,scope=server
+
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: Release ${{ github.ref_name }}
+          generate_release_notes: true
           body: |
             ## Docker Images
 
-            Pull the image using:
             ```bash
             docker pull mrorbitman/jellyfin-wrapped:${{ github.ref_name }}
-            # or
-            docker pull mrorbitman/jellyfin-wrapped:latest
+            docker pull mrorbitman/jellyfin-wrapped-server:${{ github.ref_name }}   # server mode backend
             ```
 
-            Example docker-compose.yaml:
+            **Direct mode** (admin API key in the browser; home network only):
 
-            ```
-            version: "3"
+            ```yaml
             services:
               web:
                 image: mrorbitman/jellyfin-wrapped:${{ github.ref_name }}
-
                 ports:
                   - "80:80"
+                environment:
+                  JELLYFIN_SERVER_URL: http://your-jellyfin-server:8096
+                  JELLYFIN_API_KEY: your-admin-api-key
                 restart: unless-stopped
-                container_name: jellyfin-wrapped
             ```
 
-            Docker Hub URL: https://hub.docker.com/r/mrorbitman/jellyfin-wrapped/tags
+            **Server mode** (admin API key stays on the backend; safe for public hosting):
+
+            ```yaml
+            services:
+              web:
+                image: mrorbitman/jellyfin-wrapped:${{ github.ref_name }}
+                ports:
+                  - "80:80"
+                environment:
+                  JELLYFIN_SERVER_URL: http://your-jellyfin-server:8096
+                  WRAPPED_SERVER_URL: http://backend:3000
+                depends_on: [backend]
+                restart: unless-stopped
+              backend:
+                image: mrorbitman/jellyfin-wrapped-server:${{ github.ref_name }}
+                environment:
+                  JELLYFIN_SERVER_URL: http://your-jellyfin-server:8096
+                  JELLYFIN_API_KEY: your-admin-api-key   # or JELLYFIN_API_KEY_FILE
+                  TRUST_PROXY_HOPS: "1"
+                user: "node"
+                read_only: true
+                tmpfs: [/tmp]
+                cap_drop: [ALL]
+                restart: unless-stopped
+            ```
+
+            See `server/README.md` for the server mode settings.
+
+            Docker Hub: https://hub.docker.com/r/mrorbitman/jellyfin-wrapped/tags
           draft: false
           prerelease: false
