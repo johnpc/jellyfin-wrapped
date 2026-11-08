@@ -82,7 +82,7 @@ export default function HolidayReviewPage() {
         title="No Holiday Viewing Data"
         backgroundColor="var(--grass-8)"
         nextPage={NEXT_PAGE}
-        previousPage="/oldest-show"
+        previousPage="/new-this-year"
       />
     );
   }
@@ -91,7 +91,7 @@ export default function HolidayReviewPage() {
     <PageContainer
       backgroundColor="var(--grass-8)"
       nextPage={NEXT_PAGE}
-      previousPage="/oldest-show"
+      previousPage="/new-this-year"
     >
       <Container size="4" p="4">
         <Grid gap="6">

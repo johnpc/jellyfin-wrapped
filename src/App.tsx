@@ -27,6 +27,7 @@ import UnfinishedShowsPage from "./components/pages/UnfinishedShowsPage";
 import CriticallyAcclaimedPage from "./components/pages/CriticallyAcclaimedPage";
 import TopTenPage from "./components/pages/TopTenPage";
 import FirstWatchedPage from "./components/pages/FirstWatchedPage";
+import NewThisYearPage from "./components/pages/NewThisYearPage";
 import { useEffect } from "react";
 import ActivityCalendarPage from "./components/pages/ActivityCalendarPage";
 import Navigation from "./components/Navigation";
@@ -120,6 +121,10 @@ const router = createBrowserRouter([
       {
         path: "/critically-acclaimed",
         element: <CriticallyAcclaimedPage />,
+      },
+      {
+        path: "/new-this-year",
+        element: <NewThisYearPage />,
       },
       {
         path: "/actors",

@@ -10,7 +10,7 @@ import { itemVariants } from "@/lib/styled-variants";
 import { SimpleItemDto } from "@/lib/queries";
 import PageContainer from "../PageContainer";
 
-const NEXT_PAGE = "/holidays";
+const NEXT_PAGE = "/new-this-year";
 
 export default function OldestShowPage() {
   const { showBoundary } = useErrorBoundary();

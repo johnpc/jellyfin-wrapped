@@ -19,6 +19,7 @@ const navigationItems = [
   { path: "/critically-acclaimed", name: "Critically Acclaimed" },
   { path: "/oldest-movie", name: "Oldest Movie" },
   { path: "/oldest-show", name: "Oldest Show" },
+  { path: "/new-this-year", name: "New This Year" },
   { path: "/holidays", name: "Holiday Watching" },
   { path: "/minutes-per-day", name: "Minutes Per Day" },
   { path: "/show-of-the-month", name: "Show of the Month" },
