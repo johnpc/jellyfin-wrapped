@@ -3,6 +3,7 @@ import {
   getStartDate,
   getEndDate,
   formatDateForSql,
+  formatEndDateForSql,
   playbackReportingSqlRequest,
 } from "./utils";
 
@@ -22,7 +23,7 @@ export const getViewingPatterns = async (): Promise<{
   FROM PlaybackActivity
   WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
-  AND DateCreated <= '${formatDateForSql(endDate)}'
+  AND DateCreated <= '${formatEndDateForSql(endDate)}'
   GROUP BY Hour
   ORDER BY Hour
   `;
@@ -34,7 +35,7 @@ export const getViewingPatterns = async (): Promise<{
   FROM PlaybackActivity
   WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
-  AND DateCreated <= '${formatDateForSql(endDate)}'
+  AND DateCreated <= '${formatEndDateForSql(endDate)}'
   GROUP BY DayOfWeek
   ORDER BY DayOfWeek
   `;
@@ -49,7 +50,7 @@ export const getViewingPatterns = async (): Promise<{
   FROM PlaybackActivity
   WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
-  AND DateCreated <= '${formatDateForSql(endDate)}'
+  AND DateCreated <= '${formatEndDateForSql(endDate)}'
   GROUP BY IsPrimeTime
   ORDER BY IsPrimeTime
   `;
@@ -136,7 +137,7 @@ export const getDeviceStats = async (): Promise<{
   FROM PlaybackActivity
   WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
-  AND DateCreated <= '${formatDateForSql(endDate)}'
+  AND DateCreated <= '${formatEndDateForSql(endDate)}'
   GROUP BY DeviceName
   ORDER BY TotalPlayDuration DESC
   `;
@@ -156,7 +157,7 @@ export const getDeviceStats = async (): Promise<{
   FROM PlaybackActivity
   WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
-  AND DateCreated <= '${formatDateForSql(endDate)}'
+  AND DateCreated <= '${formatEndDateForSql(endDate)}'
   GROUP BY BrowserName
   ORDER BY TotalPlayDuration DESC
   `;
@@ -175,7 +176,7 @@ export const getDeviceStats = async (): Promise<{
   FROM PlaybackActivity
   WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
-  AND DateCreated <= '${formatDateForSql(endDate)}'
+  AND DateCreated <= '${formatEndDateForSql(endDate)}'
   GROUP BY OSName
   ORDER BY TotalPlayDuration DESC
   `;

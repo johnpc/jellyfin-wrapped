@@ -22,7 +22,7 @@ localStorageMock.setItem("jellyfinUsername", "john");
 localStorageMock.setItem("jellyfinPassword", "getthejelly");
 
 import { authenticateByUserName } from "../lib/jellyfin-api.js";
-import { playbackReportingSqlRequest, getCurrentUserId, getStartDate, getEndDate, formatDateForSql } from "../lib/queries/utils.js";
+import { playbackReportingSqlRequest, getCurrentUserId, getStartDate, getEndDate, formatDateForSql, formatEndDateForSql } from "../lib/queries/utils.js";
 
 async function testSQL() {
   await authenticateByUserName(process.env.VITE_JELLYFIN_SERVER_URL || "", "john", "getthejelly");
@@ -39,7 +39,7 @@ async function testSQL() {
     WHERE UserId = '${userId}' 
     AND ItemType = 'Episode'
     AND DateCreated > '${formatDateForSql(startDate)}'
-    AND DateCreated <= '${formatDateForSql(endDate)}'
+    AND DateCreated <= '${formatEndDateForSql(endDate)}'
   `;
   const episodeData = await playbackReportingSqlRequest(episodeQuery);
   console.log("Episodes:", episodeData.results[0]);
@@ -50,7 +50,7 @@ async function testSQL() {
     WHERE UserId = '${userId}' 
     AND ItemType = 'Season'
     AND DateCreated > '${formatDateForSql(startDate)}'
-    AND DateCreated <= '${formatDateForSql(endDate)}'
+    AND DateCreated <= '${formatEndDateForSql(endDate)}'
   `;
   const seasonData = await playbackReportingSqlRequest(seasonQuery);
   console.log("Seasons:", seasonData.results[0]);
@@ -61,7 +61,7 @@ async function testSQL() {
     WHERE UserId = '${userId}' 
     AND ItemType = 'Series'
     AND DateCreated > '${formatDateForSql(startDate)}'
-    AND DateCreated <= '${formatDateForSql(endDate)}'
+    AND DateCreated <= '${formatEndDateForSql(endDate)}'
   `;
   const seriesData = await playbackReportingSqlRequest(seriesQuery);
   console.log("Series:", seriesData.results[0]);

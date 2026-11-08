@@ -5,6 +5,7 @@ import {
   getStartDate,
   getEndDate,
   formatDateForSql,
+  formatEndDateForSql,
   playbackReportingSqlRequest,
 } from "./utils";
 import { getItemDtosByIds } from "./items";
@@ -33,7 +34,7 @@ export const getMonthlyShowStats = async (): Promise<
     WHERE UserId = '${userId}'
     AND ItemType = 'Episode'
     AND DateCreated > '${formatDateForSql(startDate)}'
-    AND DateCreated <= '${formatDateForSql(endDate)}'
+    AND DateCreated <= '${formatEndDateForSql(endDate)}'
     GROUP BY Month, ItemId
     ORDER BY Month DESC, TotalPlayDuration DESC
   `;
@@ -169,7 +170,7 @@ export async function getUnfinishedShows(): Promise<UnfinishedShowDto[]> {
     WHERE UserId = '${userId}'
     AND ItemType = 'Episode'
     AND DateCreated > '${formatDateForSql(startDate)}'
-    AND DateCreated <= '${formatDateForSql(endDate)}'
+    AND DateCreated <= '${formatEndDateForSql(endDate)}'
     GROUP BY ItemId
   `;
 

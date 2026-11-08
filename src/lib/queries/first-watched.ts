@@ -4,6 +4,7 @@ import {
   getStartDate,
   getEndDate,
   formatDateForSql,
+  formatEndDateForSql,
   playbackReportingSqlRequest,
 } from "./utils";
 import { getItemDtosByIds } from "./items";
@@ -39,7 +40,7 @@ WHERE UserId = '${userId}'
 AND ItemType IN ('Movie', 'Episode')
 AND PlayDuration >= ${MIN_PLAY_SECONDS}
 AND DateCreated > '${formatDateForSql(startDate)}'
-AND DateCreated <= '${formatDateForSql(endDate)}'
+AND DateCreated <= '${formatEndDateForSql(endDate)}'
 ORDER BY DateCreated ASC
 LIMIT ${CANDIDATES}
 `;

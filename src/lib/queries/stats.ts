@@ -3,6 +3,7 @@ import {
   getStartDate,
   getEndDate,
   formatDateForSql,
+  formatEndDateForSql,
   playbackReportingSqlRequest,
 } from "./utils";
 
@@ -23,7 +24,7 @@ export const getMinutesPlayedPerDay = async (): Promise<
   FROM PlaybackActivity
   WHERE UserId = '${userId}'
   AND DateCreated > '${formatDateForSql(startDate)}'
-  AND DateCreated <= '${formatDateForSql(endDate)}'
+  AND DateCreated <= '${formatEndDateForSql(endDate)}'
   GROUP BY date(DateCreated)
   ORDER BY PlayDate DESC
   `;
@@ -66,7 +67,7 @@ export const getPunchCardData = async (): Promise<
     FROM PlaybackActivity
     WHERE UserId = '${userId}'
     AND DateCreated > '${formatDateForSql(startDate)}'
-    AND DateCreated <= '${formatDateForSql(endDate)}'
+    AND DateCreated <= '${formatEndDateForSql(endDate)}'
     GROUP BY day_of_week, hour
     ORDER BY day_of_week, hour
   `;

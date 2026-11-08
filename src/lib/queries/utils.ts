@@ -18,6 +18,13 @@ export const formatDateForSql = (date: Date): string => {
   return format(date, "yyyy-MM-dd");
 };
 
+// Upper bound for a `DateCreated <= ...` filter. The plugin stores timestamps as
+// "yyyy-MM-dd HH:mm:ss.fffffff", which compare as strings, so a bare date would
+// exclude every play on the end date itself (and all of Dec 31 for a calendar year).
+export const formatEndDateForSql = (date: Date): string => {
+  return format(date, "yyyy-MM-dd") + " 23:59:59.9999999";
+};
+
 export const getCurrentUserId = async (): Promise<string> => {
   const { getUserApi } = await import("@jellyfin/sdk/lib/utils/api");
   const { getCacheValue, setCacheValue, JELLYFIN_CURRENT_USER_CACHE_KEY } =

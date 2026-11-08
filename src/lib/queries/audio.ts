@@ -3,6 +3,7 @@ import {
   getStartDate,
   getEndDate,
   formatDateForSql,
+  formatEndDateForSql,
   playbackReportingSqlRequest,
 } from "./utils";
 import { getItemDtosByIds } from "./items";
@@ -19,7 +20,7 @@ export const listAudio = async (): Promise<SimpleItemDto[]> => {
   WHERE UserId = '${userId}'
   AND ItemType = 'Audio'
   AND DateCreated > '${formatDateForSql(startDate)}'
-  AND DateCreated <= '${formatDateForSql(endDate)}'
+  AND DateCreated <= '${formatEndDateForSql(endDate)}'
   ORDER BY rowid DESC
   `;
   const data = await playbackReportingSqlRequest(queryString);
@@ -45,7 +46,7 @@ export const listMusicVideos = async (): Promise<SimpleItemDto[]> => {
   WHERE UserId = '${userId}'
   AND ItemType = 'MusicVideo'
   AND DateCreated > '${formatDateForSql(startDate)}'
-  AND DateCreated <= '${formatDateForSql(endDate)}'
+  AND DateCreated <= '${formatEndDateForSql(endDate)}'
   ORDER BY rowid DESC
   `;
   const data = await playbackReportingSqlRequest(queryString);

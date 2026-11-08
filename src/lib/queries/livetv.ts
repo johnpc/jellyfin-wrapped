@@ -3,6 +3,7 @@ import {
   getStartDate,
   getEndDate,
   formatDateForSql,
+  formatEndDateForSql,
   playbackReportingSqlRequest,
 } from "./utils";
 
@@ -22,7 +23,7 @@ export const listLiveTvChannels = async (): Promise<
   WHERE UserId = '${userId}'
   AND ItemType = 'TvChannel'
   AND DateCreated > '${formatDateForSql(startDate)}'
-  AND DateCreated <= '${formatDateForSql(endDate)}'
+  AND DateCreated <= '${formatEndDateForSql(endDate)}'
   ORDER BY rowid DESC
   `;
   const data = await playbackReportingSqlRequest(queryString);
