@@ -8,6 +8,7 @@ interface MovieCardProps {
   item: SimpleItemDto;
   playbackTime?: number;
   episodeCount?: number;
+  playCount?: number;
   onHide?: () => void;
 }
 
@@ -15,6 +16,7 @@ export function MovieCard({
   item,
   playbackTime,
   episodeCount,
+  playCount,
   onHide,
 }: MovieCardProps) {
   const [imageUrl, setImageUrl] = useState<string>();
@@ -67,6 +69,11 @@ export function MovieCard({
         {item.communityRating && (
           <p className="text-sm text-muted-foreground">
             Rating: ⭐ {item.communityRating.toFixed(1)}
+          </p>
+        )}
+        {playCount !== undefined && playCount > 0 && (
+          <p className="text-sm text-muted-foreground">
+            Played {playCount} {playCount === 1 ? "time" : "times"}
           </p>
         )}
         {playbackTime && episodeCount && episodeCount > 1 && (
